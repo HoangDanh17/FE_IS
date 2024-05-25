@@ -20,7 +20,7 @@ const Menuitems = [
     id: 1,
     title: "Dashboard",
     icon: DashboardIcon,
-    href: "/",
+    href: "/homePage",
   },
   {
     navlabel: true,
@@ -30,13 +30,13 @@ const Menuitems = [
     id: 2,
     title: "Intern\u00A0\u00A0list",
     icon: FormatListBulletedIcon,
-    href: "/internList",
+    href: "/homePage/internList",
   },
   {
     id: 3,
     title: "Intern\u00A0\u00A0project",
     icon: FormatListBulletedIcon,
-    href: "/internProject",
+    href: "/homePage/internProject",
   },
   {
     navlabel: true,
@@ -46,13 +46,13 @@ const Menuitems = [
     id: 4,
     title: "Project\u00A0\u00A0list",
     icon: AssignmentIcon,
-    href: "/projectList",
+    href: "/homePage/projectList",
   },
   {
     id: 5,
     title: "Project\u00A0\u00A0detail",
     icon: AssignmentIcon,
-    href: "/projectDetail",
+    href: "/homePage/projectDetail",
   },
 ];
 
