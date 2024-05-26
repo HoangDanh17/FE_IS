@@ -1,13 +1,3 @@
-// import {
-//   IconAperture,
-//   IconCopy,
-//   IconLayoutDashboard,
-//   IconLogin,
-//   IconMoodHappy,
-//   IconTypography,
-//   IconUserPlus,
-// } from "@tabler/icons-react";
-import PersonIcon from "@mui/icons-material/Person";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import DashboardIcon from "@mui/icons-material/Dashboard";

@@ -9,9 +9,9 @@ import DashboardCard from "@/components/shared/DashboardCard";
 const YearlyBreakup = () => {
   // chart color
   const theme = useTheme();
-  const primary = theme.palette.success.main;
+  const primary = theme.palette.primary.main;
   const primarylight = "#ecf2ff";
-  const successlight = theme.palette.success.light;
+  const successlight = theme.palette.primary.light;
 
   // chart
   const optionscolumnchart: any = {

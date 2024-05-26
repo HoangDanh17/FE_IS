@@ -44,7 +44,14 @@ const DashboardCard = ({
               mb={3}
             >
               <Box>
-                {title ? <Chip label={title} color="success" /> : ""}
+                {title ? (
+                  <Chip
+                    label={title}
+                    style={{ backgroundColor: " #0f5e80", color: "#ECF2FF" }}
+                  />
+                ) : (
+                  ""
+                )}
 
                 {subtitle ? (
                   <Typography variant="subtitle2" color="textSecondary">

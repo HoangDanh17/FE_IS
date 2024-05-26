@@ -15,9 +15,10 @@ interface loginType {
   title?: string;
   subtitle?: JSX.Element | JSX.Element[];
   subtext?: JSX.Element | JSX.Element[];
+  handleClick: () => void;
 }
 
-const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
+const AuthLogin = ({ title, subtitle, subtext, handleClick }: loginType) => (
   <>
     {title ? (
       <Typography fontWeight="700" variant="h2" mb={1}>
@@ -58,12 +59,6 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
         alignItems="center"
         my={2}
       >
-        <FormGroup>
-          <FormControlLabel
-            control={<Checkbox defaultChecked />}
-            label="Remeber this Device"
-          />
-        </FormGroup>
         <Typography
           component={Link}
           href="/"
@@ -83,8 +78,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
         variant="contained"
         size="large"
         fullWidth
-        component={Link}
-        href="/homepage"
+        onClick={handleClick}
         type="submit"
       >
         Sign In

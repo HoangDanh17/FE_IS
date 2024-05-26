@@ -1,5 +1,5 @@
+"use client";
 import React, { useState } from "react";
-import Link from "next/link";
 import {
   Avatar,
   Box,
@@ -13,14 +13,22 @@ import {
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
+import { useRouter } from "next/navigation";
+import { deleteThemeCookie } from "@/app/action/logout";
 
 const Profile = () => {
+  const router = useRouter();
   const [anchorEl2, setAnchorEl2] = useState(null);
   const handleClick2 = (event: any) => {
     setAnchorEl2(event.currentTarget);
   };
   const handleClose2 = () => {
     setAnchorEl2(null);
+  };
+
+  const handleLogout = () => {
+    deleteThemeCookie();
+    router.push("/");
   };
 
   return (
@@ -84,10 +92,9 @@ const Profile = () => {
         </MenuItem>
         <Box mt={1} py={1} px={2}>
           <Button
-            href="/authentication/login"
+            onClick={handleLogout}
             variant="outlined"
             color="primary"
-            component={Link}
             fullWidth
           >
             Logout

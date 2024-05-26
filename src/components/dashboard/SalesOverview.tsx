@@ -16,8 +16,8 @@ const SalesOverview = () => {
 
   // chart color
   const theme = useTheme();
-  const primary = theme.palette.success.main;
-  const secondary = theme.palette.success.dark;
+  const primary = theme.palette.primary.main;
+  const secondary = theme.palette.primary.dark;
 
   // chart
   const optionscolumnchart: any = {

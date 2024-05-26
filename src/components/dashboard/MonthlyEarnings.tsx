@@ -10,7 +10,7 @@ import DashboardCard from "@/components/shared/DashboardCard";
 const MonthlyEarnings = () => {
   // chart color
   const theme = useTheme();
-  const secondary = theme.palette.success.main;
+  const secondary = theme.palette.primary.main;
   const secondarylight = "#f5fcff";
   const errorlight = "#fdede8";
 
@@ -57,7 +57,7 @@ const MonthlyEarnings = () => {
     <DashboardCard
       title="Monthly Earnings"
       action={
-        <Fab size="medium" sx={{ color: "#ffffff", bgcolor: "success.main" }}>
+        <Fab size="medium" sx={{ color: "#ffffff", bgcolor: "primary.main" }}>
           <MonetizationOnIcon width={24} />
         </Fab>
       }
