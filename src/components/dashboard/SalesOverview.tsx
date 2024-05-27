@@ -88,18 +88,17 @@ const SalesOverview = () => {
   };
   const seriescolumnchart: any = [
     {
-      name: "Eanings this month",
+      name: "Task done this month",
       data: [355, 390, 300, 350, 390, 180, 355, 390],
     },
     {
-      name: "Expense this month",
+      name: "Task in progress this month",
       data: [280, 250, 325, 215, 250, 310, 280, 250],
     },
   ];
 
   return (
     <DashboardCard
-      title="Sales Overview"
       action={
         <Select
           labelId="month-dd"

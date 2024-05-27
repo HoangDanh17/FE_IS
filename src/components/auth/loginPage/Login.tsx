@@ -23,7 +23,7 @@ const LoginPage = () => {
     // document.cookie = `token=${data.token}; path=/;`; // Lưu token vào cookies
     const data = "12123456";
     document.cookie = `token=${data}; path=/;`;
-       // Lưu token vào cookies
+    // Lưu token vào cookies
     router.push("/homePage"); // Chuyển hướng tới trang homePage
     // } else {
     //   // Xử lý lỗi đăng nhập
@@ -67,9 +67,9 @@ const LoginPage = () => {
               elevation={9}
               sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "500px" }}
             >
-              <Box display="flex" alignItems="center" justifyContent="center">
+              {/* <Box display="flex" alignItems="center" justifyContent="center">
                 <Logo />
-              </Box>
+              </Box> */}
               <AuthLogin
                 handleClick={handleLogin}
                 subtext={
@@ -79,7 +79,7 @@ const LoginPage = () => {
                     color="textSecondary"
                     mb={1}
                   >
-                    Your Social Campaigns
+                    LOGIN
                   </Typography>
                 }
                 subtitle={
