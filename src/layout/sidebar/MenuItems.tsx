@@ -10,7 +10,7 @@ const Menuitems = [
     id: 1,
     title: "Dashboard",
     icon: DashboardIcon,
-    href: "/homePage",
+    href: "/homePage/dashboard",
   },
   {
     navlabel: true,

@@ -1,33 +1,15 @@
 "use client";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AuthLogin from "@/components/auth/AuthLogin";
 import Link from "next/link";
-import Logo from "@/layout/shared/logo/Logo";
 import { Box, Card, Grid, Stack, Typography } from "@mui/material";
 const LoginPage = () => {
   const router = useRouter();
 
   const handleLogin = async () => {
-    // Giả sử bạn có API để xác thực người dùng
-    // const res = await fetch("/api/login", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ username, password }),
-    // });
-
-    // if (res.ok) {
-    // const data = await res.json();
-    // document.cookie = `token=${data.token}; path=/;`; // Lưu token vào cookies
     const data = "12123456";
     document.cookie = `token=${data}; path=/;`;
-    // Lưu token vào cookies
-    router.push("/homePage"); // Chuyển hướng tới trang homePage
-    // } else {
-    //   // Xử lý lỗi đăng nhập
-    // }
+    router.push("/homePage");
   };
 
   return (

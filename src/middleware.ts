@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const privatePaths = ["/homePage"];
+const authPaths = ["/login", "/register"];
+
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("token"); // Lấy token từ cookies (hoặc bạn có thể sử dụng bất kỳ phương pháp lưu trữ nào khác)
-  if (!token && req.nextUrl.pathname !== "/") {
-    return NextResponse.redirect(new URL("/", req.url));
+  const { pathname } = req.nextUrl;
+  const sessionToken = req.cookies.get("sessionToken")?.value;
+  if (privatePaths.some((path) => pathname.startsWith(path)) && !sessionToken) {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
+  // Đăng nhập rồi thì không cho vào login/register nữa
+  if (authPaths.some((path) => pathname.startsWith(path)) && sessionToken) {
+    return NextResponse.redirect(new URL("/homePage", req.url));
+  }
+
   return NextResponse.next(); // Tiếp tục nếu người dùng có token hoặc đang ở trang /login
 }
 
 // Chỉ định các đường dẫn mà middleware sẽ được áp dụng
 export const config = {
-  matcher: ["/homePage/:path*"],
+  matcher: ["/login", "/register", "/homePage/:path*"],
 };

@@ -13,10 +13,10 @@ import {
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
-import { useRouter } from "next/navigation";
-import { deleteThemeCookie } from "@/app/action/logout";
+import { usePathname, useRouter } from "next/navigation";
 
 const Profile = () => {
+  const pathname = usePathname();
   const router = useRouter();
   const [anchorEl2, setAnchorEl2] = useState(null);
   const handleClick2 = (event: any) => {
@@ -27,8 +27,7 @@ const Profile = () => {
   };
 
   const handleLogout = () => {
-    deleteThemeCookie();
-    router.push("/");
+    router.push(`/login`);
   };
 
   return (
