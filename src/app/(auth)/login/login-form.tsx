@@ -28,33 +28,34 @@ const LoginForm = () => {
       password: "",
     },
   });
+    router.push("/homePage");
 
   async function onSubmit(values: LoginBodyType) {
     if (loading) return;
     setLoading(true);
     console.log(values)
-    try {
-      const result = await authApiRequest.login(values);
+    // try {
+    //   const result = await authApiRequest.login(values);
 
-      await authApiRequest.auth({
-        sessionToken: result.payload.data.token,
-      });
-      CustomSnackbar({
-        description: result.payload.message,
-        type: "success",
-      });
-        // setUser(result.payload.data.account);
+    //   await authApiRequest.auth({
+    //     sessionToken: result.payload.data.token,
+    //   });
+    //   CustomSnackbar({
+    //     description: result.payload.message,
+    //     type: "success",
+    //   });
+    //     // setUser(result.payload.data.account);
 
-      router.push("/homePage");
-      console.log(result);
-    } catch (error: any) {
-      handleErrorApi({
-        error,
-        setError: form.setError,
-      });
-    } finally {
-      setLoading(false);
-    }
+    //   router.push("/homePage");
+    //   console.log(result);
+    // } catch (error: any) {
+    //   handleErrorApi({
+    //     error,
+    //     setError: form.setError,
+    //   });
+    // } finally {
+    //   setLoading(false);
+    // }
   }
 
   return (
