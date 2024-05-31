@@ -19,7 +19,7 @@ interface ItemType {
   toggleMobileSidebar: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-const Header = ({ toggleMobileSidebar }: ItemType) => {
+const Header = () => {
   // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   // const lgDown = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
@@ -43,7 +43,6 @@ const Header = ({ toggleMobileSidebar }: ItemType) => {
         <IconButton
           color="inherit"
           aria-label="menu"
-          onClick={toggleMobileSidebar}
           sx={{
             display: {
               lg: "none",

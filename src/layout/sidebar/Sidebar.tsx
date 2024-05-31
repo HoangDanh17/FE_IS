@@ -4,17 +4,7 @@ import { Upgrade } from "./Updrade";
 import Logo from "@/layout/shared/logo/Logo";
 import { useTheme } from "@mui/material/styles";
 
-interface ItemType {
-  isMobileSidebarOpen: boolean;
-  onSidebarClose: (event: React.MouseEvent<HTMLElement>) => void;
-  isSidebarOpen: boolean;
-}
-
-const Sidebar = ({
-  isMobileSidebarOpen,
-  onSidebarClose,
-  isSidebarOpen,
-}: ItemType) => {
+const Sidebar = () => {
   const theme = useTheme();
   const lgUp = useMediaQuery(theme.breakpoints.up("lg"));
 
@@ -33,7 +23,6 @@ const Sidebar = ({
         {/* ------------------------------------------- */}
         <Drawer
           anchor="left"
-          open={isSidebarOpen}
           variant="permanent"
           PaperProps={{
             sx: {
@@ -72,8 +61,6 @@ const Sidebar = ({
   return (
     <Drawer
       anchor="left"
-      open={isMobileSidebarOpen}
-      onClose={onSidebarClose}
       variant="temporary"
       PaperProps={{
         sx: {

@@ -21,13 +21,12 @@ const PageWrapper = styled("div")(() => ({
   zIndex: 1,
   backgroundColor: "transparent",
 }));
+
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   return (
     <html lang="en">
       <body>
@@ -41,11 +40,7 @@ export default function MainLayout({
             {/* ------------------------------------------- */}
             {/* Sidebar */}
             {/* ------------------------------------------- */}
-            <Sidebar
-              isSidebarOpen={isSidebarOpen}
-              isMobileSidebarOpen={isMobileSidebarOpen}
-              onSidebarClose={() => setMobileSidebarOpen(false)}
-            />
+            <Sidebar />
             {/* ------------------------------------------- */}
             {/* Main Wrapper */}
             {/* ------------------------------------------- */}
@@ -53,7 +48,7 @@ export default function MainLayout({
               {/* ------------------------------------------- */}
               {/* Header */}
               {/* ------------------------------------------- */}
-              <Header toggleMobileSidebar={() => setMobileSidebarOpen(true)} />
+              <Header/>
               {/* ------------------------------------------- */}
               {/* PageContent */}
               {/* ------------------------------------------- */}

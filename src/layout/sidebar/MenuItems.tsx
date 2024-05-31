@@ -13,36 +13,42 @@ const Menuitems = [
     href: "/homePage/dashboard",
   },
   {
-    navlabel: true,
-    subheader: "Intern_management",
+    id: 2,
+    title: "Quản lí tài khoản",
+    icon: DashboardIcon,
+    href: "/homePage/accountManagement",
   },
   {
-    id: 2,
-    title: "Intern\u00A0\u00A0list",
+    navlabel: true,
+    subheader: "Quản lí thực tập",
+  },
+  {
+    id: 3,
+    title: "Kỳ thực tập",
+    icon: FormatListBulletedIcon,
+    href: "/homePage/internTerm",
+  },
+  {
+    id: 4,
+    title: "Danh sách intern",
     icon: FormatListBulletedIcon,
     href: "/homePage/internList",
   },
   {
-    id: 3,
-    title: "Intern\u00A0\u00A0project",
-    icon: FormatListBulletedIcon,
-    href: "/homePage/internProject",
-  },
-  {
     navlabel: true,
-    subheader: "Project_management",
+    subheader: "Quản lí dự án",
   },
   {
-    id: 4,
-    title: "Project\u00A0\u00A0list",
+    id: 5,
+    title: "Danh sách dự án",
     icon: AssignmentIcon,
     href: "/homePage/projectList",
   },
   {
-    id: 5,
-    title: "Project\u00A0\u00A0detail",
+    id: 6,
+    title: "Thành viên dự án",
     icon: AssignmentIcon,
-    href: "/homePage/projectDetail",
+    href: "/homePage/projectMember",
   },
 ];
 
