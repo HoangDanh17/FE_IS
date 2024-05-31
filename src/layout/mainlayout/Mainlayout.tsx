@@ -28,48 +28,44 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        <ThemeProvider theme={baselightTheme}>
-          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-          <CssBaseline />
-          <MainWrapper
-            className="mainwrapper"
-            style={{ backgroundColor: "#f1f5f9" }}
+    <ThemeProvider theme={baselightTheme}>
+      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+      <CssBaseline />
+      <MainWrapper
+        className="mainwrapper"
+        style={{ backgroundColor: "#f1f5f9" }}
+      >
+        {/* ------------------------------------------- */}
+        {/* Sidebar */}
+        {/* ------------------------------------------- */}
+        <Sidebar />
+        {/* ------------------------------------------- */}
+        {/* Main Wrapper */}
+        {/* ------------------------------------------- */}
+        <PageWrapper className="page-wrapper">
+          {/* ------------------------------------------- */}
+          {/* Header */}
+          {/* ------------------------------------------- */}
+          <Header />
+          {/* ------------------------------------------- */}
+          {/* PageContent */}
+          {/* ------------------------------------------- */}
+          <Container
+            sx={{
+              paddingTop: "20px",
+              maxWidth: "1200px",
+            }}
           >
             {/* ------------------------------------------- */}
-            {/* Sidebar */}
+            {/* Page Route */}
             {/* ------------------------------------------- */}
-            <Sidebar />
+            <Box sx={{ minHeight: "calc(100vh - 170px)" }}>{children}</Box>
             {/* ------------------------------------------- */}
-            {/* Main Wrapper */}
+            {/* End Page */}
             {/* ------------------------------------------- */}
-            <PageWrapper className="page-wrapper">
-              {/* ------------------------------------------- */}
-              {/* Header */}
-              {/* ------------------------------------------- */}
-              <Header/>
-              {/* ------------------------------------------- */}
-              {/* PageContent */}
-              {/* ------------------------------------------- */}
-              <Container
-                sx={{
-                  paddingTop: "20px",
-                  maxWidth: "1200px",
-                }}
-              >
-                {/* ------------------------------------------- */}
-                {/* Page Route */}
-                {/* ------------------------------------------- */}
-                <Box sx={{ minHeight: "calc(100vh - 170px)" }}>{children}</Box>
-                {/* ------------------------------------------- */}
-                {/* End Page */}
-                {/* ------------------------------------------- */}
-              </Container>
-            </PageWrapper>
-          </MainWrapper>
-        </ThemeProvider>
-      </body>
-    </html>
+          </Container>
+        </PageWrapper>
+      </MainWrapper>
+    </ThemeProvider>
   );
 }
