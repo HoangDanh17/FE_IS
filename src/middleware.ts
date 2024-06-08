@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const privatePaths = ["/homepage"];
+const privatePaths = ["/homePage"];
 const authPaths = ["/login", "/register"];
 
 export function middleware(req: NextRequest) {

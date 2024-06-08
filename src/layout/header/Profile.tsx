@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -9,16 +9,69 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Chip,
+  Drawer,
+  Stack,
+  Typography,
 } from "@mui/material";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import EmailIcon from "@mui/icons-material/Email";
 import PersonIcon from "@mui/icons-material/Person";
 import { usePathname, useRouter } from "next/navigation";
+import { useAppContext } from "@/app/app-provider";
+import authApiRequest from "@/apiRequests/auth";
+import { handleErrorApi } from "@/lib/utils";
+import { toast } from "@/components/ui/use-toast";
+import { Label } from "@radix-ui/react-label";
+import { Input } from "@/components/ui/input";
+
+interface UserInfo {
+  user_name: string;
+  email: string;
+  account_role: string;
+}
 
 const Profile = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [anchorEl2, setAnchorEl2] = useState(null);
+  const { user, setUser } = useAppContext();
+  const [userName, setUserName] = useState("");
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  useEffect(() => {
+    setUserName(user?.user_name || "");
+    setUserInfo(
+      user
+        ? {
+            user_name: user.user_name,
+            email: user.email,
+            account_role: user.account_role,
+          }
+        : null
+    );
+  }, [user]);
+
+  const handleLogout = async () => {
+    try {
+      await authApiRequest
+        .logoutFromNextClientToNextServer(true)
+        .then((res) => {
+          toast({
+            title: `Đăng xuất thành công`,
+            duration: 2000,
+            variant: "info",
+          });
+          router.push(`/login?redirectFrom=${pathname}`);
+        });
+    } finally {
+      setUser(null);
+      router.refresh();
+      localStorage.removeItem("sessionToken");
+      localStorage.removeItem("sessionTokenExpiresAt");
+    }
+  };
+
   const handleClick2 = (event: any) => {
     setAnchorEl2(event.currentTarget);
   };
@@ -26,34 +79,17 @@ const Profile = () => {
     setAnchorEl2(null);
   };
 
-  const handleLogout = () => {
-    router.push(`/login`);
-  };
+  const [openDrawer, setOpenDrawer] = useState<boolean>(false);
 
   return (
     <Box>
-      <IconButton
-        size="large"
-        aria-label="show 11 new notifications"
-        color="inherit"
-        aria-controls="msgs-menu"
-        aria-haspopup="true"
-        sx={{
-          ...(typeof anchorEl2 === "object" && {
-            color: "primary.main",
-          }),
-        }}
+      <Chip
         onClick={handleClick2}
-      >
-        <Avatar
-          src="/images/profile/user-1.jpg"
-          alt="image"
-          sx={{
-            width: 35,
-            height: 35,
-          }}
-        />
-      </IconButton>
+        avatar={<Avatar alt="Natacha" src="/images/profile/user-1.jpg" />}
+        label={userName}
+        variant="outlined"
+        style={{ width: "auto", fontSize: 14, fontWeight: 600 }}
+      />
       {/* ------------------------------------------- */}
       {/* Message Dropdown */}
       {/* ------------------------------------------- */}
@@ -75,7 +111,13 @@ const Profile = () => {
           <ListItemIcon>
             <PersonIcon width={20} />
           </ListItemIcon>
-          <ListItemText>My Profile</ListItemText>
+          <ListItemText
+            onClick={() => {
+              setOpenDrawer(true);
+            }}
+          >
+            My Profile
+          </ListItemText>
         </MenuItem>
         <MenuItem>
           <ListItemIcon>
@@ -100,6 +142,88 @@ const Profile = () => {
           </Button>
         </Box>
       </Menu>
+      <Drawer
+        anchor="right"
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
+        style={{ width: 500 }}
+      >
+        <Box sx={{ width: 500, padding: 4, position: "relative" }}>
+          <Box
+            sx={{
+              width: "100%",
+              height: "50%",
+              background: "#cffafe",
+              position: "absolute",
+              backgroundClip: "padding-box",
+              top: 0,
+              left: 0,
+              zIndex: -1,
+            }}
+          />
+          <Stack
+            style={{ alignItems: "center" }}
+            direction={"column"}
+            spacing={4}
+          >
+            <Typography variant="h3" style={{ marginBottom: 30 }}>
+              Thông tin người dùng
+            </Typography>
+            <Avatar
+              alt="Natacha"
+              src="/images/profile/user-1.jpg"
+              sx={{ width: 200, height: 200 }}
+            />
+            <Stack spacing={3} style={{ width: "100%" }}>
+              <Box className="flex flex-row w-full items-center gap-1.5">
+                <Label htmlFor="Tên" style={{ width: "20%", fontWeight: 700 }}>
+                  Tên:
+                </Label>
+                <Input
+                  type="text"
+                  id="Tên"
+                  placeholder="Tên"
+                  disabled
+                  value={userInfo?.user_name}
+                  style={{ width: "70%" }}
+                />
+              </Box>
+              <Box className="flex flex-row w-full items-center gap-1.5">
+                <Label
+                  htmlFor="email"
+                  style={{ width: "20%", fontWeight: 700 }}
+                >
+                  Email:
+                </Label>
+                <Input
+                  type="email"
+                  id="email"
+                  placeholder="Email"
+                  disabled
+                  value={userInfo?.email}
+                  style={{ width: "70%" }}
+                />
+              </Box>
+              <Box className="flex flex-row w-full items-center gap-1.5">
+                <Label
+                  htmlFor="chucVu"
+                  style={{ width: "20%", fontWeight: 700 }}
+                >
+                  Chức vụ:
+                </Label>
+                <Input
+                  type="text"
+                  id="chucVu"
+                  placeholder="Chức vụ"
+                  value={userInfo?.account_role}
+                  disabled
+                  style={{ width: "70%" }}
+                />
+              </Box>
+            </Stack>
+          </Stack>
+        </Box>
+      </Drawer>
     </Box>
   );
 };

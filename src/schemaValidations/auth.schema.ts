@@ -29,10 +29,11 @@ export const RegisterRes = z.object({
   data: z.object({
     token: z.string(),
     expiresAt: z.string(),
-    account: z.object({
+    account_info: z.object({
       id: z.number(),
-      name: z.string(),
+      user_name: z.string(),
       email: z.string(),
+      account_role: z.string(),
     }),
   }),
   message: z.string(),

@@ -9,18 +9,29 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { handleErrorApi } from "@/lib/utils";
 import authApiRequest from "@/apiRequests/auth";
-import CustomSnackbar from "@/components/ui/snackbar";
 import Link from "next/link";
+import { useAppContext } from "@/app/app-provider";
+import { toast } from "@/components/ui/use-toast";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
 
 const LoginForm = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { setUser } = useAppContext();
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -28,34 +39,32 @@ const LoginForm = () => {
       password: "",
     },
   });
-    router.push("/homePage");
 
   async function onSubmit(values: LoginBodyType) {
     if (loading) return;
     setLoading(true);
-    console.log(values)
-    // try {
-    //   const result = await authApiRequest.login(values);
+    try {
+      const result = await authApiRequest.login(values);
 
-    //   await authApiRequest.auth({
-    //     sessionToken: result.payload.data.token,
-    //   });
-    //   CustomSnackbar({
-    //     description: result.payload.message,
-    //     type: "success",
-    //   });
-    //     // setUser(result.payload.data.account);
-
-    //   router.push("/homePage");
-    //   console.log(result);
-    // } catch (error: any) {
-    //   handleErrorApi({
-    //     error,
-    //     setError: form.setError,
-    //   });
-    // } finally {
-    //   setLoading(false);
-    // }
+      await authApiRequest.auth({
+        sessionToken: result.payload.data.token,
+      });
+      toast({
+        title: `Chào mừng đăng nhập ${result.payload.data.account_info.user_name}`,
+        duration: 2000,
+        variant: "info",
+      });
+      setUser(result.payload.data.account_info);
+      console.log(result);
+      router.push("/homePage");
+    } catch (error: any) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -105,65 +114,79 @@ const LoginForm = () => {
               </Typography>
               <Stack>
                 <Box>
-                  <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-                    <Controller
-                      name="email"
-                      control={form.control}
-                      render={({ field, fieldState: { error } }) => (
-                        <TextField
-                          style={{ marginBottom: 14 }}
-                          {...field}
-                          variant="outlined"
-                          fullWidth
-                          id="email"
-                          label="Email"
-                          error={!!error}
-                          helperText={error ? error.message : null}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="password"
-                      control={form.control}
-                      render={({ field, fieldState: { error } }) => (
-                        <TextField
-                          {...field}
-                          style={{ marginBottom: 14 }}
-                          variant="outlined"
-                          fullWidth
-                          id="password"
-                          label="Mật khẩu"
-                          type="password"
-                          error={!!error}
-                          helperText={error ? error.message : null}
-                        />
-                      )}
-                    />
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      size="large"
-                      fullWidth
-                      type="submit"
-                      disabled={loading}
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(onSubmit)}
+                      className="space-y-2 max-w-[600px] flex-shrink-0 w-full"
+                      noValidate
                     >
-                      Đăng nhập
-                    </Button>
-                  </form>
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input
+                                style={{ marginBottom: 14 }}
+                                type="email"
+                                {...field}
+                                placeholder="Nhập email"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Mật khẩu</FormLabel>
+                            <FormControl>
+                              <Input
+                                style={{ marginBottom: 14 }}
+                                type="password"
+                                {...field}
+                                placeholder="Nhập password"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        type="submit"
+                        disabled={loading}
+                      >
+                        Đăng nhập
+                      </Button>
+                    </form>
+                  </Form>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    justifyContent="center"
+                    mt={3}
+                  >
+                    <Typography
+                      component={Link}
+                      href="/register"
+                      fontWeight="500"
+                      sx={{
+                        textDecoration: "none",
+                        color: "primary.main",
+                      }}
+                    >
+                      Tạo tài khoản
+                    </Typography>
+                  </Stack>
                 </Box>
-              </Stack>
-              <Stack direction="row" spacing={1} justifyContent="center" mt={3}>
-                <Typography
-                  component={Link}
-                  href="/register"
-                  fontWeight="500"
-                  sx={{
-                    textDecoration: "none",
-                    color: "primary.main",
-                  }}
-                >
-                  Create Account
-                </Typography>
               </Stack>
             </Card>
           </Grid>

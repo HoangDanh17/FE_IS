@@ -1,9 +1,9 @@
+import { toast } from "@/components/ui/use-toast";
 import { EntityError } from "@/lib/http";
 import { type ClassValue, clsx } from "clsx";
 import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import jwt from "jsonwebtoken";
-import CustomSnackbar from "@/components/ui/snackbar";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,9 +26,11 @@ export const handleErrorApi = ({
       });
     });
   } else {
-    CustomSnackbar({
+    toast({
+      title: "Lỗi",
       description: error?.payload?.message ?? "Lỗi không xác định",
-      type: "error",
+      variant: "destructive",
+      duration: duration ?? 4000,
     });
   }
 };
