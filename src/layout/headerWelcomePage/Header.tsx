@@ -22,7 +22,6 @@ const HeaderWelcomePage = () => {
         aria-label="Platform"
       >
         <ToggleButton value="login">
-          {" "}
           <Link href="/login">Đăng nhập</Link>
         </ToggleButton>
         <ToggleButton value="register">
