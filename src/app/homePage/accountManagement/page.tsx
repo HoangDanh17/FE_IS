@@ -2,6 +2,7 @@ import FilterAccount from "@/components/accountManagement/Filter";
 import TableAccount from "@/components/accountManagement/Table";
 import ButtonGroupAccount from "@/components/accountManagement/ButtonGroup";
 import { Hidden } from "@mui/material";
+import { Suspense } from "react";
 
 const accountManagement = () => {
   return (
@@ -17,7 +18,6 @@ const accountManagement = () => {
       <div>
         <ButtonGroupAccount />
       </div>
-
     </div>
   );
 };

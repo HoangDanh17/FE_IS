@@ -1,41 +1,15 @@
 "use client";
 import * as React from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import TablePagination from "@mui/material/TablePagination";
-import {
-  Box,
-  Fade,
-  Modal,
-  Typography,
-  Button,
-  styled,
-  Chip,
-  Fab,
-} from "@mui/material";
+import { Box, Fade, Modal, Typography, Button, Chip, Fab } from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import FormCreate from "@/components/projectList/formCrud/FormCreate";
-import FormUpdate from "@/components/projectList/formCrud/FormUpdate";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useAppContext } from "@/app/app-provider";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import DetailCard from "@/components/projectList/DetailCard";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -53,7 +27,7 @@ const styleCard = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 700,
+  width: 800,
   bgcolor: "background.paper",
   border: "2px solid #000",
   boxShadow: 24,
@@ -125,7 +99,17 @@ export default function ProjectListTable() {
     { title: "Project 4", startDate: "06/09/2024", duration: "3 months" },
     { title: "Project 5", startDate: "07/10/2024", duration: "2 months" },
     { title: "Project 6", startDate: "08/11/2024", duration: "1 month" },
+    { title: "Project 7", startDate: "08/11/2024", duration: "1 month" },
+    { title: "Project 8", startDate: "08/11/2024", duration: "1 month" },
+    { title: "Project 9", startDate: "08/11/2024", duration: "1 month" },
+    { title: "Project 10", startDate: "08/11/2024", duration: "1 month" },
+    { title: "Project 11", startDate: "08/11/2024", duration: "1 month" },
+    { title: "Project 12", startDate: "08/11/2024", duration: "1 month" },
+    { title: "Project 13", startDate: "08/11/2024", duration: "1 month" },
+    { title: "Project 14", startDate: "08/11/2024", duration: "1 month" },
+    { title: "Project 15", startDate: "08/11/2024", duration: "1 month" },
   ];
+
   // Card click
   const [openCardModal, setOpenCardModal] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState<any>(null);
@@ -133,7 +117,7 @@ export default function ProjectListTable() {
   const handleCloseCardModal = () => setOpenCardModal(false);
 
   const handleOpenCardModal = (row: object) => {
-    console.log(row)
+    console.log(row);
     setSelectedCard(row);
     setOpenCardModal(true);
   };
@@ -143,7 +127,7 @@ export default function ProjectListTable() {
   const handleOpenCreateModal = () => setOpenCreateModal(true);
   const handleCloseCreateModal = () => setOpenCreateModal(false);
   // Edit modal
-  
+
   //Delete modal
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] =
     React.useState(false);
@@ -191,7 +175,7 @@ export default function ProjectListTable() {
   // </Button>
   return (
     <div>
-      <div
+      <div 
         style={{
           marginTop: 20,
           width: "100%",
@@ -200,7 +184,7 @@ export default function ProjectListTable() {
         }}
       >
         {/* Card */}
-        <div className="flex ">
+        <div className="flex mb-4">
           <Label style={{ fontSize: 36, alignSelf: "center", marginRight: 12 }}>
             Quản lí dự án
           </Label>
@@ -216,46 +200,48 @@ export default function ProjectListTable() {
             Tạo dự án
           </Fab>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-          {projects.map((project, index) => (
-            <Card
-              onClick={() => handleOpenCardModal(project)}
-              key={index}
-              className="w-[360px] hover:scale-110 duration-300"
-            >
-              <CardHeader>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    height: "auto",
-                  }}
-                >
-                  <CardTitle style={{ alignContent: "center" }}>
-                    {project.title}
-                  </CardTitle>
-                  <Chip size="small" label="in progress" />
-                </div>
-              </CardHeader>
-              <CardContent style={{ paddingRight: 18 }}>
-                <div className="flex flex-row space-x-2 w-full">
-                  <div className="grid w-full items-center gap-4">
-                    <div className="flex flex-row space-x-1">
-                      <Label>Startdate:</Label>
-                      <Label>{project.startDate}</Label>
+        <ScrollArea className="h-[321px] rounded-md border p-2">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+            {projects.map((project, index) => (
+              <Card
+                onClick={() => handleOpenCardModal(project)}
+                key={index}
+                className="w-[360px] hover:scale-110 duration-300 cursor-grab shadow-lg	"
+              >
+                <CardHeader>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      height: "auto",
+                    }}
+                  >
+                    <CardTitle style={{ alignContent: "center" }}>
+                      {project.title}
+                    </CardTitle>
+                    <Chip size="small" label="in progress" />
+                  </div>
+                </CardHeader>
+                <CardContent style={{ paddingRight: 18 }}>
+                  <div className="flex flex-row space-x-2 w-full">
+                    <div className="grid w-full items-center gap-4">
+                      <div className="flex flex-row space-x-1">
+                        <Label>Startdate:</Label>
+                        <Label>{project.startDate}</Label>
+                      </div>
+                    </div>
+                    <div className="grid w-full items-center gap-4">
+                      <div className="flex flex-row space-x-1.5">
+                        <Label>Duration:</Label>
+                        <Label>{project.duration}</Label>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid w-full items-center gap-4">
-                    <div className="flex flex-row space-x-1.5">
-                      <Label>Duration:</Label>
-                      <Label>{project.duration}</Label>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </ScrollArea>
       </div>
       {/* Modal Create*/}
       <Modal
@@ -297,7 +283,7 @@ export default function ProjectListTable() {
           </Box>
         </Fade>
       </Modal>
-     
+
       {/* Modal Delete Confirm */}
       <Modal
         aria-labelledby="transition-modal-title"

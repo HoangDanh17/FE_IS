@@ -3,16 +3,25 @@ import * as z from "zod";
 import { styled } from "@mui/material/styles";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import MuiAccordion, { AccordionProps } from "@mui/material/Accordion";
+import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import MuiAccordionSummary, {
   AccordionSummaryProps,
 } from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import { Button, Grid, InputLabel, TextField } from "@mui/material";
+import {
+  Button,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
+
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(({ theme }) => ({
@@ -47,30 +56,22 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 const FilterTable = () => {
   const [loading, setLoading] = useState(false);
 
-  const schema = z
-    .object({
-      name: z.string(),
-      address: z.string(),
-      email: z.string(),
-      phone: z.string(),
-      term: z.string(),
-      age: z.number(),
-      gender: z.string(),
-    })
-    .strict();
+  const schema = z.object({
+    nameProject: z.string(),
+    duration: z.string(),
+    status: z.number(),
+    managerName: z.string(),
+  });
 
   type FormData = z.infer<typeof schema>;
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: "",
-      address: "",
-      email: "",
-      phone: "0",
-      term: "",
-      age: 0,
-      gender: "",
+      nameProject: "",
+      duration: "",
+      status: 1, // Set default value for status as a number
+      managerName: "",
     },
   });
 
@@ -98,17 +99,17 @@ const FilterTable = () => {
                 <Grid container spacing={1}>
                   <Grid item xs={3}>
                     <Controller
-                      name="name"
+                      name="nameProject"
                       control={form.control}
                       render={({ field, fieldState: { error } }) => (
                         <div>
                           <TextField
                             {...field}
-                            id="name"
-                            label="name"
+                            id="nameProject"
+                            label="nameProject"
                             variant="standard"
                             size="small"
-                            style={{ width: "90%" }}
+                            style={{ width: "90%", marginTop: 6 }}
                             error={!!error}
                             helperText={error ? error.message : null}
                           />
@@ -119,17 +120,17 @@ const FilterTable = () => {
 
                   <Grid item xs={3}>
                     <Controller
-                      name="address"
+                      name="duration"
                       control={form.control}
                       render={({ field, fieldState: { error } }) => (
                         <div>
                           <TextField
                             {...field}
-                            id="address"
-                            label="address"
+                            id="duration"
+                            label="duration"
                             variant="standard"
                             size="small"
-                            style={{ width: "90%" }}
+                            style={{ width: "90%", marginTop: 6 }}
                             error={!!error}
                             helperText={error ? error.message : null}
                           />
@@ -139,17 +140,17 @@ const FilterTable = () => {
                   </Grid>
                   <Grid item xs={3}>
                     <Controller
-                      name="email"
+                      name="managerName"
                       control={form.control}
                       render={({ field, fieldState: { error } }) => (
                         <div>
                           <TextField
                             {...field}
-                            id="email"
-                            label="email"
+                            id="managerName"
+                            label="managerName"
                             variant="standard"
                             size="small"
-                            style={{ width: "90%" }}
+                            style={{ width: "90%", marginTop: 6 }}
                             error={!!error}
                             helperText={error ? error.message : null}
                           />
@@ -159,94 +160,54 @@ const FilterTable = () => {
                   </Grid>
                   <Grid item xs={3}>
                     <Controller
-                      name="phone"
+                      name="status"
                       control={form.control}
                       render={({ field, fieldState: { error } }) => (
                         <div>
-                          <TextField
+                          <InputLabel id="status-label">Trạng thái</InputLabel>
+                          <Select
                             {...field}
-                            id="phone"
-                            label="phone"
+                            labelId="status-label"
+                            id="status"
+                            label="status"
                             variant="standard"
                             size="small"
                             style={{ width: "90%" }}
                             error={!!error}
-                            helperText={error ? error.message : null}
-                          />
+                            value={field.value || ""}
+                            onChange={(e) => {
+                              field.onChange(Number(e.target.value));
+                            }}
+                          >
+                            <MenuItem value={1}>Todo</MenuItem>
+                            <MenuItem value={2}>In Progress</MenuItem>
+                            <MenuItem value={3}>Testing</MenuItem>
+                            <MenuItem value={4}>Done</MenuItem>
+                          </Select>
                         </div>
                       )}
                     />
                   </Grid>
-                  <Grid item xs={3}>
-                    <Controller
-                      name="term"
-                      control={form.control}
-                      render={({ field, fieldState: { error } }) => (
-                        <div>
-                          <TextField
-                            {...field}
-                            id="term"
-                            label="term"
-                            variant="standard"
-                            size="small"
-                            style={{ width: "90%" }}
-                            error={!!error}
-                            helperText={error ? error.message : null}
-                          />
-                        </div>
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Controller
-                      name="age"
-                      control={form.control}
-                      render={({ field, fieldState: { error } }) => (
-                        <div>
-                          <TextField
-                            {...field}
-                            id="age"
-                            label="age"
-                            type="number"
-                            variant="standard"
-                            size="small"
-                            style={{ width: "90%" }}
-                            error={!!error}
-                            helperText={error ? error.message : null}
-                          />
-                        </div>
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Controller
-                      name="gender"
-                      control={form.control}
-                      render={({ field, fieldState: { error } }) => (
-                        <div>
-                          <TextField
-                            {...field}
-                            id="gender"
-                            label="gender"
-                            variant="standard"
-                            size="small"
-                            style={{ width: "90%" }}
-                            error={!!error}
-                            helperText={error ? error.message : null}
-                          />
-                        </div>
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={5} style={{ width: "100%" }}>
                     <Button
                       type="submit"
                       variant="contained"
                       color="primary"
                       startIcon={<SearchIcon />}
-                      style={{ width: "50%", marginLeft: 30,marginTop:8 }}
+                      style={{ width: "50%", marginTop: 4, marginRight: 5 }}
                     >
                       Tìm kiếm
+                    </Button>
+                    <Button
+                      startIcon={<CleaningServicesIcon />}
+                      style={{
+                        width: "40%",
+                        marginTop: 4,
+                        // backgroundColor: "#e2e8f0",
+                      }}
+                      color="error"
+                    >
+                      Hủy tìm kiếm
                     </Button>
                   </Grid>
                 </Grid>

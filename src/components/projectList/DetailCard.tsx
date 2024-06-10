@@ -1,9 +1,16 @@
-"use client";
-import FormUpdate from "@/components/projectList/formCrud/FormUpdate";
-import { Divider, Fade, Modal } from "@mui/material";
+import React from "react";
+import {
+  Avatar,
+  AvatarGroup,
+  Divider,
+  Fade,
+  Modal,
+  Tooltip,
+} from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import {
   TextField,
   Typography,
@@ -13,6 +20,8 @@ import {
   Button,
 } from "@mui/material";
 import { useState } from "react";
+import FormAddPM from "@/components/projectList/formCrud/FormAddPM";
+import FormUpdate from "@/components/projectList/formCrud/FormUpdate";
 
 const Div = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -35,6 +44,7 @@ const confirmDeleteStyle = {
   ...style,
   width: 300,
 };
+
 interface RowData {
   id: number;
   title: string;
@@ -45,6 +55,7 @@ interface RowData {
 }
 
 const DetailCard = ({ row }: { row: RowData }) => {
+  // update modal
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const handleOpenUpdateModal = (row: any) => {
@@ -53,6 +64,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
   };
   const handleCloseUpdateModal = () => setOpenUpdateModal(false);
 
+  // delete modal
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
 
   const [rowToDelete, setRowToDelete] = useState<number | null>(null);
@@ -68,6 +80,15 @@ const DetailCard = ({ row }: { row: RowData }) => {
       handleCloseDeleteConfirmModal();
     }
   };
+  // add PM
+  const [openAddPMModal, setOpenAddPMModal] = useState(false);
+  const [data, setData] = useState<any>(null);
+  const handleOpenAddPMModal = (row: any) => {
+    setData(row);
+    setOpenAddPMModal(true);
+  };
+  const handleCloseAddPMModal = () => setOpenAddPMModal(false);
+
   return (
     <Div>
       <div
@@ -125,6 +146,28 @@ const DetailCard = ({ row }: { row: RowData }) => {
                     defaultValue={row.duration}
                   />
                 </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="h6">Quản lí dự án </Typography>
+                  <div className="flex mt-2">
+                    <AvatarGroup>
+                      {[
+                        "Remy Sharp",
+                        "Travis Howard",
+                        "Cindy Baker",
+                        "Agnes Walker",
+                        "Trevor Henderson",
+                      ].map((name, index) => (
+                        <Tooltip title={name} key={index}>
+                          <Avatar
+                            alt={name}
+                            src="https://github.com/shadcn.png"
+                            // title={name}
+                          />
+                        </Tooltip>
+                      ))}
+                    </AvatarGroup>
+                  </div>
+                </Grid>
               </Grid>
             </Grid>
             <Grid item xs={1} sm={1}>
@@ -152,6 +195,17 @@ const DetailCard = ({ row }: { row: RowData }) => {
                     style={{ width: "100%", marginTop: 6 }}
                   >
                     Xóa dự án
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="info"
+                    startIcon={<AddIcon />}
+                    onClick={() => handleOpenAddPMModal(row.id)}
+                    style={{ width: "100%", marginTop: 6 }}
+                  >
+                    Thêm quản lí
                   </Button>
                 </Grid>
               </Grid>
@@ -212,6 +266,26 @@ const DetailCard = ({ row }: { row: RowData }) => {
                 Xóa
               </Button>
             </Box>
+          </Box>
+        </Fade>
+      </Modal>
+      {/* Modal Add PM */}
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={openAddPMModal}
+        onClose={handleCloseAddPMModal}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openAddPMModal}>
+          <Box sx={style}>
+            <FormAddPM row={data}></FormAddPM>
           </Box>
         </Fade>
       </Modal>

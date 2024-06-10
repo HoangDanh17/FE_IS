@@ -16,15 +16,14 @@ const Div = styled("div")(({ theme }) => ({
 }));
 
 interface RowData {
-  id: number;
-  name: string;
-  calories: number;
-  fat: number;
-  carbs: number;
-  protein: number;
+  // id: number;
+  title: string;
+  startDate: string;
+  duration: string;
 }
 
 const FormUpdate = ({ row }: { row: RowData }) => {
+  console.log(row);
   return (
     <Div>
       <div style={{ textAlignLast: "center" }}>
@@ -43,51 +42,29 @@ const FormUpdate = ({ row }: { row: RowData }) => {
                 fullWidth
                 style={{ marginTop: 2 }}
                 size="small"
-                defaultValue={row.name}
+                defaultValue={row.title}
               />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="h6">Calories</Typography>
+              <Typography variant="h6">Ngày bắt đầu</Typography>
               <TextField
-                id="calories"
+                id="startDate"
                 variant="outlined"
                 fullWidth
                 style={{ marginTop: 2 }}
                 size="small"
-                defaultValue={row.calories}
+                defaultValue={row.startDate}
               />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="h6">Fat (g)</Typography>
+              <Typography variant="h6">Kéo dài</Typography>
               <TextField
-                id="fat"
+                id="duration"
                 variant="outlined"
                 fullWidth
                 style={{ marginTop: 2 }}
                 size="small"
-                defaultValue={row.fat}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h6">Carbs (g)</Typography>
-              <TextField
-                id="carbs"
-                variant="outlined"
-                fullWidth
-                style={{ marginTop: 2 }}
-                size="small"
-                defaultValue={row.carbs}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h6">Protein (g)</Typography>
-              <TextField
-                id="protein"
-                variant="outlined"
-                fullWidth
-                style={{ marginTop: 2 }}
-                size="small"
-                defaultValue={row.protein}
+                defaultValue={row.duration}
               />
             </Grid>
             <Grid item xs={12}>
