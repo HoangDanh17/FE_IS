@@ -9,7 +9,7 @@ interface AddModalProps {
 
 const AddModalAccount: React.FC<AddModalProps> = ({onClose}) => {
     return (
-        <Box className="modal-box">
+        <Box className="modal-add-box">
             <Typography id="modal-modal-title" variant="h6" component="h2">
                 Thêm tài khoản mới
             </Typography>
@@ -19,7 +19,7 @@ const AddModalAccount: React.FC<AddModalProps> = ({onClose}) => {
                     <Grid item xs={4}>
                         <FormControl fullWidth>
                             <TextField
-                                label="Họ và Tên"
+                                label="Tên người dùng"
                             />
                         </FormControl>
                     </Grid>
@@ -43,7 +43,7 @@ const AddModalAccount: React.FC<AddModalProps> = ({onClose}) => {
                     <Grid item xs={4}>
                         <FormControl fullWidth>
                             <TextField
-                                label="Ngày tạo"
+                                label="Role"
                             />
                         </FormControl>
                     </Grid>

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, Input, Button, FormControl, Grid, MenuItem, Select, Typography, CardContent } from '@mui/material';
 import { Search } from '@mui/icons-material';
-import "@/components/css/manageintern/Filter.css";
 
 const Filter = () => {
     return (

@@ -5,7 +5,7 @@ import "@/styles/accountManagement/ButtonGroup.css";
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import AddModalAccount from './AddModal';
+import AddModalAccount from './AddAccountModal';
 import EditModalAccount from './EditModal';
 
 const ButtonGroupAccount = () => {
@@ -22,7 +22,7 @@ const ButtonGroupAccount = () => {
     return (
         <Card style={{ marginTop: "10px" }}>
             <CardContent style={{ height: "68px" }}>
-                <Button variant="contained" color="success" className="import-btn">Nhập Excel</Button>
+                {/* <Button variant="contained" color="success" className="import-btn">Nhập Excel</Button> */}
 
                 <Button
                     variant="contained"

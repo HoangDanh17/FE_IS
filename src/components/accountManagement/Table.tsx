@@ -10,40 +10,32 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { TablePagination } from '@mui/material';
+import { TablePagination, Radio, Button } from '@mui/material';
 import "@/styles/accountManagement/DataTable.css";
-
-// const columns: GridColDef[] = [
-//   { field: 'id', headerName: 'ID', width: 50 },
-//   { field: 'idAccount', headerName: 'ID thành viên', width: 130 },
-//   { field: 'userName', headerName: 'Tên thành viên', width: 130 },
-//   { field: 'email', headerName: 'Email', width: 130 },
-//   { field: 'password', headerName: 'Mật khẩu', width: 130 },
-//   { field: 'createDate', headerName: 'Ngày tạo', width: 130 },
-// ];
+import AccountInfolModal from './AccountInfolModal';
 
 function createData(
   id: string,
   idAccount: string,
   userName: string,
   email: string,
-  password: number,
+  role: string,
   createDate: string
 ) {
-  return { idAccount, userName, email, password, createDate };
+  return { idAccount, userName, email, role, createDate };
 }
 
 const initialRows = [
-  { idAccount: "a385jaad2", userName: 'Nguyễn Văn A', email: 'test@gmail.com', password: "string", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn B', email: 'test@gmail.com', password: "string", createDate: "02/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn C', email: 'test@gmail.com', password: "string", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn D', email: 'test@gmail.com', password: "string", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn E', email: 'test@gmail.com', password: "string", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn F', email: 'test@gmail.com', password: "string", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn G', email: 'test@gmail.com', password: "string", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn H', email: 'test@gmail.com', password: "string", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn I', email: 'test@gmail.com', password: "string", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn J', email: 'test@gmail.com', password: "string", createDate: "01/06/2024" },
+  { idAccount: "a385jaad2", userName: 'Nguyễn Văn A', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
+  { idAccount: "a385jaad3", userName: 'Nguyễn Văn B', email: 'test@gmail.com', role: "admin", createDate: "02/06/2024" },
+  { idAccount: "a385jaad3", userName: 'Nguyễn Văn C', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
+  { idAccount: "a385jaad3", userName: 'Nguyễn Văn D', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
+  { idAccount: "a385jaad3", userName: 'Nguyễn Văn E', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
+  { idAccount: "a385jaad3", userName: 'Nguyễn Văn F', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
+  { idAccount: "a385jaad3", userName: 'Nguyễn Văn G', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
+  { idAccount: "a385jaad3", userName: 'Nguyễn Văn H', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
+  { idAccount: "a385jaad3", userName: 'Nguyễn Văn I', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
+  { idAccount: "a385jaad3", userName: 'Nguyễn Văn J', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
 
 ];
 
@@ -63,15 +55,25 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
-  '&:last-child td, &:last-child th': {
-    border: 0,
-  },
 }));
+
+interface TableRow {
+  id: number;
+  userName: string;
+  email: string;
+  role: string;
+  createDate: string;
+}
+
 
 const TableAccount = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [selectedValue, setSelectedValue] = React.useState<string | null>(null);
+
+  // handle detail modal
+  const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [selectedRow, setSelectedRow] = React.useState<TableRow | null>(null);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -82,32 +84,38 @@ const TableAccount = () => {
     setPage(0);
   };
 
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedValue(event.target.value);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedValue(null);
+  };
+
+  const handleViewDetail = (row: TableRow) => {
+    setSelectedRow(row);
+    setOpenModal(true);
+  };
 
   return (
-    <div style={{ maxHeight: 600, width: '100%' }}>
-      {/* <DataGrid
-        rows={displayedRows}
-        columns={columns}
-        checkboxSelection
-        classes={{
-          root: 'custom-row',       // Apply to all rows
-          columnHeader: 'custom-header', // Apply to header
-          cell: 'custom-cell',      // Apply to cells
-        }}
-        className="custom-row custom-pagination"
-        hideFooterPagination
-      /> */}
-
+    <div style={{ maxHeight: 762, width: '180%' }}>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+        <Table sx={{ minWidth: 640 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell align='center'>STT</StyledTableCell>
-              <StyledTableCell>ID Thành Viên</StyledTableCell>
-              <StyledTableCell>Tên Thành Viên</StyledTableCell>
+              <StyledTableCell sx={{ width: 70 }} align='center'>
+                <Radio
+                  onClick={handleDeselectAll}
+                  className="radio-buttons"
+                  color='secondary'
+                />
+              </StyledTableCell>
+
+              <StyledTableCell>Tên Người Dùng</StyledTableCell>
               <StyledTableCell>Email</StyledTableCell>
-              <StyledTableCell>Mật khẩu</StyledTableCell>
+              <StyledTableCell>Role</StyledTableCell>
               <StyledTableCell>Ngày tạo</StyledTableCell>
+              <StyledTableCell>Xem chi tiết</StyledTableCell>
             </TableRow>
           </TableHead>
 
@@ -117,14 +125,24 @@ const TableAccount = () => {
               : rows
             ).map((row) => (
               <StyledTableRow key={row.id}>
-                <StyledTableCell component="th" scope="row" align='center'>
-                  {row.id}
-                </StyledTableCell>
-                <StyledTableCell>{row.idAccount}</StyledTableCell>
+
+                <div className="radio-cell" style={{ margin: "3px 0 0 14px" }}>
+                  <Radio
+                    checked={selectedValue === row.id.toString()}
+                    onChange={handleRadioChange}
+                    value={row.id.toString()}
+                    className="radio-buttons"
+                  />
+                </div>
+
                 <StyledTableCell>{row.userName}</StyledTableCell>
                 <StyledTableCell>{row.email}</StyledTableCell>
-                <StyledTableCell>{row.password}</StyledTableCell>
+                <StyledTableCell>{row.role}</StyledTableCell>
                 <StyledTableCell>{row.createDate}</StyledTableCell>
+
+                <StyledTableCell>
+                  <Button size='small' onClick={() => handleViewDetail(row)}>Click</Button>
+                </StyledTableCell>
               </StyledTableRow>
             ))}
           </TableBody>
@@ -141,6 +159,9 @@ const TableAccount = () => {
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="custom-row custom-pagination"
       />
+
+      <AccountInfolModal open={openModal} handleClose={() => setOpenModal(false)} selectedRow={selectedRow} />
+
     </div>
   );
 }

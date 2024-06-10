@@ -21,18 +21,12 @@ const FilterAccount = () => {
                 <AccordionDetails>
                     <FormControl fullWidth>
                         <Grid container spacing={2}>
-                        <Grid item xs={3}>
-                                <FormControl fullWidth>
-                                    <Input
-                                        placeholder="ID thành viên"
-                                    />
-                                </FormControl>
-                            </Grid>
+                            
 
                             <Grid item xs={3}>
                                 <FormControl fullWidth>
                                     <Input
-                                        placeholder="Tên thành viên"
+                                        placeholder="Tên người dùng"
                                     />
                                 </FormControl>
                             </Grid>
@@ -42,6 +36,14 @@ const FilterAccount = () => {
                                     <Input
                                         placeholder="Email"
                                         type="email"
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={3}>
+                                <FormControl fullWidth>
+                                    <Input
+                                        placeholder="Role"
                                     />
                                 </FormControl>
                             </Grid>

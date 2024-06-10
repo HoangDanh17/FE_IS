@@ -12,9 +12,9 @@ const projectMember = () => {
                 <TableProjectMember />
             </div>
 
-            <div>
+            {/* <div>
                 <ButtonGroupMemberProject />
-            </div>
+            </div> */}
 
         </div>
     );

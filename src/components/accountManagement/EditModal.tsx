@@ -9,7 +9,7 @@ interface AddModalProps {
 
 const EditModalAccount: React.FC<AddModalProps> = ({onClose}) => {
     return (
-        <Box className="modal-box">
+        <Box className="modal-edit-box">
             <Typography id="modal-modal-title" variant="h6" component="h2">
                 Cập nhật tài khoản
             </Typography>
