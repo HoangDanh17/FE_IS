@@ -5,11 +5,11 @@ import "@/components/css/manageintern/ButtonGroup.css";
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import AddModal from './AddModal';
-import EditModal from '@/components/manageintern/EditTable';
-import DeleteModal from './DeleteModal';
+import AddModal from './AddModal2';
+import EditModal from './EditModal2';
+import DeleteModal from './DeleteModal2';
 
-const ButtonGroup = () => {
+const ButtonGroup2 = () => {
     //useState Modal Add
     const [openAddModal, setOpenAddModal] = React.useState(false);
     const handleOpenAddModal = () => setOpenAddModal(true);
@@ -112,4 +112,4 @@ const ButtonGroup = () => {
     )
 }
 
-export default ButtonGroup;
+export default ButtonGroup2;
