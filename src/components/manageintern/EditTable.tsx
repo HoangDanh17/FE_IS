@@ -1,17 +1,18 @@
 import React from 'react';
-import { Box, TextField, Typography, Button, Grid, FormControl } from "@mui/material"
-import '@/components/css/manageintern/ModalBox.css'
+import { Box, TextField, Typography, Button, Grid, FormControl } from "@mui/material";
+import '@/components/css/manageintern/ModalBox.css';
 
-
-interface AddModalProps {
+interface EditModalProps {
     onClose: () => void;
+    onEdit: () => void;
+    onDelete: () => void;
 }
 
-const AddModal: React.FC<AddModalProps> = ({onClose}) => {
+const EditModal: React.FC<EditModalProps> = ({ onClose, onEdit, onDelete }) => {
     return (
         <Box className="modal-box">
             <Typography id="modal-modal-title" variant="h6" component="h2">
-                Thêm tài khoản mới
+                Edit Information
             </Typography>
 
             <FormControl>
@@ -19,7 +20,7 @@ const AddModal: React.FC<AddModalProps> = ({onClose}) => {
                     <Grid item xs={4}>
                         <FormControl fullWidth>
                             <TextField
-                                label="Họ và Tên"
+                                label="Họ và tên"
                             />
                         </FormControl>
                     </Grid>
@@ -61,12 +62,13 @@ const AddModal: React.FC<AddModalProps> = ({onClose}) => {
                     <Button
                         variant="contained"
                         color="primary"
+                        onClick={onEdit}
                     >
-                        Add
-                    </Button>
+                        Edit
+                    </Button>                 
                 </Box>
             </FormControl>
         </Box>
     )
 }
-export default AddModal;
+export default EditModal;

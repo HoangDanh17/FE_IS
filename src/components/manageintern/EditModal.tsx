@@ -58,7 +58,7 @@ const EditModal = (props: EditModalProps) => {
                         <Grid item xs={4}>
                             <FormControl fullWidth>
                                 <TextField
-                                    label="Role"
+                                    label="Kỹ năng"
                                 />
                             </FormControl>
                         </Grid>
