@@ -22,6 +22,7 @@ import {
 import { useState } from "react";
 import FormAddPM from "@/components/projectList/formCrud/FormAddPM";
 import FormUpdate from "@/components/projectList/formCrud/FormUpdate";
+import dayjs from "dayjs";
 
 const Div = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -46,16 +47,15 @@ const confirmDeleteStyle = {
 };
 
 interface RowData {
-  id: number;
-  title: string;
-  startDate: number;
+  id: string;
+  name: string;
+  "start-date": string;
   duration: number;
-  carbs: number;
-  protein: number;
 }
 
 const DetailCard = ({ row }: { row: RowData }) => {
   // update modal
+  console.log("row",row)
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const handleOpenUpdateModal = (row: any) => {
@@ -67,13 +67,15 @@ const DetailCard = ({ row }: { row: RowData }) => {
   // delete modal
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
 
-  const [rowToDelete, setRowToDelete] = useState<number | null>(null);
-  const handleOpenDeleteConfirmModal = (id: number) => {
+  const [rowToDelete, setRowToDelete] = useState<string | null>(null);
+
+  const handleOpenDeleteConfirmModal = (id: string) => {
     setRowToDelete(id);
     setOpenDeleteConfirmModal(true);
   };
 
   const handleCloseDeleteConfirmModal = () => setOpenDeleteConfirmModal(false);
+  
   const handleDelete = () => {
     if (rowToDelete !== null) {
       console.log(rowToDelete);
@@ -118,7 +120,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
                     fullWidth
                     style={{ marginTop: 2 }}
                     size="small"
-                    defaultValue={row.title}
+                    defaultValue={row.name}
                     disabled
                   />
                 </Grid>
@@ -131,7 +133,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
                     style={{ marginTop: 2 }}
                     disabled
                     size="small"
-                    defaultValue={row.startDate}
+                    defaultValue={dayjs(row['start-date']).format("YYYY-MM-DD")}
                   />
                 </Grid>
                 <Grid item xs={12}>

@@ -1,26 +1,36 @@
 "use client";
-import * as z from "zod";
-import { styled } from "@mui/material/styles";
-import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
-import MuiAccordion, { AccordionProps } from "@mui/material/Accordion";
-import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
-import MuiAccordionSummary, {
-  AccordionSummaryProps,
-} from "@mui/material/AccordionSummary";
-import Typography from "@mui/material/Typography";
-import AccordionDetails from "@mui/material/AccordionDetails";
+import { useState, ChangeEvent, FormEvent } from "react";
 import {
-  Button,
+  Typography,
   Grid,
+  Box,
+  styled,
+  Button,
+  TextField,
   InputLabel,
   MenuItem,
   Select,
-  TextField,
+  SelectChangeEvent,
 } from "@mui/material";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
+import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
+import MuiAccordion, { AccordionProps } from "@mui/material/Accordion";
+import MuiAccordionSummary, {
+  AccordionSummaryProps,
+} from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
 import SearchIcon from "@mui/icons-material/Search";
+import projectApiRequest from "@/apiRequests/project";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import ProjectListTable, {
+  FormFilterData,
+} from "@/components/projectList/ProjectListTable";
+import { ProjectListResType } from "@/schemaValidations/project.schema";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -55,167 +65,166 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 
 const FilterTable = () => {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  const schema = z.object({
-    nameProject: z.string(),
-    duration: z.string(),
-    status: z.number(),
-    managerName: z.string(),
+  const [formData, setFormData] = useState<FormFilterData>({
+    name: "",
+    status: "not_start",
+    "start-date-from": "",
+    "start-date-to": "",
   });
 
-  type FormData = z.infer<typeof schema>;
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      nameProject: "",
-      duration: "",
-      status: 1, // Set default value for status as a number
-      managerName: "",
-    },
-  });
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    setFormData({ ...formData, status: e.target.value });
+  };
 
-  async function onSubmit(values: FormData) {
-    // if (loading) return;
-    // setLoading(true);
-    console.log("Form Data123:", values);
-    // setLoading(false);
-    return;
+  const handleDateChange = (name: string, date: Dayjs | null) => {
+    setFormData({
+      ...formData,
+      [name]: date ? date.format("YYYY-MM-DD") : "",
+    });
+  };
+
+  const [isFilter, setIsFilter] = useState<boolean>(false);
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setIsFilter(true);
   }
+
+  const handleReset = () => {
+    setFormData({
+      name: "",
+      status: "not_start",
+      "start-date-from": "",
+      "start-date-to": "",
+    });
+    setIsFilter(false);
+  };
 
   return (
     <div>
-      <Grid container spacing={1}>
-        <Grid item xs={24}>
-          <Accordion defaultExpanded>
-            <AccordionSummary
-              aria-controls="panel1d-content"
-              id="panel1d-header"
-            >
-              <Typography>Tìm kiếm thông tin</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <Grid container spacing={1}>
-                  <Grid item xs={3}>
-                    <Controller
-                      name="nameProject"
-                      control={form.control}
-                      render={({ field, fieldState: { error } }) => (
-                        <div>
-                          <TextField
-                            {...field}
-                            id="nameProject"
-                            label="nameProject"
-                            variant="standard"
-                            size="small"
-                            style={{ width: "90%", marginTop: 6 }}
-                            error={!!error}
-                            helperText={error ? error.message : null}
-                          />
-                        </div>
-                      )}
-                    />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Grid container spacing={1}>
+          <Grid item xs={24}>
+            <Accordion defaultExpanded>
+              <AccordionSummary
+                aria-controls="panel1d-content"
+                id="panel1d-header"
+              >
+                <Typography>Tìm kiếm thông tin</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <form onSubmit={handleSubmit}>
+                  <Grid container spacing={1}>
+                    <Grid item xs={3}>
+                      <TextField
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        id="name"
+                        label="Tên dự án"
+                        variant="standard"
+                        size="small"
+                        style={{ width: "90%", marginTop: 6 }}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <DatePicker
+                        label="Ngày bắt đầu từ"
+                        value={
+                          formData["start-date-from"]
+                            ? dayjs(formData["start-date-from"])
+                            : null
+                        }
+                        onChange={(date) =>
+                          handleDateChange("start-date-from", date)
+                        }
+                        slotProps={{
+                          textField: {
+                            variant: "standard",
+                            style: {
+                              marginTop: 3,
+                              marginRight: 6,
+                              width: "90%",
+                            },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <DatePicker
+                        label="Ngày bắt đầu đến"
+                        value={
+                          formData["start-date-to"]
+                            ? dayjs(formData["start-date-to"])
+                            : null
+                        }
+                        onChange={(date) =>
+                          handleDateChange("start-date-to", date)
+                        }
+                        slotProps={{
+                          textField: {
+                            variant: "standard",
+                            style: { marginTop: 3, width: "90%" },
+                          },
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <InputLabel id="status-label">Trạng thái</InputLabel>
+                      <Select
+                        labelId="status-label"
+                        id="status"
+                        value={formData.status}
+                        onChange={handleSelectChange}
+                        variant="standard"
+                        size="small"
+                        defaultValue="not_start"
+                        style={{ width: "90%" }}
+                      >
+                        <MenuItem value={"not_start"}>Not start</MenuItem>
+                        <MenuItem value={"doing"}>Doing</MenuItem>
+                        <MenuItem value={"done"}>Done</MenuItem>
+                        <MenuItem value={"cancel"}>Cancel</MenuItem>
+                      </Select>
+                    </Grid>
+                    <Grid item xs={5} style={{ width: "100%" }}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        startIcon={<SearchIcon />}
+                        style={{ width: "50%", marginTop: 4, marginRight: 5 }}
+                      >
+                        Tìm kiếm
+                      </Button>
+                      <Button
+                        onClick={handleReset}
+                        startIcon={<CleaningServicesIcon />}
+                        style={{
+                          width: "40%",
+                          marginTop: 4,
+                        }}
+                        color="error"
+                      >
+                        Hủy tìm kiếm
+                      </Button>
+                    </Grid>
                   </Grid>
-
-                  <Grid item xs={3}>
-                    <Controller
-                      name="duration"
-                      control={form.control}
-                      render={({ field, fieldState: { error } }) => (
-                        <div>
-                          <TextField
-                            {...field}
-                            id="duration"
-                            label="duration"
-                            variant="standard"
-                            size="small"
-                            style={{ width: "90%", marginTop: 6 }}
-                            error={!!error}
-                            helperText={error ? error.message : null}
-                          />
-                        </div>
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Controller
-                      name="managerName"
-                      control={form.control}
-                      render={({ field, fieldState: { error } }) => (
-                        <div>
-                          <TextField
-                            {...field}
-                            id="managerName"
-                            label="managerName"
-                            variant="standard"
-                            size="small"
-                            style={{ width: "90%", marginTop: 6 }}
-                            error={!!error}
-                            helperText={error ? error.message : null}
-                          />
-                        </div>
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={3}>
-                    <Controller
-                      name="status"
-                      control={form.control}
-                      render={({ field, fieldState: { error } }) => (
-                        <div>
-                          <InputLabel id="status-label">Trạng thái</InputLabel>
-                          <Select
-                            {...field}
-                            labelId="status-label"
-                            id="status"
-                            label="status"
-                            variant="standard"
-                            size="small"
-                            style={{ width: "90%" }}
-                            error={!!error}
-                            value={field.value || ""}
-                            onChange={(e) => {
-                              field.onChange(Number(e.target.value));
-                            }}
-                          >
-                            <MenuItem value={1}>Todo</MenuItem>
-                            <MenuItem value={2}>In Progress</MenuItem>
-                            <MenuItem value={3}>Testing</MenuItem>
-                            <MenuItem value={4}>Done</MenuItem>
-                          </Select>
-                        </div>
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={5} style={{ width: "100%" }}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                      startIcon={<SearchIcon />}
-                      style={{ width: "50%", marginTop: 4, marginRight: 5 }}
-                    >
-                      Tìm kiếm
-                    </Button>
-                    <Button
-                      startIcon={<CleaningServicesIcon />}
-                      style={{
-                        width: "40%",
-                        marginTop: 4,
-                        // backgroundColor: "#e2e8f0",
-                      }}
-                      color="error"
-                    >
-                      Hủy tìm kiếm
-                    </Button>
-                  </Grid>
-                </Grid>
-              </form>
-            </AccordionDetails>
-          </Accordion>
+                </form>
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
         </Grid>
-      </Grid>
+      </LocalizationProvider>
+      <ProjectListTable
+        isFilter={isFilter}
+        formData={formData}
+      ></ProjectListTable>
     </div>
   );
 };

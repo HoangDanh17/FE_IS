@@ -46,7 +46,6 @@ export default function AppProvider({
     },
     [setUserState]
   );
-
   useEffect(() => {
     const _user = localStorage.getItem("user");
     setUserState(_user ? JSON.parse(_user) : null);

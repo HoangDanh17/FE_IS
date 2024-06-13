@@ -1,6 +1,15 @@
 "use client";
 import * as React from "react";
-import { Box, Fade, Modal, Typography, Button, Chip, Fab } from "@mui/material";
+import {
+  Box,
+  Fade,
+  Modal,
+  Typography,
+  Button,
+  Chip,
+  Fab,
+  Skeleton,
+} from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import FormCreate from "@/components/projectList/formCrud/FormCreate";
 import AddIcon from "@mui/icons-material/Add";
@@ -9,6 +18,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import DetailCard from "@/components/projectList/DetailCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import projectApiRequest from "@/apiRequests/project";
+import { ProjectListResType } from "@/schemaValidations/project.schema";
+import dayjs from "dayjs";
 
 const style = {
   position: "absolute" as "absolute",
@@ -37,76 +49,54 @@ const confirmDeleteStyle = {
   width: 300,
 };
 
-function createData(
-  id: number,
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-) {
-  return { id, name, calories, fat, carbs, protein };
+export interface FormFilterData {
+  name: string;
+  status: string;
+  "start-date-from": string;
+  "start-date-to": string;
 }
 
-const rows = [
-  createData(1, "Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData(2, "Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData(3, "Eclair", 262, 16.0, 24, 6.0),
-  createData(4, "Cupcake", 305, 3.7, 67, 4.3),
-  createData(5, "Gingerbread", 356, 16.0, 49, 3.9),
-  createData(6, "Brownie", 412, 12.5, 38, 4.2),
-  createData(7, "Cheesecake", 328, 14.0, 22, 5.1),
-  createData(8, "Donut", 179, 8.3, 31, 3.7),
-  createData(9, "Macaroon", 94, 3.2, 15, 4.8),
-  createData(10, "Tart", 287, 11.7, 39, 4.6),
-  createData(11, "Pie", 415, 17.8, 28, 4.9),
-  createData(12, "Muffin", 206, 9.6, 33, 4.1),
-  createData(13, "Cookie", 137, 6.4, 27, 3.8),
-  createData(14, "Croissant", 295, 13.2, 41, 4.5),
-  createData(15, "Scone", 218, 10.1, 35, 4.3),
-];
+export default function ProjectListTable({
+  isFilter,
+  formData,
+}: {
+  isFilter: boolean;
+  formData: FormFilterData;
+}) {
+  const [data, setData] = React.useState<ProjectListResType | null>(null);
+  const [limit, setLimit] = React.useState(9);
+  const [loading, setLoading] = React.useState(false);
+  const handleLoadMore = () => setLimit(limit + 9);
 
-interface TableHeader {
-  label: string;
-  align?: "right" | "center" | "inherit" | "left" | "justify";
-}
-const tableHeaders: TableHeader[] = [
-  { label: "ID", align: "center" },
-  { label: "Dessert (100g serving)" },
-  { label: "Calories", align: "center" },
-  { label: "Fat (g)", align: "center" },
-  { label: "Carbs (g)", align: "center" },
-  { label: "Protein (g)", align: "center" },
-  { label: "Action", align: "center" },
-];
-
-const truncateText = (text: string, maxWords: number) => {
-  const words = text.split(" ");
-  return words.length > maxWords
-    ? words.slice(0, maxWords).join(" ") + "..."
-    : text;
-};
-
-export default function ProjectListTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const projects = [
-    { title: "Project 1", startDate: "03/06/2024", duration: "6 months" },
-    { title: "Project 2", startDate: "04/07/2024", duration: "5 months" },
-    { title: "Project 3", startDate: "05/08/2024", duration: "4 months" },
-    { title: "Project 4", startDate: "06/09/2024", duration: "3 months" },
-    { title: "Project 5", startDate: "07/10/2024", duration: "2 months" },
-    { title: "Project 6", startDate: "08/11/2024", duration: "1 month" },
-    { title: "Project 7", startDate: "08/11/2024", duration: "1 month" },
-    { title: "Project 8", startDate: "08/11/2024", duration: "1 month" },
-    { title: "Project 9", startDate: "08/11/2024", duration: "1 month" },
-    { title: "Project 10", startDate: "08/11/2024", duration: "1 month" },
-    { title: "Project 11", startDate: "08/11/2024", duration: "1 month" },
-    { title: "Project 12", startDate: "08/11/2024", duration: "1 month" },
-    { title: "Project 13", startDate: "08/11/2024", duration: "1 month" },
-    { title: "Project 14", startDate: "08/11/2024", duration: "1 month" },
-    { title: "Project 15", startDate: "08/11/2024", duration: "1 month" },
-  ];
+  React.useEffect(() => {
+    if (!isFilter) {
+      setLoading(true);
+      projectApiRequest
+        .getListProject(limit, {})
+        .then(({ payload }) => {
+          setData(payload);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(true);
+      projectApiRequest
+        .getListProject(limit, formData)
+        .then(({ payload }) => {
+          setData(payload);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [isFilter, limit]);
 
   // Card click
   const [openCardModal, setOpenCardModal] = React.useState(false);
@@ -144,36 +134,9 @@ export default function ProjectListTable() {
     }
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  //   <Button
-  //   variant="contained"
-  //   style={{ marginRight: 8 }}
-  //   size="small"
-  //   startIcon={<EditIcon />}
-  //   onClick={() => handleOpenUpdateModal(row)}
-  //   color="warning"
-  // >
-  //   Edit
-  // </Button>
-  // <Button
-  //   variant="contained"
-  //   color="error"
-  //   size="small"
-  // >
-  //   Delete
-  // </Button>
   return (
     <div>
-      <div 
+      <div
         style={{
           marginTop: 20,
           width: "100%",
@@ -200,7 +163,7 @@ export default function ProjectListTable() {
         </div>
         <ScrollArea className="h-[321px] rounded-md border p-2">
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            {projects.map((project, index) => (
+            {data?.data.map((project, index) => (
               <Card
                 onClick={() => handleOpenCardModal(project)}
                 key={index}
@@ -215,9 +178,9 @@ export default function ProjectListTable() {
                     }}
                   >
                     <CardTitle style={{ alignContent: "center" }}>
-                      {project.title}
+                      {project.name}
                     </CardTitle>
-                    <Chip size="small" label="in progress" />
+                    <Chip size="small" label={project.status} />
                   </div>
                 </CardHeader>
                 <CardContent style={{ paddingRight: 18 }}>
@@ -225,7 +188,9 @@ export default function ProjectListTable() {
                     <div className="grid w-full items-center gap-4">
                       <div className="flex flex-row space-x-1">
                         <Label>Startdate:</Label>
-                        <Label>{project.startDate}</Label>
+                        <Label>
+                          {dayjs(project["start-date"]).format("DD/MM/YYYY")}
+                        </Label>
                       </div>
                     </div>
                     <div className="grid w-full items-center gap-4">
@@ -238,6 +203,11 @@ export default function ProjectListTable() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+          <div className="flex justify-center">
+            <Button onClick={handleLoadMore} style={{ marginTop: 16 }}>
+              Load More
+            </Button>
           </div>
         </ScrollArea>
       </div>

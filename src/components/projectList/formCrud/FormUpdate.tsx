@@ -8,6 +8,7 @@ import {
   Button,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import dayjs from "dayjs";
 
 const Div = styled("div")(({ theme }) => ({
   //   ...theme.typography.button,
@@ -16,9 +17,9 @@ const Div = styled("div")(({ theme }) => ({
 }));
 
 interface RowData {
-  // id: number;
-  title: string;
-  startDate: string;
+  // id: string;
+  name: string;
+  "start-date": string;
   duration: string;
 }
 
@@ -42,7 +43,7 @@ const FormUpdate = ({ row }: { row: RowData }) => {
                 fullWidth
                 style={{ marginTop: 2 }}
                 size="small"
-                defaultValue={row.title}
+                defaultValue={row.name}
               />
             </Grid>
             <Grid item xs={12}>
@@ -53,7 +54,7 @@ const FormUpdate = ({ row }: { row: RowData }) => {
                 fullWidth
                 style={{ marginTop: 2 }}
                 size="small"
-                defaultValue={row.startDate}
+                defaultValue={dayjs(row['start-date']).format("YYYY-MM-DD")}
               />
             </Grid>
             <Grid item xs={12}>

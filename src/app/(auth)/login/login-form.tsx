@@ -50,7 +50,7 @@ const LoginForm = () => {
         sessionToken: result.payload.data.token,
       });
       toast({
-        title: `Chào mừng đăng nhập ${result.payload.data.account_info.user_name}`,
+        title: `Chào mừng đăng nhập ${result.payload.data.account_info['user-name']}`,
         duration: 2000,
         variant: "info",
       });

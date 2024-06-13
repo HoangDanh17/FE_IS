@@ -1,4 +1,3 @@
-import { LoadingSpinner } from "@/app/loading";
 import MainLayout from "@/layout/mainlayout/Mainlayout";
 import { Suspense } from "react";
 
