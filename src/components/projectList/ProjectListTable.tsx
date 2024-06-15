@@ -1,19 +1,8 @@
 "use client";
-import * as React from "react";
-import {
-  Box,
-  Fade,
-  Modal,
-  Typography,
-  Button,
-  Chip,
-  Fab,
-  Skeleton,
-} from "@mui/material";
+import { Box, Fade, Modal, Button, Chip, Fab } from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import FormCreate from "@/components/projectList/formCrud/FormCreate";
 import AddIcon from "@mui/icons-material/Add";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import DetailCard from "@/components/projectList/DetailCard";
@@ -21,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import projectApiRequest from "@/apiRequests/project";
 import { ProjectListResType } from "@/schemaValidations/project.schema";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 
 const style = {
   position: "absolute" as "absolute",
@@ -44,11 +34,6 @@ const styleCard = {
   p: 4,
 };
 
-const confirmDeleteStyle = {
-  ...style,
-  width: 300,
-};
-
 export interface FormFilterData {
   name: string;
   status: string;
@@ -58,19 +43,21 @@ export interface FormFilterData {
 
 export default function ProjectListTable({
   isFilter,
-  formData,
+  dataFilter,
+  handleReset,
 }: {
   isFilter: boolean;
-  formData: FormFilterData;
+  dataFilter: FormFilterData | null;
+  handleReset: () => void;
 }) {
-  const [data, setData] = React.useState<ProjectListResType | null>(null);
-  const [limit, setLimit] = React.useState(9);
-  const [loading, setLoading] = React.useState(false);
+  const [data, setData] = useState<ProjectListResType | null>(null);
+  const [limit, setLimit] = useState(9);
+  const [loading, setLoading] = useState(false);
   const handleLoadMore = () => setLimit(limit + 9);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    setLoading(true);
     if (!isFilter) {
-      setLoading(true);
       projectApiRequest
         .getListProject(limit, {})
         .then(({ payload }) => {
@@ -83,9 +70,8 @@ export default function ProjectListTable({
           setLoading(false);
         });
     } else {
-      setLoading(true);
       projectApiRequest
-        .getListProject(limit, formData)
+        .getListProject(limit, dataFilter)
         .then(({ payload }) => {
           setData(payload);
         })
@@ -96,11 +82,11 @@ export default function ProjectListTable({
           setLoading(false);
         });
     }
-  }, [isFilter, limit]);
+  }, [isFilter, dataFilter, limit]);
 
   // Card click
-  const [openCardModal, setOpenCardModal] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState<any>(null);
+  const [openCardModal, setOpenCardModal] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<any>(null);
 
   const handleCloseCardModal = () => setOpenCardModal(false);
 
@@ -111,27 +97,11 @@ export default function ProjectListTable({
   };
 
   // Create modal
-  const [openCreateModal, setOpenCreateModal] = React.useState(false);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
   const handleOpenCreateModal = () => setOpenCreateModal(true);
-  const handleCloseCreateModal = () => setOpenCreateModal(false);
-  // Edit modal
-
-  //Delete modal
-  const [openDeleteConfirmModal, setOpenDeleteConfirmModal] =
-    React.useState(false);
-
-  const [rowToDelete, setRowToDelete] = React.useState<number | null>(null);
-  const handleOpenDeleteConfirmModal = (id: number) => {
-    setRowToDelete(id);
-    setOpenDeleteConfirmModal(true);
-  };
-
-  const handleCloseDeleteConfirmModal = () => setOpenDeleteConfirmModal(false);
-  const handleDelete = () => {
-    if (rowToDelete !== null) {
-      console.log(rowToDelete);
-      handleCloseDeleteConfirmModal();
-    }
+  const handleCloseCreateModal = () => {
+    setOpenCreateModal(false);
+    handleReset();
   };
 
   return (
@@ -227,7 +197,7 @@ export default function ProjectListTable({
       >
         <Fade in={openCreateModal}>
           <Box sx={style}>
-            <FormCreate></FormCreate>
+            <FormCreate handleClose={handleCloseCreateModal}></FormCreate>
           </Box>
         </Fade>
       </Modal>
@@ -248,43 +218,6 @@ export default function ProjectListTable({
         <Fade in={openCardModal}>
           <Box sx={styleCard}>
             <DetailCard row={selectedCard}></DetailCard>
-          </Box>
-        </Fade>
-      </Modal>
-
-      {/* Modal Delete Confirm */}
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={openDeleteConfirmModal}
-        onClose={handleCloseDeleteConfirmModal}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
-        <Fade in={openDeleteConfirmModal}>
-          <Box sx={confirmDeleteStyle}>
-            <Typography id="transition-modal-title" variant="h6" component="h2">
-              Xác nhận xóa
-            </Typography>
-            <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-              Bạn có chắc chắn muốn xóa hàng này không?
-            </Typography>
-            <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-              <Button
-                onClick={handleCloseDeleteConfirmModal}
-                style={{ marginRight: 8 }}
-              >
-                Hủy
-              </Button>
-              <Button variant="contained" color="error" onClick={handleDelete}>
-                Xóa
-              </Button>
-            </Box>
           </Box>
         </Fade>
       </Modal>

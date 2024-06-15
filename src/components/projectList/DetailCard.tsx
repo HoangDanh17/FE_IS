@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Avatar,
   AvatarGroup,
+  Chip,
   Divider,
   Fade,
   Modal,
@@ -22,7 +23,12 @@ import {
 import { useState } from "react";
 import FormAddPM from "@/components/projectList/formCrud/FormAddPM";
 import FormUpdate from "@/components/projectList/formCrud/FormUpdate";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
+import {
+  MemberInProjectResType,
+  MemberInProjectType,
+} from "@/schemaValidations/project.schema";
+import projectApiRequest from "@/apiRequests/project";
 
 const Div = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -46,16 +52,25 @@ const confirmDeleteStyle = {
   width: 300,
 };
 
-interface RowData {
+export interface RowData {
   id: string;
   name: string;
-  "start-date": string;
-  duration: number;
+  "start-date": Date;
+  duration: string;
+  status: string;
+  description: string;
 }
 
 const DetailCard = ({ row }: { row: RowData }) => {
+  const [listMemberInProject, setListMemberInProject] =
+    useState<MemberInProjectResType>();
+  useEffect(() => {
+    projectApiRequest.getListPMInProject(row.id).then(({ payload }) => {
+      setListMemberInProject(payload);
+    });
+  }, []);
+
   // update modal
-  console.log("row",row)
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const handleOpenUpdateModal = (row: any) => {
@@ -75,7 +90,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
   };
 
   const handleCloseDeleteConfirmModal = () => setOpenDeleteConfirmModal(false);
-  
+
   const handleDelete = () => {
     if (rowToDelete !== null) {
       console.log(rowToDelete);
@@ -101,7 +116,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
         }}
       >
         <Typography id="transition-modal-title" variant="h4" component="h2">
-          Chi tiết dự án
+          Chi tiết dự án - Status: <Chip label={row.status}></Chip>
         </Typography>
         <Typography id="transition-modal-title" variant="h4" component="h2">
           Hành động
@@ -133,7 +148,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
                     style={{ marginTop: 2 }}
                     disabled
                     size="small"
-                    defaultValue={dayjs(row['start-date']).format("YYYY-MM-DD")}
+                    defaultValue={dayjs(row["start-date"]).format("YYYY-MM-DD")}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -149,25 +164,34 @@ const DetailCard = ({ row }: { row: RowData }) => {
                   />
                 </Grid>
                 <Grid item xs={12}>
+                  <Typography variant="h6">Thông tin mô tả </Typography>
+                  <TextField
+                    id="fat"
+                    variant="outlined"
+                    fullWidth
+                    style={{ marginTop: 2 }}
+                    size="small"
+                    disabled
+                    defaultValue={row.description}
+                  />
+                </Grid>
+                <Grid item xs={12}>
                   <Typography variant="h6">Quản lí dự án </Typography>
                   <div className="flex mt-2">
-                    <AvatarGroup>
-                      {[
-                        "Remy Sharp",
-                        "Travis Howard",
-                        "Cindy Baker",
-                        "Agnes Walker",
-                        "Trevor Henderson",
-                      ].map((name, index) => (
-                        <Tooltip title={name} key={index}>
-                          <Avatar
-                            alt={name}
-                            src="https://github.com/shadcn.png"
-                            // title={name}
-                          />
-                        </Tooltip>
-                      ))}
-                    </AvatarGroup>
+                    {listMemberInProject?.data.length !== 0 ? (
+                      <AvatarGroup>
+                        {listMemberInProject?.data.map((name, index) => (
+                          <Tooltip title={name["user-name"]} key={index}>
+                            <Avatar
+                              alt={name["user-name"]}
+                              src="/images/avatar.jpg"
+                            />
+                          </Tooltip>
+                        ))}
+                      </AvatarGroup>
+                    ) : (
+                      <Typography variant="body1">Chưa có PM</Typography>
+                    )}
                   </div>
                 </Grid>
               </Grid>

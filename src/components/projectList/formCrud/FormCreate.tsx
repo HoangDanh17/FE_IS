@@ -23,7 +23,7 @@ const Div = styled("div")(({ theme }) => ({
   padding: theme.spacing(1),
 }));
 
-const FormCreate = () => {
+const FormCreate = ({ handleClose }: { handleClose: () => void }) => {
   const [formData, setFormData] = useState<CreateProjectType>({
     description: "",
     duration: "",
@@ -46,6 +46,8 @@ const FormCreate = () => {
   const router = useRouter();
 
   async function handleSubmit(e: FormEvent) {
+    if (loading) return;
+    setLoading(true);
     e.preventDefault();
     const formattedData = {
       ...formData,
@@ -54,12 +56,8 @@ const FormCreate = () => {
         : null,
     };
 
-    console.log(formattedData);
-    if (loading) return;
-    setLoading(true);
     try {
       const result = await projectApiRequest.createProject(formattedData);
-
       toast({
         title: `${result.payload.message}`,
         duration: 2000,
@@ -75,6 +73,7 @@ const FormCreate = () => {
       });
     } finally {
       setLoading(false);
+      handleClose();
     }
   }
 
@@ -132,7 +131,9 @@ const FormCreate = () => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h6" style={{marginBottom:4}}>Ngày bắt đầu</Typography>
+                <Typography variant="h6" style={{ marginBottom: 4 }}>
+                  Ngày bắt đầu
+                </Typography>
                 <DatePicker
                   value={dayjs(formData["start-at"])}
                   onChange={(newValue) => handleDateChange(newValue)}

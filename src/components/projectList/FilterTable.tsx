@@ -69,7 +69,7 @@ const FilterTable = () => {
 
   const [formData, setFormData] = useState<FormFilterData>({
     name: "",
-    status: "not_start",
+    status: "",
     "start-date-from": "",
     "start-date-to": "",
   });
@@ -90,19 +90,23 @@ const FilterTable = () => {
   };
 
   const [isFilter, setIsFilter] = useState<boolean>(false);
+  const [dataFilter, setDataFilter] = useState<FormFilterData | null>(null);
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setIsFilter(true);
+    setDataFilter(formData);
   }
 
   const handleReset = () => {
     setFormData({
       name: "",
-      status: "not_start",
+      status: "",
       "start-date-from": "",
       "start-date-to": "",
     });
     setIsFilter(false);
+    setDataFilter(null);
   };
 
   return (
@@ -183,7 +187,6 @@ const FilterTable = () => {
                         onChange={handleSelectChange}
                         variant="standard"
                         size="small"
-                        defaultValue="not_start"
                         style={{ width: "90%" }}
                       >
                         <MenuItem value={"not_start"}>Not start</MenuItem>
@@ -223,7 +226,8 @@ const FilterTable = () => {
       </LocalizationProvider>
       <ProjectListTable
         isFilter={isFilter}
-        formData={formData}
+        dataFilter={dataFilter}
+        handleReset={handleReset}
       ></ProjectListTable>
     </div>
   );
