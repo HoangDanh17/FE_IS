@@ -1,17 +1,37 @@
-import React from 'react';
-import { Box, TextField, Typography, Button, Grid, FormControl } from "@mui/material"
-import '@/components/css/manageintern/ModalBox.css'
-
+import React, { useState } from 'react';
+import { Box, TextField, Typography, Button, Grid, FormControl } from "@mui/material";
+import '@/components/css/manageintern/ModalBox.css';
 
 interface AddModalProps {
+    onAdd: (data: any) => void;
     onClose: () => void;
 }
 
-const AddModal: React.FC<AddModalProps> = ({onClose}) => {
+const AddModal: React.FC<AddModalProps> = ({ onAdd, onClose }) => {
+    const [formData, setFormData] = useState({
+        semester: '',
+        university: '',
+        start_date: '',
+        end_date: ''
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
+    const handleAdd = () => {
+        onAdd(formData);
+        onClose();
+    };
+
     return (
         <Box className="modal-box">
             <Typography id="modal-modal-title" variant="h6" component="h2">
-                Thêm tài khoản mới
+                Thêm kì học mới
             </Typography>
 
             <FormControl>
@@ -19,7 +39,10 @@ const AddModal: React.FC<AddModalProps> = ({onClose}) => {
                     <Grid item xs={4}>
                         <FormControl fullWidth>
                             <TextField
-                                label="Họ và Tên"
+                                label="Kì"
+                                name="semester"
+                                value={formData.semester}
+                                onChange={handleChange}
                             />
                         </FormControl>
                     </Grid>
@@ -27,7 +50,10 @@ const AddModal: React.FC<AddModalProps> = ({onClose}) => {
                     <Grid item xs={4}>
                         <FormControl fullWidth>
                             <TextField
-                                label="Email"
+                                label="Trường"
+                                name="university"
+                                value={formData.university}
+                                onChange={handleChange}
                             />
                         </FormControl>
                     </Grid>
@@ -35,7 +61,10 @@ const AddModal: React.FC<AddModalProps> = ({onClose}) => {
                     <Grid item xs={4}>
                         <FormControl fullWidth>
                             <TextField
-                                label="Số điện thoại"
+                                label="Start Date"
+                                name="start_date"
+                                value={formData.start_date}
+                                onChange={handleChange}
                             />
                         </FormControl>
                     </Grid>
@@ -43,7 +72,10 @@ const AddModal: React.FC<AddModalProps> = ({onClose}) => {
                     <Grid item xs={4}>
                         <FormControl fullWidth>
                             <TextField
-                                label="Kỹ năng"
+                                label="End Date"
+                                name="end_date"
+                                value={formData.end_date}
+                                onChange={handleChange}
                             />
                         </FormControl>
                     </Grid>
@@ -51,22 +83,16 @@ const AddModal: React.FC<AddModalProps> = ({onClose}) => {
 
                 <Box display="flex" justifyContent="flex-end">
                     <Button
-                        color="primary"
-                        className="cancel-btn"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </Button>
-
-                    <Button
                         variant="contained"
                         color="primary"
+                        onClick={handleAdd}
                     >
                         Add
                     </Button>
                 </Box>
             </FormControl>
         </Box>
-    )
-}
+    );
+};
+
 export default AddModal;

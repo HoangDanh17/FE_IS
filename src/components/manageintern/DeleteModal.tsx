@@ -1,70 +1,37 @@
-// // DeleteModal.tsx
-// import React from 'react';
-// import { Box, Typography, Button } from '@mui/material';
-
-// interface DeleteModalProps {
-//     open: boolean;
-//     onClose: () => void;
-//     onDelete: () => void;
-// }
-
-// const DeleteModal: React.FC<DeleteModalProps> = ({ open, onClose, onDelete }) => {
-//     return (
-//         <Box className="modal-box">
-//             <Typography variant="h6" component="h2">
-//                 Xác nhận xóa
-//             </Typography>
-//             <Typography variant="body1">
-//                 Bạn có chắc chắn muốn xóa thông tin này?
-//             </Typography>
-//             <Box display="flex" justifyContent="flex-end" mt={2}>
-//                 <Button onClick={onClose} color="primary">
-//                     Hủy
-//                 </Button>
-//                 <Button onClick={onDelete} variant="contained" color="error" sx={{ ml: 1 }}>
-//                     Xóa
-//                 </Button>
-//             </Box>
-//         </Box>
-//     );
-// };
-
-// export default DeleteModal;
-
+'use client';
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 
+interface RowData {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  skill: string[];
+}
+
 interface DeleteModalProps {
-    open: boolean;
-    onClose: () => void;
-    onDelete: (id: number) => void;
-    rowData: any;
+  open: boolean;
+  onClose: () => void;
+  onDelete: () => void;
+  rowData: RowData | null; // Add this line to the interface
 }
 
 const DeleteModal: React.FC<DeleteModalProps> = ({ open, onClose, onDelete, rowData }) => {
-    const handleDelete = () => {
-        onDelete(rowData.id);
-        onClose();
-    };
-
-    return (
-        <Box className="modal-box">
-            <Typography variant="h6" component="h2">
-                Xác nhận xóa
-            </Typography>
-            <Typography variant="body1">
-                Bạn có chắc chắn muốn xóa thông tin này?
-            </Typography>
-            <Box display="flex" justifyContent="flex-end" mt={2}>
-                <Button onClick={onClose} color="primary">
-                    Hủy
-                </Button>
-                <Button onClick={handleDelete} variant="contained" color="error" sx={{ ml: 1 }}>
-                    Xóa
-                </Button>
-            </Box>
-        </Box>
-    );
+  return (
+    <Box className="modal-box">
+      <Typography id="modal-modal-title" variant="h6" component="h2">
+        Xóa tài khoản
+      </Typography>
+      <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+        Bạn có chắc chắn muốn xóa tài khoản {rowData?.name}?
+      </Typography>
+      <Box display="flex" justifyContent="flex-end">
+        <Button onClick={onClose}>Hủy</Button>
+        <Button onClick={onDelete} color="error">Xóa</Button>
+      </Box>
+    </Box>
+  );
 };
 
 export default DeleteModal;

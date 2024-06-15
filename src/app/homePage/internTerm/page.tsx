@@ -1,6 +1,6 @@
-import Table4 from "@/components/manageterm/Table4";
+import TermTable from "@/components/manageterm/TermTable";
 import FilterTerm from "@/components/manageterm/FilterTerm"
-import ButtonGroup2 from "@/components/manageterm/ButtonGroup2";
+
 const internTerm = () => {
  return ( 
   <div>
@@ -9,11 +9,11 @@ const internTerm = () => {
       </div>
   <div className="table" style={{ marginTop: "10px" }}>
         {/* <DataTable /> */}
-        <Table4/>
+        <TermTable/>
       </div>
-      <div>
+      {/* <div>
         <ButtonGroup2 />
-      </div>
+      </div> */}
       </div>
   ) 
 

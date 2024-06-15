@@ -1,88 +1,112 @@
-import React from 'react';
-import { Box, TextField, Typography, Button, Grid, FormControl, Modal } from "@mui/material"
-import '@/components/css/manageintern/ModalBox.css'
+"use client";
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  TextField,
+  Typography,
+  Button,
+  Grid,
+  FormControl,
+} from "@mui/material";
+import "@/components/css/manageintern/ModalBox.css";
+import { RowData } from "./TermTable";
 
+const defaultRowData: RowData = {
+  id: "",
+  semester: "",
+  university: "",
+  start_date: "",
+  end_date: "",
+};
 
-interface EditModalProps {
-    onClose: () => void;
-    openEditModal: boolean;
-    setOpenEditModal: (v: boolean) => void;
-    dataUpdate: any;
-    setDataUpdate: any;
-}
+const EditModal = ({
+  row,
+}: {
+  row: RowData | null;
+}) => {
+  const [formData, setFormData] = useState<RowData | null>(defaultRowData);
 
-const EditModal = (props: EditModalProps) => {
+  useEffect(() => {
+    if (row) {
+      setFormData(row); // Initialize form data with the selected row data
+    }
+  }, [row]);
 
-    const {
-        openEditModal, setOpenEditModal, dataUpdate, setDataUpdate, onClose
-    } = props;
+  const handleChange =
+    (field: keyof RowData) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (formData) {
+        setFormData({
+          ...formData,
+          [field]: event.target.value,
+        });
+      }
+    };
 
-    return (
-        <Modal
-            open={openEditModal}
-            //onClose={handleCloseAddModal}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-        >
-            <Box className="modal-box">
-                <Typography id="modal-modal-title" variant="h6" component="h2">
-                    Thêm tài khoản mới
-                </Typography>
+  const handleSubmit = () => {
+    if (formData) {
+      console.log(formData); // Log the updated form data to the console
+    }
+  };
 
-                <FormControl>
-                    <Grid container spacing={2} marginY={2}>
-                        <Grid item xs={4}>
-                            <FormControl fullWidth>
-                                <TextField
-                                    label="Họ và Tên"
-                                />
-                            </FormControl>
-                        </Grid>
+  return (
+    <div>
+      <Box className="modal-box">
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          Sửa
+        </Typography>
 
-                        <Grid item xs={4}>
-                            <FormControl fullWidth>
-                                <TextField
-                                    label="Email"
-                                />
-                            </FormControl>
-                        </Grid>
+        <FormControl>
+          <Grid container spacing={2} marginY={2}>
+            <Grid item xs={4}>
+              <FormControl fullWidth>
+                <TextField
+                  label="Kì"
+                  value={formData?.semester || ""}
+                  onChange={handleChange("semester")}
+                />
+              </FormControl>
+            </Grid>
 
-                        <Grid item xs={4}>
-                            <FormControl fullWidth>
-                                <TextField
-                                    label="Mật khẩu"
-                                />
-                            </FormControl>
-                        </Grid>
+            <Grid item xs={4}>
+              <FormControl fullWidth>
+                <TextField
+                  label="Trường"
+                  value={formData?.university || ""}
+                  onChange={handleChange("university")}
+                />
+              </FormControl>
+            </Grid>
 
-                        <Grid item xs={4}>
-                            <FormControl fullWidth>
-                                <TextField
-                                    label="Role"
-                                />
-                            </FormControl>
-                        </Grid>
-                    </Grid>
+            <Grid item xs={4}>
+              <FormControl fullWidth>
+                <TextField
+                  label="Ngày bắt đầu"
+                  value={formData?.start_date || ""}
+                  onChange={handleChange("start_date")}
+                />
+              </FormControl>
+            </Grid>
 
-                    <Box display="flex" justifyContent="flex-end">
-                        <Button
-                            color="primary"
-                            className="cancel-btn"
-                            onClick={onclose}
-                        >
-                            Cancel
-                        </Button>
+            <Grid item xs={4}>
+              <FormControl fullWidth>
+                <TextField
+                  label="Ngày kết thúc"
+                  value={formData?.end_date || ""}
+                  onChange={handleChange("end_date")}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
 
-                        <Button
-                            variant="contained"
-                            color="primary"
-                        >
-                            Add
-                        </Button>
-                    </Box>
-                </FormControl>
-            </Box>
-        </Modal>
-    )
-}
+          <Box display="flex" justifyContent="flex-end">
+            <Button variant="contained" color="primary" onClick={handleSubmit}>
+              Edit
+            </Button>
+          </Box>
+        </FormControl>
+      </Box>
+    </div>
+  );
+};
+
 export default EditModal;

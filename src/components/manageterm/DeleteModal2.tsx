@@ -1,32 +1,30 @@
-// DeleteModal.tsx
+'use client';
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import { RowData } from './TermTable';  // Import RowData from TermTable
 
 interface DeleteModalProps {
-    open: boolean;
-    onClose: () => void;
-    onDelete: () => void;
+  open: boolean;
+  onClose: () => void;
+  onDelete: () => void;
+  rowData: RowData | null;
 }
 
-const DeleteModal: React.FC<DeleteModalProps> = ({ open, onClose, onDelete }) => {
-    return (
-        <Box className="modal-box">
-            <Typography variant="h6" component="h2">
-                Xác nhận xóa
-            </Typography>
-            <Typography variant="body1">
-                Bạn có chắc chắn muốn xóa thông tin này?
-            </Typography>
-            <Box display="flex" justifyContent="flex-end" mt={2}>
-                <Button onClick={onClose} color="primary">
-                    Hủy
-                </Button>
-                <Button onClick={onDelete} variant="contained" color="error" sx={{ ml: 1 }}>
-                    Xóa
-                </Button>
-            </Box>
-        </Box>
-    );
+const DeleteModal: React.FC<DeleteModalProps> = ({ open, onClose, onDelete, rowData }) => {
+  return (
+    <Box className="modal-box">
+      <Typography id="modal-modal-title" variant="h6" component="h2">
+        Xóa
+      </Typography>
+      <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+        Bạn có chắc chắn muốn xóa?
+      </Typography>
+      <Box display="flex" justifyContent="flex-end">
+        <Button onClick={onClose}>Hủy</Button>
+        <Button onClick={onDelete} color="error">Xóa</Button>
+      </Box>
+    </Box>
+  );
 };
 
 export default DeleteModal;

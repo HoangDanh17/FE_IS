@@ -142,13 +142,13 @@ const Table4 = () => {
                 className="custom-row custom-pagination"
             />
 
-            <EditModal
+            {/* <EditModal
                 onClose={handleCloseEditModal}
                 openEditModal={openEditModal}
                 setOpenEditModal={setOpenEditModal}
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
-            />
+            /> */}
         </div>
     );
 };

@@ -1,21 +1,21 @@
+
 import Filter from "@/components/manageintern/FilterIntern";
-import DataTable from "@/components/manageintern/Table";
-import ButtonGroup from "@/components/manageintern/ButtonGroup";
-import Table2 from "@/components/manageintern/Table2";
+import InternTable from "@/components/manageintern/InternTable";
+
 const manageIntern = () => {
   return (
     <div>
       <div className="filter">
-        <Filter />
+        <Filter/>
       </div>
 
-      <div className="table" style={{ marginTop: "10px" }}>
+      <div className="table" style={{ marginTop: "10px", }}>
         {/* <DataTable /> */}
-        <Table2/>
+       <InternTable/>
       </div>
 
       <div>
-        <ButtonGroup />
+        {/* <ButtonGroup /> */}
       </div>
 
     </div>

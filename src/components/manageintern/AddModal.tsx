@@ -1,13 +1,10 @@
+'use client';
 import React from 'react';
 import { Box, TextField, Typography, Button, Grid, FormControl } from "@mui/material"
 import '@/components/css/manageintern/ModalBox.css'
 
 
-interface AddModalProps {
-    onClose: () => void;
-}
-
-const AddModal: React.FC<AddModalProps> = ({onClose}) => {
+const AddModal = () => {
     return (
         <Box className="modal-box">
             <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -50,14 +47,6 @@ const AddModal: React.FC<AddModalProps> = ({onClose}) => {
                 </Grid>
 
                 <Box display="flex" justifyContent="flex-end">
-                    <Button
-                        color="primary"
-                        className="cancel-btn"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </Button>
-
                     <Button
                         variant="contained"
                         color="primary"

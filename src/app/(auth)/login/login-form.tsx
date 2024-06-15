@@ -41,30 +41,31 @@ const LoginForm = () => {
   });
 
   async function onSubmit(values: LoginBodyType) {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const result = await authApiRequest.login(values);
+    router.push("/homePage");
+    // if (loading) return;
+    // setLoading(true);
+    // try {
+    //   const result = await authApiRequest.login(values);
 
-      await authApiRequest.auth({
-        sessionToken: result.payload.data.token,
-      });
-      toast({
-        title: `Chào mừng đăng nhập ${result.payload.data.account_info.user_name}`,
-        duration: 2000,
-        variant: "info",
-      });
-      setUser(result.payload.data.account_info);
-      console.log(result);
-      router.push("/homePage");
-    } catch (error: any) {
-      handleErrorApi({
-        error,
-        setError: form.setError,
-      });
-    } finally {
-      setLoading(false);
-    }
+    //   await authApiRequest.auth({
+    //     sessionToken: result.payload.data.token,
+    //   });
+    //   toast({
+    //     title: `Chào mừng đăng nhập ${result.payload.data.account_info.user_name}`,
+    //     duration: 2000,
+    //     variant: "info",
+    //   });
+    //   setUser(result.payload.data.account_info);
+    //   console.log(result);
+    //   router.push("/homePage");
+    // } catch (error: any) {
+    //   handleErrorApi({
+    //     error,
+    //     setError: form.setError,
+    //   });
+    // } finally {
+    //   setLoading(false);
+    // }
   }
 
   return (
