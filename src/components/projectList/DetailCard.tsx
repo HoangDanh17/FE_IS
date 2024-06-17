@@ -23,11 +23,8 @@ import {
 import { useState } from "react";
 import FormAddPM from "@/components/projectList/formCrud/FormAddPM";
 import FormUpdate from "@/components/projectList/formCrud/FormUpdate";
-import dayjs, { Dayjs } from "dayjs";
-import {
-  MemberInProjectResType,
-  MemberInProjectType,
-} from "@/schemaValidations/project.schema";
+import dayjs from "dayjs";
+import { MemberInProjectResType } from "@/schemaValidations/project.schema";
 import projectApiRequest from "@/apiRequests/project";
 
 const Div = styled("div")(({ theme }) => ({
@@ -47,10 +44,10 @@ const style = {
   p: 4,
 };
 
-const confirmDeleteStyle = {
-  ...style,
-  width: 300,
-};
+// const confirmDeleteStyle = {
+//   ...style,
+//   width: 300,
+// };
 
 export interface RowData {
   id: string;
@@ -61,9 +58,16 @@ export interface RowData {
   description: string;
 }
 
-const DetailCard = ({ row }: { row: RowData }) => {
+const DetailCard = ({
+  row,
+  handleCloseCard,
+}: {
+  row: RowData;
+  handleCloseCard: () => void;
+}) => {
   const [listMemberInProject, setListMemberInProject] =
     useState<MemberInProjectResType>();
+
   useEffect(() => {
     projectApiRequest.getListPMInProject(row.id).then(({ payload }) => {
       setListMemberInProject(payload);
@@ -77,34 +81,59 @@ const DetailCard = ({ row }: { row: RowData }) => {
     setSelectedRow(row);
     setOpenUpdateModal(true);
   };
-  const handleCloseUpdateModal = () => setOpenUpdateModal(false);
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+    handleCloseCard();
+  };
 
   // delete modal
-  const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
 
-  const [rowToDelete, setRowToDelete] = useState<string | null>(null);
+  // const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
 
-  const handleOpenDeleteConfirmModal = (id: string) => {
-    setRowToDelete(id);
-    setOpenDeleteConfirmModal(true);
-  };
+  // const [rowToDelete, setRowToDelete] = useState<string | null>(null);
 
-  const handleCloseDeleteConfirmModal = () => setOpenDeleteConfirmModal(false);
+  // const handleOpenDeleteConfirmModal = (id: string) => {
+  //   setRowToDelete(id);
+  //   setOpenDeleteConfirmModal(true);
+  // };
 
-  const handleDelete = () => {
-    if (rowToDelete !== null) {
-      console.log(rowToDelete);
-      handleCloseDeleteConfirmModal();
-    }
-  };
+  // const handleCloseDeleteConfirmModal = () => setOpenDeleteConfirmModal(false);
+
+  // const handleDelete = () => {
+  //   if (rowToDelete !== null) {
+  //     console.log(rowToDelete);
+  //     handleCloseDeleteConfirmModal();
+  //   }
+  // };
   // add PM
+
   const [openAddPMModal, setOpenAddPMModal] = useState(false);
+
   const [data, setData] = useState<any>(null);
   const handleOpenAddPMModal = (row: any) => {
     setData(row);
     setOpenAddPMModal(true);
   };
-  const handleCloseAddPMModal = () => setOpenAddPMModal(false);
+
+  const handleCloseAddPMModal = () => {
+    setOpenAddPMModal(false);
+    handleCloseCard();
+  };
+
+  const getStatusChipColor = (status: string) => {
+    switch (status) {
+      case "not_start":
+        return { backgroundColor: "#FFB6C1", color: "white" }; // Màu hồng pastel đậm hơn
+      case "doing":
+        return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
+      case "done":
+        return { backgroundColor: "#90EE90", color: "white" }; // Màu xanh lá pastel đậm hơn
+      case "cancel":
+        return { backgroundColor: "#FFA07A", color: "white" }; // Màu cam pastel đậm hơn
+      default:
+        return { backgroundColor: "#D3D3D3", color: "white" }; // Màu xám
+    }
+  };
 
   return (
     <Div>
@@ -116,7 +145,12 @@ const DetailCard = ({ row }: { row: RowData }) => {
         }}
       >
         <Typography id="transition-modal-title" variant="h4" component="h2">
-          Chi tiết dự án - Status: <Chip label={row.status}></Chip>
+          Chi tiết dự án - Status:{" "}
+          <Chip
+            size="small"
+            label={row.status === "not_start" ? "not start" : row.status}
+            sx={getStatusChipColor(row.status)}
+          ></Chip>
         </Typography>
         <Typography id="transition-modal-title" variant="h4" component="h2">
           Hành động
@@ -212,7 +246,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
                     Sửa dự án
                   </Button>
                 </Grid>
-                <Grid item>
+                {/* <Grid item>
                   <Button
                     variant="contained"
                     color="error"
@@ -222,13 +256,13 @@ const DetailCard = ({ row }: { row: RowData }) => {
                   >
                     Xóa dự án
                   </Button>
-                </Grid>
+                </Grid> */}
                 <Grid item>
                   <Button
                     variant="contained"
                     color="info"
                     startIcon={<AddIcon />}
-                    onClick={() => handleOpenAddPMModal(row.id)}
+                    onClick={() => handleOpenAddPMModal(row)}
                     style={{ width: "100%", marginTop: 6 }}
                   >
                     Thêm quản lí
@@ -255,12 +289,15 @@ const DetailCard = ({ row }: { row: RowData }) => {
       >
         <Fade in={openUpdateModal}>
           <Box sx={style}>
-            <FormUpdate row={selectedRow}></FormUpdate>
+            <FormUpdate
+              row={selectedRow}
+              handleClose={handleCloseUpdateModal}
+            ></FormUpdate>
           </Box>
         </Fade>
       </Modal>
       {/* Modal Delete */}
-      <Modal
+      {/* <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openDeleteConfirmModal}
@@ -294,7 +331,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
             </Box>
           </Box>
         </Fade>
-      </Modal>
+      </Modal> */}
       {/* Modal Add PM */}
       <Modal
         aria-labelledby="transition-modal-title"
@@ -311,7 +348,11 @@ const DetailCard = ({ row }: { row: RowData }) => {
       >
         <Fade in={openAddPMModal}>
           <Box sx={style}>
-            <FormAddPM row={data}></FormAddPM>
+            <FormAddPM
+              row={data}
+              listMemberInProject={listMemberInProject}
+              handleClose={handleCloseAddPMModal}
+            ></FormAddPM>
           </Box>
         </Fade>
       </Modal>

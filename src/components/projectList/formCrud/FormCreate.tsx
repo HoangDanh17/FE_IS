@@ -137,7 +137,7 @@ const FormCreate = ({ handleClose }: { handleClose: () => void }) => {
                 <DatePicker
                   value={dayjs(formData["start-at"])}
                   onChange={(newValue) => handleDateChange(newValue)}
-                  slotProps={{ textField: { fullWidth: true } }}
+                  slotProps={{ textField: { fullWidth: true, size: "small" } }}
                 />
               </Grid>
               <Grid item xs={12}>

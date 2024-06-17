@@ -1,5 +1,5 @@
 "use client";
-import { Box, Fade, Modal, Button, Chip, Fab } from "@mui/material";
+import { Box, Fade, Modal, Button, Chip, Fab, Skeleton } from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import FormCreate from "@/components/projectList/formCrud/FormCreate";
 import AddIcon from "@mui/icons-material/Add";
@@ -54,44 +54,40 @@ export default function ProjectListTable({
   const [limit, setLimit] = useState(9);
   const [loading, setLoading] = useState(false);
   const handleLoadMore = () => setLimit(limit + 9);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const triggerRefresh = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
 
   useEffect(() => {
     setLoading(true);
-    if (!isFilter) {
-      projectApiRequest
-        .getListProject(limit, {})
-        .then(({ payload }) => {
-          setData(payload);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      projectApiRequest
-        .getListProject(limit, dataFilter)
-        .then(({ payload }) => {
-          setData(payload);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [isFilter, dataFilter, limit]);
+    const fetchData = async () => {
+      try {
+        const { payload } = await projectApiRequest.getListProject(
+          limit,
+          isFilter ? dataFilter : {}
+        );
+        setData(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [isFilter, dataFilter, limit, refreshKey]);
 
   // Card click
   const [openCardModal, setOpenCardModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<any>(null);
 
-  const handleCloseCardModal = () => setOpenCardModal(false);
+  const handleCloseCardModal = () => {
+    setOpenCardModal(false);
+    handleReset();
+    triggerRefresh();
+  };
 
   const handleOpenCardModal = (row: object) => {
-    console.log(row);
     setSelectedCard(row);
     setOpenCardModal(true);
   };
@@ -102,6 +98,21 @@ export default function ProjectListTable({
   const handleCloseCreateModal = () => {
     setOpenCreateModal(false);
     handleReset();
+  };
+
+  const getStatusChipColor = (status: string) => {
+    switch (status) {
+      case "not_start":
+        return { backgroundColor: "#FFB6C1", color: "white" }; // Màu hồng pastel đậm hơn
+      case "doing":
+        return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
+      case "done":
+        return { backgroundColor: "#90EE90", color: "white" }; // Màu xanh lá pastel đậm hơn
+      case "cancel":
+        return { backgroundColor: "#FFA07A", color: "white" }; // Màu cam pastel đậm hơn
+      default:
+        return { backgroundColor: "#D3D3D3", color: "white" }; // Màu xám
+    }
   };
 
   return (
@@ -133,46 +144,69 @@ export default function ProjectListTable({
         </div>
         <ScrollArea className="h-[321px] rounded-md border p-2">
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            {data?.data.map((project, index) => (
-              <Card
-                onClick={() => handleOpenCardModal(project)}
-                key={index}
-                className="w-[360px] hover:scale-110 duration-300 cursor-grab shadow-lg	"
-              >
-                <CardHeader>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      height: "auto",
-                    }}
+            {loading
+              ? Array.from(new Array(9)).map((_, index) => (
+                  <Card key={index} className="w-[360px]">
+                    <CardHeader>
+                      <Skeleton variant="text" width="80%" height={30} />
+                      <Skeleton
+                        variant="rectangular"
+                        width="100%"
+                        height={60}
+                      />
+                    </CardHeader>
+                  </Card>
+                ))
+              : data?.data.map((project, index) => (
+                  <Card
+                    onClick={() => handleOpenCardModal(project)}
+                    key={index}
+                    className="w-[360px] hover:scale-110 duration-300 cursor-grab shadow-lg"
                   >
-                    <CardTitle style={{ alignContent: "center" }}>
-                      {project.name}
-                    </CardTitle>
-                    <Chip size="small" label={project.status} />
-                  </div>
-                </CardHeader>
-                <CardContent style={{ paddingRight: 18 }}>
-                  <div className="flex flex-row space-x-2 w-full">
-                    <div className="grid w-full items-center gap-4">
-                      <div className="flex flex-row space-x-1">
-                        <Label>Startdate:</Label>
-                        <Label>
-                          {dayjs(project["start-date"]).format("DD/MM/YYYY")}
-                        </Label>
+                    <CardHeader>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          height: "auto",
+                        }}
+                      >
+                        <CardTitle style={{ alignContent: "center" }}>
+                          {project.name}
+                        </CardTitle>
+                        <Chip
+                          size="small"
+                          label={
+                            project.status === "not_start"
+                              ? "not start"
+                              : project.status
+                          }
+                          sx={getStatusChipColor(project.status)}
+                        />
                       </div>
-                    </div>
-                    <div className="grid w-full items-center gap-4">
-                      <div className="flex flex-row space-x-1.5">
-                        <Label>Duration:</Label>
-                        <Label>{project.duration}</Label>
+                    </CardHeader>
+                    <CardContent style={{ paddingRight: 18 }}>
+                      <div className="flex flex-row space-x-2 w-full">
+                        <div className="grid w-full items-center gap-4">
+                          <div className="flex flex-row space-x-1">
+                            <Label>Startdate:</Label>
+                            <Label>
+                              {dayjs(project["start-date"]).format(
+                                "DD/MM/YYYY"
+                              )}
+                            </Label>
+                          </div>
+                        </div>
+                        <div className="grid w-full items-center gap-4">
+                          <div className="flex flex-row space-x-1.5">
+                            <Label>Duration:</Label>
+                            <Label>{project.duration}</Label>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    </CardContent>
+                  </Card>
+                ))}
           </div>
           <div className="flex justify-center">
             <Button onClick={handleLoadMore} style={{ marginTop: 16 }}>
@@ -217,7 +251,10 @@ export default function ProjectListTable({
       >
         <Fade in={openCardModal}>
           <Box sx={styleCard}>
-            <DetailCard row={selectedCard}></DetailCard>
+            <DetailCard
+              row={selectedCard}
+              handleCloseCard={handleCloseCardModal}
+            ></DetailCard>
           </Box>
         </Fade>
       </Modal>

@@ -31,8 +31,18 @@ const projectApiRequest = {
     ),
   createProject: (body: CreateProjectType) =>
     http.post<CreateProjectResType>("/api/v1/projects", body),
-  updateProject: (body: UpdateProjectApiType) =>
-    http.put<CreateProjectResType>(`/api/v1/projects/${body.id}`, body),
+  addPmIntoProject: (id: string, body: { "list-manager-id": string[] }) =>
+    http.post<CreateProjectResType>(
+      `api/v1/projects/${id}/project-managers`,
+      body
+    ),
+  updateProject: (body: UpdateProjectApiType) => {
+    const { id, ...updateBody } = body;
+    return http.put<CreateProjectResType>(
+      `/api/v1/projects/${body.id}`,
+      updateBody
+    );
+  },
 };
 
 export default projectApiRequest;

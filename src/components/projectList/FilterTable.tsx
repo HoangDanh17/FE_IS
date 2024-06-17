@@ -3,7 +3,6 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import {
   Typography,
   Grid,
-  Box,
   styled,
   Button,
   TextField,
@@ -12,9 +11,8 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
@@ -24,13 +22,9 @@ import MuiAccordionSummary, {
 } from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import SearchIcon from "@mui/icons-material/Search";
-import projectApiRequest from "@/apiRequests/project";
-import { toast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
 import ProjectListTable, {
   FormFilterData,
 } from "@/components/projectList/ProjectListTable";
-import { ProjectListResType } from "@/schemaValidations/project.schema";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -63,10 +57,14 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
   },
 }));
 
-const FilterTable = () => {
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+const statusLabels: { [key: string]: string } = {
+  not_start: "Not start",
+  doing: "Doing",
+  done: "Done",
+  cancel: "Cancel",
+};
 
+const FilterTable = () => {
   const [formData, setFormData] = useState<FormFilterData>({
     name: "",
     status: "",
@@ -185,14 +183,24 @@ const FilterTable = () => {
                         id="status"
                         value={formData.status}
                         onChange={handleSelectChange}
+                        displayEmpty
                         variant="standard"
                         size="small"
                         style={{ width: "90%" }}
+                        renderValue={(selected) => {
+                          if (selected.length === 0) {
+                            return <em>Chọn trạng thái</em>;
+                          }
+                          return statusLabels[selected];
+                        }}
                       >
-                        <MenuItem value={"not_start"}>Not start</MenuItem>
-                        <MenuItem value={"doing"}>Doing</MenuItem>
-                        <MenuItem value={"done"}>Done</MenuItem>
-                        <MenuItem value={"cancel"}>Cancel</MenuItem>
+                        <MenuItem disabled value="">
+                          <em>Chọn trạng thái</em>
+                        </MenuItem>
+                        <MenuItem value="not_start">Not start</MenuItem>
+                        <MenuItem value="doing">Doing</MenuItem>
+                        <MenuItem value="done">Done</MenuItem>
+                        <MenuItem value="cancel">Cancel</MenuItem>
                       </Select>
                     </Grid>
                     <Grid item xs={5} style={{ width: "100%" }}>

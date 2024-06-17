@@ -80,7 +80,7 @@ export type ProjectFilterType = z.TypeOf<typeof ProjectFilterSchema>;
 export type CreateProjectResType = z.TypeOf<typeof CreateProjectRes>;
 export type CreateProjectType = z.TypeOf<typeof CreateProject>;
 export type UpdateProjectType = z.TypeOf<typeof UpdateProject>;
-export type UpdateProjectApiType = z.TypeOf<typeof UpdateProject>;
+export type UpdateProjectApiType = z.TypeOf<typeof UpdateProjectForApi>;
 export type MemberInProjectResType = z.TypeOf<typeof MemberInProjectRes>;
 export type MemberInProjectType = z.TypeOf<typeof MemberInProject>;
 

@@ -18,13 +18,21 @@ import { UpdateProjectType } from "@/schemaValidations/project.schema";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { toast } from "@/components/ui/use-toast";
+import projectApiRequest from "@/apiRequests/project";
 
 const Div = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   padding: theme.spacing(1),
 }));
 
-const FormUpdate = ({ row }: { row: RowData }) => {
+const FormUpdate = ({
+  row,
+  handleClose,
+}: {
+  row: RowData;
+  handleClose: () => void;
+}) => {
   const [formData, setFormData] = useState<UpdateProjectType>({
     description: row.description,
     duration: row.duration,
@@ -53,32 +61,33 @@ const FormUpdate = ({ row }: { row: RowData }) => {
   const router = useRouter();
 
   async function handleSubmit(e: FormEvent) {
+    if (loading) return;
+    setLoading(true);
     e.preventDefault();
     const { "start-at": startAt, ...rest } = formData;
     const formattedData = {
       ...rest,
       "start-date": startAt ? dayjs(startAt).format("YYYY-MM-DD") : null,
+      id: row.id,
     };
-    console.log(formattedData);
-    // try {
-    //   const result = await projectApiRequest.createProject(formattedData);
-    //   toast({
-    //     title: `${result.payload.message}`,
-    //     duration: 2000,
-    //     variant: "success",
-    //   });
-    //   console.log(result);
-    //   router.refresh();
-    // } catch (error: any) {
-    //   toast({
-    //     title: `${error}`,
-    //     duration: 2000,
-    //     variant: "destructive",
-    //   });
-    // } finally {
-    //   setLoading(false);
-    //   handleClose();
-    // }
+    try {
+      const result = await projectApiRequest.updateProject(formattedData);
+      toast({
+        title: `${result.payload.message}`,
+        duration: 2000,
+        variant: "success",
+      });
+      handleClose();
+      router.refresh();
+    } catch (error: any) {
+      toast({
+        title: `${error}`,
+        duration: 2000,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
