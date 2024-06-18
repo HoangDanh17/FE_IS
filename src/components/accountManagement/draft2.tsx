@@ -1,27 +1,23 @@
 'use client'
 import * as React from 'react';
-import { Button, Card, CardContent, Modal, Box, Typography } from "@mui/material";
+import { Button, Card, CardContent } from "@mui/material";
 import "@/styles/accountManagement/ButtonGroup.css";
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import AddModalAccount from './AddAccountModal';
 import EditModalAccount from './EditModal';
-import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { RowData } from './Table';
-import { useRouter } from "next/navigation";
-import { toast } from "@/components/ui/use-toast";
-import accountApiRequest from '@/apiRequests/accountManagement/account';
+import accountApiRequest from "@/lib/accountApiRequest"; // Import API requests
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface ButtonGroupAccountProps {
     row: RowData | undefined;
+    onDeleteSuccess: () => void; // Callback to refresh the list after delete
 }
 
-
-const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row }) => {
-    const [loading, setLoading] = React.useState(false);
-    const router = useRouter();
-
+const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row, onDeleteSuccess }) => {
     //useState Modal Add
     const [openAddModal, setOpenAddModal] = React.useState(false);
     const handleOpenAddModal = () => setOpenAddModal(true);
@@ -32,15 +28,54 @@ const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row }) => {
     const handleOpenEditModal = () => setOpenEditModal(true);
     const handleCloseEditModal = () => setOpenEditModal(false);
 
-    // useState Modal Confirm Delete
-    const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
-    const handleOpenDeleteModal = () => setOpenDeleteModal(true);
-    const handleCloseDeleteModal = () => setOpenDeleteModal(false);
+    const handleDelete = async () => {
+        if (row) {
+            try {
+                await accountApiRequest.deleteAccount(row.id);
+                onDeleteSuccess();
+                toast.success("Account deleted successfully");
+            } catch (error) {
+                console.error("Error deleting account", error);
+                toast.error("Failed to delete account");
+            }
+        }
+    };
+
+    const confirmDelete = () => {
+        toast(
+            ({ closeToast }) => (
+                <div>
+                    Are you sure you want to delete this account?
+                    <div>
+                        <Button
+                            variant="contained"
+                            color='error'
+                            onClick={() => {
+                                handleDelete();
+                                closeToast();
+                            }}
+                            style={{ marginRight: "10px" }}
+                        >
+                            Delete
+                        </Button>
+                        <Button
+                            variant="contained"
+                            onClick={closeToast}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                </div>
+            ),
+            {
+                autoClose: false
+            }
+        );
+    };
 
     return (
         <Card style={{ marginTop: "10px" }}>
             <CardContent style={{ height: "68px" }}>
-
                 <Button
                     variant="contained"
                     className="add-btn"
@@ -65,7 +100,7 @@ const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row }) => {
                     color='error'
                     className="delete-btn"
                     startIcon={<DeleteOutlineOutlinedIcon />}
-                    onClick={handleOpenDeleteModal}
+                    onClick={confirmDelete}
                 >
                     Xóa
                 </Button>
@@ -74,26 +109,23 @@ const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row }) => {
                 <Modal
                     open={openAddModal}
                     onClose={handleCloseAddModal}
-
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
                 >
                     <AddModalAccount onClose={handleCloseAddModal} />
                 </Modal>
 
-                  {/* Modal Edit */}
+                {/* Modal Edit */}
                 <Modal
                     open={openEditModal}
                     onClose={handleCloseEditModal}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
                 >
                     <EditModalAccount onClose={handleCloseEditModal} row={row} />
                 </Modal>
 
-                {/* Modal Confirm Delete */}
-                <Modal
-                    open={openDeleteModal}
-                    onClose={handleCloseDeleteModal}
-                >
-                   <ConfirmDeleteModal onClose={handleCloseDeleteModal} row={row}/>
-                </Modal>
+                <ToastContainer />
             </CardContent>
         </Card>
     )
