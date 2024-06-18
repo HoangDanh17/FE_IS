@@ -26,7 +26,7 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
 
 interface UserInfo {
-  user_name: string;
+  "user-name": string;
   email: string;
   account_role: string;
 }
@@ -40,11 +40,11 @@ const Profile = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    setUserName(user?.user_name || "");
+    setUserName(user?.["user-name"] || "");
     setUserInfo(
       user
         ? {
-            user_name: user.user_name,
+            "user-name": user["user-name"],
             email: user.email,
             account_role: user.account_role,
           }
@@ -184,7 +184,7 @@ const Profile = () => {
                   id="Tên"
                   placeholder="Tên"
                   disabled
-                  value={userInfo?.user_name}
+                  value={userInfo?.["user-name"]}
                   style={{ width: "70%" }}
                 />
               </Box>

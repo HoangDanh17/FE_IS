@@ -1,11 +1,6 @@
 "use client";
-import * as React from "react";
 import Box from "@mui/material/Box";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
 import AddIcon from "@mui/icons-material/Add";
-import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import {
   Typography,
@@ -15,39 +10,70 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Autocomplete,
+  TextField,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import projectApiRequest from "@/apiRequests/project";
+import { RowData } from "@/components/projectList/DetailCard";
+import { MemberInProjectResType } from "@/schemaValidations/project.schema";
+import { useEffect, useState } from "react";
+import { toast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
-interface RowData {
-  id: number;
-  name: string;
-}
+type Manager = {
+  id: string | number;
+  "user-name": string;
+  email?: string;
+  isOriginal?: boolean;
+};
 
-const dummyData: RowData[] = [
-  { id: 1, name: "Manager 1" },
-  { id: 2, name: "Manager 2" },
-  { id: 3, name: "Manager 3" },
-];
+export default function FormAddPM({
+  row,
+  listMemberInProject,
+  handleClose,
+}: {
+  row: RowData;
+  listMemberInProject: MemberInProjectResType | undefined;
+  handleClose: () => void;
+}) {
+  const [managers, setManagers] = useState<Manager[]>([]);
+  const [availableManagers, setAvailableManagers] = useState<Manager[]>([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
-export default function FormAddPM({ row }: { row: RowData }) {
-  const [managers, setManagers] = React.useState<string[]>([]);
-  const [submittedData, setSubmittedData] = React.useState("");
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [deleteIndex, setDeleteIndex] = React.useState<number | null>(null);
+  const router = useRouter();
 
-  React.useEffect(() => {
-    const initialManagers = dummyData.map((item) => String(item.id));
-    setManagers(initialManagers);
+  useEffect(() => {
+    if (listMemberInProject) {
+      const originalManagers = listMemberInProject.data.map((m) => ({
+        ...m,
+        isOriginal: true,
+      }));
+      setManagers(originalManagers);
+    }
+  }, [listMemberInProject]);
+
+  useEffect(() => {
+    projectApiRequest.getListPMNotInProject(row.id).then(({ payload }) => {
+      setAvailableManagers(payload.data);
+    });
   }, []);
 
-  const handleChange = (event: SelectChangeEvent<string>, index: number) => {
-    const newManagers = [...managers];
-    newManagers[index] = event.target.value;
-    setManagers(newManagers);
+  const handleChange = (newValue: Manager | null, index: number) => {
+    if (newValue) {
+      const newManagers = [...managers];
+      newManagers[index] = { ...newValue, isOriginal: false };
+      setManagers(newManagers);
+    }
   };
-
   const handleAddManager = () => {
-    setManagers([...managers, ""]);
+    const availableManager = availableManagers.find(
+      (m) => !managers.some((existingM) => existingM.id === m.id)
+    );
+    if (availableManager) {
+      setManagers([...managers, { ...availableManager, isOriginal: false }]);
+    }
   };
 
   const handleDeleteManager = (index: number) => {
@@ -70,12 +96,32 @@ export default function FormAddPM({ row }: { row: RowData }) {
   };
 
   const handleSubmit = () => {
-    setSubmittedData(managers.join(", "));
+    const submitData = {
+      "list-manager-id": managers.map((manager) => String(manager.id)),
+    };
+    projectApiRequest
+      .addPmIntoProject(row.id, submitData)
+      .then((response) => {
+        toast({
+          title: `${response.payload.message}`,
+          duration: 2000,
+          variant: "success",
+        });
+        handleClose();
+        router.refresh();
+      })
+      .catch((error) => {
+        toast({
+          title: `${error}`,
+          duration: 2000,
+          variant: "destructive",
+        });
+      });
   };
 
   return (
     <Box sx={{ minWidth: 120 }}>
-      <Typography variant="h4">Thêm quản lí dự án</Typography>
+      <Typography variant="h4">Quản lý dự án</Typography>
       {managers.map((manager, index) => (
         <Box
           display="flex"
@@ -83,24 +129,23 @@ export default function FormAddPM({ row }: { row: RowData }) {
           key={index}
           style={{ marginTop: 20 }}
         >
-          <FormControl fullWidth>
-            <InputLabel id={`demo-simple-select-label-${index}`}>
-              Manager
-            </InputLabel>
-            <Select
-              labelId={`demo-simple-select-label-${index}`}
-              id={`demo-simple-select-${index}`}
-              value={manager}
-              label="Manager"
-              onChange={(event) => handleChange(event, index)}
-            >
-              {dummyData.map((item) => (
-                <MenuItem key={item.id} value={String(item.id)}>
-                  {item.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Autocomplete
+            disablePortal
+            id={`manager-select-${index}`}
+            options={manager.isOriginal ? [manager] : availableManagers}
+            getOptionLabel={(option) => option["user-name"]}
+            value={manager}
+            onChange={(event, newValue) => handleChange(newValue, index)}
+            disabled={manager.isOriginal}
+            renderInput={(params) => (
+              <TextField {...params} label="Quản lý dự án" />
+            )}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            getOptionDisabled={(option) =>
+              managers.some((m) => m.id === option.id && m.id !== manager.id)
+            }
+            fullWidth
+          />
           <IconButton
             aria-label="delete"
             onClick={() => handleDeleteManager(index)}
@@ -110,7 +155,6 @@ export default function FormAddPM({ row }: { row: RowData }) {
         </Box>
       ))}
       <Button
-        // variant="contained"
         onClick={handleAddManager}
         style={{
           marginTop: 20,
@@ -118,9 +162,9 @@ export default function FormAddPM({ row }: { row: RowData }) {
           backgroundColor: "#94a3b8",
           color: "#334155",
         }}
-        startIcon={<AddIcon></AddIcon>}
+        startIcon={<AddIcon />}
       >
-        Thêm quản lí
+        Thêm quản lý
       </Button>
 
       <Button
@@ -130,7 +174,6 @@ export default function FormAddPM({ row }: { row: RowData }) {
       >
         Xác nhận
       </Button>
-      {submittedData && <p>Submitted data: {submittedData}</p>}
 
       <Dialog
         open={openDialog}
@@ -141,7 +184,7 @@ export default function FormAddPM({ row }: { row: RowData }) {
         <DialogTitle id="alert-dialog-title">{"Xác nhận xóa"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Bạn có chắc chắn muốn xóa quản lí này?
+            Bạn có chắc chắn muốn xóa quản lý này?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

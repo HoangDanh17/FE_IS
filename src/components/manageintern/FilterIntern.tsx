@@ -10,14 +10,7 @@ const Filter = () => {
                 style={{ height: 'px' }}>
                 <FormControl>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={3}>
-                            <FormControl fullWidth>
-                                <Input
-                                    placeholder="Account ID"
-                                    type="ID"
-                                />
-                            </FormControl>
-                        </Grid>
+                        
                         <Grid item xs={12} sm={3}>
                             <FormControl fullWidth>
                                 <Input
@@ -42,7 +35,7 @@ const Filter = () => {
                         <Grid item xs={12} sm={3}>
                             <FormControl fullWidth>
                                 <Input
-                                    placeholder="OJT ID"
+                                    placeholder="Skill"
                                 />
                             </FormControl>
                         </Grid>

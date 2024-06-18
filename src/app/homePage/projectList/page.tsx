@@ -1,13 +1,9 @@
 import FilterTable from "@/components/projectList/FilterTable";
-import ProjectListTable from "@/components/projectList/ProjectListTable";
 
-const projectList = () => {
+export default async function projectList() {
   return (
     <div>
       <FilterTable></FilterTable>
-      <ProjectListTable></ProjectListTable>
     </div>
   );
-};
-
-export default projectList;
+}

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Avatar,
   AvatarGroup,
+  Chip,
   Divider,
   Fade,
   Modal,
@@ -22,6 +23,9 @@ import {
 import { useState } from "react";
 import FormAddPM from "@/components/projectList/formCrud/FormAddPM";
 import FormUpdate from "@/components/projectList/formCrud/FormUpdate";
+import dayjs from "dayjs";
+import { MemberInProjectResType } from "@/schemaValidations/project.schema";
+import projectApiRequest from "@/apiRequests/project";
 
 const Div = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -40,21 +44,36 @@ const style = {
   p: 4,
 };
 
-const confirmDeleteStyle = {
-  ...style,
-  width: 300,
-};
+// const confirmDeleteStyle = {
+//   ...style,
+//   width: 300,
+// };
 
-interface RowData {
-  id: number;
-  title: string;
-  startDate: number;
-  duration: number;
-  carbs: number;
-  protein: number;
+export interface RowData {
+  id: string;
+  name: string;
+  "start-date": Date;
+  duration: string;
+  status: string;
+  description: string;
 }
 
-const DetailCard = ({ row }: { row: RowData }) => {
+const DetailCard = ({
+  row,
+  handleCloseCard,
+}: {
+  row: RowData;
+  handleCloseCard: () => void;
+}) => {
+  const [listMemberInProject, setListMemberInProject] =
+    useState<MemberInProjectResType>();
+
+  useEffect(() => {
+    projectApiRequest.getListPMInProject(row.id).then(({ payload }) => {
+      setListMemberInProject(payload);
+    });
+  }, []);
+
   // update modal
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState<any>(null);
@@ -62,32 +81,59 @@ const DetailCard = ({ row }: { row: RowData }) => {
     setSelectedRow(row);
     setOpenUpdateModal(true);
   };
-  const handleCloseUpdateModal = () => setOpenUpdateModal(false);
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+    handleCloseCard();
+  };
 
   // delete modal
-  const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
 
-  const [rowToDelete, setRowToDelete] = useState<number | null>(null);
-  const handleOpenDeleteConfirmModal = (id: number) => {
-    setRowToDelete(id);
-    setOpenDeleteConfirmModal(true);
-  };
+  // const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
 
-  const handleCloseDeleteConfirmModal = () => setOpenDeleteConfirmModal(false);
-  const handleDelete = () => {
-    if (rowToDelete !== null) {
-      console.log(rowToDelete);
-      handleCloseDeleteConfirmModal();
-    }
-  };
+  // const [rowToDelete, setRowToDelete] = useState<string | null>(null);
+
+  // const handleOpenDeleteConfirmModal = (id: string) => {
+  //   setRowToDelete(id);
+  //   setOpenDeleteConfirmModal(true);
+  // };
+
+  // const handleCloseDeleteConfirmModal = () => setOpenDeleteConfirmModal(false);
+
+  // const handleDelete = () => {
+  //   if (rowToDelete !== null) {
+  //     console.log(rowToDelete);
+  //     handleCloseDeleteConfirmModal();
+  //   }
+  // };
   // add PM
+
   const [openAddPMModal, setOpenAddPMModal] = useState(false);
+
   const [data, setData] = useState<any>(null);
   const handleOpenAddPMModal = (row: any) => {
     setData(row);
     setOpenAddPMModal(true);
   };
-  const handleCloseAddPMModal = () => setOpenAddPMModal(false);
+
+  const handleCloseAddPMModal = () => {
+    setOpenAddPMModal(false);
+    handleCloseCard();
+  };
+
+  const getStatusChipColor = (status: string) => {
+    switch (status) {
+      case "not_start":
+        return { backgroundColor: "#FFB6C1", color: "white" }; // Màu hồng pastel đậm hơn
+      case "doing":
+        return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
+      case "done":
+        return { backgroundColor: "#90EE90", color: "white" }; // Màu xanh lá pastel đậm hơn
+      case "cancel":
+        return { backgroundColor: "#FFA07A", color: "white" }; // Màu cam pastel đậm hơn
+      default:
+        return { backgroundColor: "#D3D3D3", color: "white" }; // Màu xám
+    }
+  };
 
   return (
     <Div>
@@ -99,7 +145,12 @@ const DetailCard = ({ row }: { row: RowData }) => {
         }}
       >
         <Typography id="transition-modal-title" variant="h4" component="h2">
-          Chi tiết dự án
+          Chi tiết dự án - Status:{" "}
+          <Chip
+            size="small"
+            label={row.status === "not_start" ? "not start" : row.status}
+            sx={getStatusChipColor(row.status)}
+          ></Chip>
         </Typography>
         <Typography id="transition-modal-title" variant="h4" component="h2">
           Hành động
@@ -118,7 +169,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
                     fullWidth
                     style={{ marginTop: 2 }}
                     size="small"
-                    defaultValue={row.title}
+                    defaultValue={row.name}
                     disabled
                   />
                 </Grid>
@@ -131,7 +182,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
                     style={{ marginTop: 2 }}
                     disabled
                     size="small"
-                    defaultValue={row.startDate}
+                    defaultValue={dayjs(row["start-date"]).format("YYYY-MM-DD")}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -147,25 +198,34 @@ const DetailCard = ({ row }: { row: RowData }) => {
                   />
                 </Grid>
                 <Grid item xs={12}>
+                  <Typography variant="h6">Thông tin mô tả </Typography>
+                  <TextField
+                    id="fat"
+                    variant="outlined"
+                    fullWidth
+                    style={{ marginTop: 2 }}
+                    size="small"
+                    disabled
+                    defaultValue={row.description}
+                  />
+                </Grid>
+                <Grid item xs={12}>
                   <Typography variant="h6">Quản lí dự án </Typography>
                   <div className="flex mt-2">
-                    <AvatarGroup>
-                      {[
-                        "Remy Sharp",
-                        "Travis Howard",
-                        "Cindy Baker",
-                        "Agnes Walker",
-                        "Trevor Henderson",
-                      ].map((name, index) => (
-                        <Tooltip title={name} key={index}>
-                          <Avatar
-                            alt={name}
-                            src="https://github.com/shadcn.png"
-                            // title={name}
-                          />
-                        </Tooltip>
-                      ))}
-                    </AvatarGroup>
+                    {listMemberInProject?.data.length !== 0 ? (
+                      <AvatarGroup>
+                        {listMemberInProject?.data.map((name, index) => (
+                          <Tooltip title={name["user-name"]} key={index}>
+                            <Avatar
+                              alt={name["user-name"]}
+                              src="/images/avatar.jpg"
+                            />
+                          </Tooltip>
+                        ))}
+                      </AvatarGroup>
+                    ) : (
+                      <Typography variant="body1">Chưa có PM</Typography>
+                    )}
                   </div>
                 </Grid>
               </Grid>
@@ -186,7 +246,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
                     Sửa dự án
                   </Button>
                 </Grid>
-                <Grid item>
+                {/* <Grid item>
                   <Button
                     variant="contained"
                     color="error"
@@ -196,13 +256,13 @@ const DetailCard = ({ row }: { row: RowData }) => {
                   >
                     Xóa dự án
                   </Button>
-                </Grid>
+                </Grid> */}
                 <Grid item>
                   <Button
                     variant="contained"
                     color="info"
                     startIcon={<AddIcon />}
-                    onClick={() => handleOpenAddPMModal(row.id)}
+                    onClick={() => handleOpenAddPMModal(row)}
                     style={{ width: "100%", marginTop: 6 }}
                   >
                     Thêm quản lí
@@ -229,12 +289,15 @@ const DetailCard = ({ row }: { row: RowData }) => {
       >
         <Fade in={openUpdateModal}>
           <Box sx={style}>
-            <FormUpdate row={selectedRow}></FormUpdate>
+            <FormUpdate
+              row={selectedRow}
+              handleClose={handleCloseUpdateModal}
+            ></FormUpdate>
           </Box>
         </Fade>
       </Modal>
       {/* Modal Delete */}
-      <Modal
+      {/* <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openDeleteConfirmModal}
@@ -268,7 +331,7 @@ const DetailCard = ({ row }: { row: RowData }) => {
             </Box>
           </Box>
         </Fade>
-      </Modal>
+      </Modal> */}
       {/* Modal Add PM */}
       <Modal
         aria-labelledby="transition-modal-title"
@@ -285,7 +348,11 @@ const DetailCard = ({ row }: { row: RowData }) => {
       >
         <Fade in={openAddPMModal}>
           <Box sx={style}>
-            <FormAddPM row={data}></FormAddPM>
+            <FormAddPM
+              row={data}
+              listMemberInProject={listMemberInProject}
+              handleClose={handleCloseAddPMModal}
+            ></FormAddPM>
           </Box>
         </Fade>
       </Modal>
