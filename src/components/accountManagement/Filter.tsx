@@ -11,7 +11,6 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import TableAccount, { FormFilterData } from './Table';
 import dayjs, { Dayjs } from "dayjs";
-import { RowData } from './Table';
 
 const FilterAccount = () => {
     const [formData, setFormData] = useState<FormFilterData>({

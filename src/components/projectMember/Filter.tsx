@@ -24,13 +24,6 @@ const FilterProjectMember: React.FC = () => {
         setModalOpen(false);
     };
 
-    const availableMembers = [
-        { id: 1, name: 'Nguyen Van A', position: 'Developer' },
-        { id: 2, name: 'Tran Thi B', position: 'Designer' },
-        { id: 3, name: 'Le Van C', position: 'Tester' },
-        // Add more members here
-    ];
-
     return (
         <Grid container spacing={2} alignItems="flex-start">
             <Grid item xs={12} md={3}>
