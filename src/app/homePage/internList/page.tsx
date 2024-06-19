@@ -8,16 +8,6 @@ const manageIntern = () => {
       <div className="filter">
         <Filter/>
       </div>
-
-      <div className="table" style={{ marginTop: "10px", }}>
-        {/* <DataTable /> */}
-       <InternTable/>
-      </div>
-
-      <div>
-        {/* <ButtonGroup /> */}
-      </div>
-
     </div>
   );
 };

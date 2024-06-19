@@ -1,98 +1,142 @@
 import React, { useState } from 'react';
 import { Box, TextField, Typography, Button, Grid, FormControl } from "@mui/material";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from 'dayjs';
 import '@/components/css/manageintern/ModalBox.css';
+import { CreateTermType } from '@/schemaValidations/term.schema';
+import { useRouter } from 'next/navigation';
+import termApiRequest from '@/apiRequests/term';
+import { toast } from '../ui/use-toast';
 
 interface AddModalProps {
-    onAdd: (data: any) => void;
-    onClose: () => void;
+  onClose: () => void;
 }
 
-const AddModal: React.FC<AddModalProps> = ({ onAdd, onClose }) => {
-    const [formData, setFormData] = useState({
-        semester: '',
-        university: '',
-        start_date: '',
-        end_date: ''
+  
+const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
+  const [formData, setFormData] = useState<CreateTermType>({
+    semester: '',
+    university: '',
+    "start-at": '',  
+    "end-at": '',    
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
     });
+  };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
+  const handleDateChange = (name: string, date: Dayjs | null) => {
+    setFormData({
+      ...formData,
+      [name]: date,
+    });
+  };
+
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleAdd () {
+    setLoading(true);
+    const formattedData = {
+      ...formData,
+      "start-at": formData["start-at"] ? dayjs(formData["start-at"]).format('YYYY-MM-DD') : '',
+      "end-at": formData["end-at"] ? dayjs(formData["end-at"]).format('YYYY-MM-DD') : '',
+    };
+    console.log("Form Data:", formattedData);
+    try {
+        const result = await termApiRequest.createTerm(formattedData);
+        toast({
+          title: `${result.payload.message}`,
+          duration: 2000,
+          variant: "success",
         });
-    };
-
-    const handleAdd = () => {
-        onAdd(formData);
+        console.log(result);
+        router.refresh();
+      } catch (error: any) {
+        toast({
+          title: `${error}`,
+          duration: 2000,
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
         onClose();
-    };
+      }
+  };
 
-    return (
-        <Box className="modal-box">
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-                Thêm kì học mới
-            </Typography>
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Box className="modal-box">
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          Thêm kì học mới
+        </Typography>
 
-            <FormControl>
-                <Grid container spacing={2} marginY={2}>
-                    <Grid item xs={4}>
-                        <FormControl fullWidth>
-                            <TextField
-                                label="Kì"
-                                name="semester"
-                                value={formData.semester}
-                                onChange={handleChange}
-                            />
-                        </FormControl>
-                    </Grid>
+        <FormControl>
+          <Grid container spacing={2} marginY={2}>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <TextField
+                  label="Kì"
+                  name="semester"
+                  value={formData.semester}
+                  onChange={handleChange}
+                />
+              </FormControl>
+            </Grid>
 
-                    <Grid item xs={4}>
-                        <FormControl fullWidth>
-                            <TextField
-                                label="Trường"
-                                name="university"
-                                value={formData.university}
-                                onChange={handleChange}
-                            />
-                        </FormControl>
-                    </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <TextField
+                  label="Trường"
+                  name="university"
+                  value={formData.university}
+                  onChange={handleChange}
+                />
+              </FormControl>
+            </Grid>
 
-                    <Grid item xs={4}>
-                        <FormControl fullWidth>
-                            <TextField
-                                label="Start Date"
-                                name="start_date"
-                                value={formData.start_date}
-                                onChange={handleChange}
-                            />
-                        </FormControl>
-                    </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <DatePicker
+                  label="Start Date"
+                  value={dayjs(formData["start-at"])}
+                  onChange={(date) => handleDateChange('start-at', date)}
+                  slotProps={{ textField: { fullWidth: true, size: "small" } }}
+                />
+              </FormControl>
+            </Grid>
 
-                    <Grid item xs={4}>
-                        <FormControl fullWidth>
-                            <TextField
-                                label="End Date"
-                                name="end_date"
-                                value={formData.end_date}
-                                onChange={handleChange}
-                            />
-                        </FormControl>
-                    </Grid>
-                </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <DatePicker
+                  label="End Date"
+                  value={dayjs(formData["end-at"])}
+                  onChange={(date) => handleDateChange('end-at', date)}
+                  slotProps={{ textField: { fullWidth: true, size: "small" } }}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
 
-                <Box display="flex" justifyContent="flex-end">
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleAdd}
-                    >
-                        Add
-                    </Button>
-                </Box>
-            </FormControl>
-        </Box>
-    );
+          <Box display="flex" justifyContent="flex-end">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAdd}
+            >
+              Add
+            </Button>
+          </Box>
+        </FormControl>
+      </Box>
+    </LocalizationProvider>
+  );
 };
 
 export default AddModal;

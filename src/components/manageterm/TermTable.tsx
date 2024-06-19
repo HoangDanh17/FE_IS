@@ -1,6 +1,5 @@
-'use client';
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -15,9 +14,27 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditModal from "./EditModal2";
 import "@/components/css/manageintern/DataTable.css";
-import { Button, Modal, Radio } from "@mui/material";
+import { Button, CircularProgress, Modal, Box, Typography, Radio } from "@mui/material";
 import AddModal from "./AddModal2";
-import DeleteModal from "./DeleteModal2";
+import termApiRequest from "@/apiRequests/term";
+import { TermListResType } from "@/schemaValidations/term.schema";
+import dayjs from "dayjs";
+import { toast } from "../ui/use-toast";
+import { useRouter } from "next/navigation";
+
+export interface RowData2 {
+  id: string;
+  semester: string;
+  university: string;
+  "start-at": string;
+  "end-at": string;
+}
+
+export interface RowData {
+  id: string;
+  semester: string;
+  university: string;
+}
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -33,55 +50,54 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
 }));
 
-const CustomTablePagination = styled(TablePagination)(({ theme }) => ({
-  "& .MuiTablePagination-root": {
-    color: theme.palette.primary.main,
-  },
-}));
-
-let idCounter = 1;
-function createData(
-  semester: string,
-  university: string,
-  start_date: string,
-  end_date: string
-) {
-  const id = idCounter++;
-  return { id, semester, university, start_date, end_date };
-}
-
-const rows = [
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-  createData("SU24", "FPT University", "07/05/2024", "07/10/2024"),
-];
-
-export interface RowData {
-  id: number;  // Changed from string to number
-  semester: string;
-  university: string;
-  start_date: string;
-  end_date: string;
-}
-
-const TermTable = () => {
+const TermTable = ({
+  isFilter,
+  dataFilter,
+  handleReset,
+}: {
+  isFilter: boolean;
+  dataFilter: RowData | null;
+  handleReset: () => void;
+}) => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState<RowData | null>(null);
-  const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+  const [selectedRowData, setSelectedRowData] = useState<RowData2 | null>();
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selectedValue, setSelectedValue] = useState<RowData2 | null>();
+
+  const [data, setData] = useState<TermListResType | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setLoading(true);
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleRadioChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    row: RowData2
+  ) => {
+    setSelectedValue(row);
+    setSelectedRowData(row);
+    console.log("Selected row: ", row);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedValue(null);
+    setSelectedRowData(null);
+  };
 
   const handleOpenAddModal = () => setOpenAddModal(true);
   const handleCloseAddModal = () => setOpenAddModal(false);
@@ -96,101 +112,123 @@ const TermTable = () => {
 
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);
-
+  const router = useRouter();
   const handleDelete = () => {
-    if (selectedRowData) {
+    if (selectedRowData && selectedRowData.id) { // Ensure selectedRowData and its id are defined
       console.log(`Deleted: ${selectedRowData.id}`);
-      handleCloseDeleteModal();
-      setSelectedRowData(null);
-      setSelectedRowId(null);
+      termApiRequest.deleteTerm(selectedRowData.id).then(() => {
+        router.refresh();
+        toast({
+          title: 'Đã xóa thành công',
+          duration: 2000,
+          variant: "success",
+        });
+      });
     }
+    handleCloseDeleteModal();
+    setSelectedRowData(null);
   };
 
-  const handleAdd = (data: RowData) => {
-    rows.push(createData(data.semester, data.university, data.start_date, data.end_date));
-    handleCloseAddModal();
-  };
-
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const handleRowClick = (rowData: RowData) => {
-    setSelectedRowData(rowData);
-    setSelectedRowId(rowData.id);  // Ensure selectedRowId is a number
-  };
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const { payload } = await termApiRequest.getListTerm(page + 1, rowsPerPage, isFilter ? dataFilter : {});
+        setData(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [isFilter, page, rowsPerPage, dataFilter]);
 
   return (
-    <div>
+    <div style={{ maxHeight: 762, width: "100%", marginTop: "10px" }}>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 1150 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell align="center">STT</StyledTableCell>
-              <StyledTableCell>Semester</StyledTableCell>
-              <StyledTableCell>University</StyledTableCell>
-              <StyledTableCell>Start Date</StyledTableCell>
-              <StyledTableCell>End Date</StyledTableCell>
-              <StyledTableCell align="center">Select</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row) => (
-              <StyledTableRow key={row.id} onClick={() => handleRowClick(row)}>
-                <StyledTableCell component="th" scope="row" align="center">
-                  {row.id}
-                </StyledTableCell>
-                <StyledTableCell>{row.semester}</StyledTableCell>
-                <StyledTableCell>{row.university}</StyledTableCell>
-                <StyledTableCell>{row.start_date}</StyledTableCell>
-                <StyledTableCell>{row.end_date}</StyledTableCell>
-                <StyledTableCell align="center">
+        {loading ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        ) : (
+          <Table sx={{ minWidth: 640 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell sx={{ width: 70 }} align="center">
                   <Radio
-                    checked={selectedRowId === row.id}
-                    onChange={() => handleRowClick(row)}
-                    value={row.id}
-                    name="row-selection"
-                    inputProps={{ 'aria-label': row.id.toString() }}
+                    onClick={handleDeselectAll}
+                    className="radio-buttons"
+                    color="secondary"
                   />
                 </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
+                <StyledTableCell>ID</StyledTableCell>
+                <StyledTableCell>Semester</StyledTableCell>
+                <StyledTableCell>University</StyledTableCell>
+                <StyledTableCell>Start Date</StyledTableCell>
+                <StyledTableCell>End Date</StyledTableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {data?.data.map((account, index) => (
+                <StyledTableRow key={index}>
+                  <div
+                    className="radio-cell"
+                    style={{ margin: "3px 0 0 14px" }}
+                  >
+                    <Radio
+                      checked={selectedValue?.id === account.id}
+                      onChange={(event) => handleRadioChange(event, account)}
+                      value={account.id.toString()}
+                      className="radio-buttons"
+                    />
+                  </div>
+                  <StyledTableCell>{account.id}</StyledTableCell>
+                  <StyledTableCell>{account.semester}</StyledTableCell>
+                  <StyledTableCell>{account.university}</StyledTableCell>
+                  <StyledTableCell>
+                    {dayjs(account["start-at"]).format("DD/MM/YYYY")}
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    {dayjs(account["end-at"]).format("DD/MM/YYYY")}
+                  </StyledTableCell>                
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
 
       <TablePagination
         rowsPerPageOptions={[5, 10]}
         component="div"
-        count={rows.length}
+        count={data?.paging.items || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="custom-row custom-pagination"
       />
+
       <Button
         variant="contained"
         className="add-btn"
         startIcon={<AddIcon />}
         onClick={handleOpenAddModal}
-        style={{ marginRight: '10px' }}
+        style={{ marginRight: "10px" }}
       >
         Thêm
       </Button>
       <Button
-        style={{ marginRight: '10px' }}
+        style={{ marginRight: "10px" }}
         variant="contained"
         className="edit-btn"
         startIcon={<EditIcon />}
@@ -200,7 +238,7 @@ const TermTable = () => {
         Sửa
       </Button>
       <Button
-        style={{ marginRight: '10px' }}
+        style={{ marginRight: "10px" }}
         variant="contained"
         color="error"
         className="delete-btn"
@@ -210,34 +248,62 @@ const TermTable = () => {
       >
         Xóa
       </Button>
+
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openAddModal}
         onClose={handleCloseAddModal}
       >
-        <AddModal onAdd={handleAdd} onClose={handleCloseAddModal} />
+        <AddModal onClose={handleCloseAddModal} />
       </Modal>
+
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openEditModal}
         onClose={handleCloseEditModal}
       >
-        <EditModal row={selectedRowData} />
+        <EditModal row={selectedRowData} onClose={handleCloseEditModal} />
       </Modal>
+
       <Modal
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
       >
-        <DeleteModal
-          open={openDeleteModal}
-          onClose={handleCloseDeleteModal}
-          onDelete={handleDelete}
-          rowData={selectedRowData}
-        />
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirm Deletion
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Are you sure you want to delete this row?
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDelete}
+              sx={{ mr: 1 }}
+            >
+              Delete
+            </Button>
+            <Button variant="contained" onClick={handleCloseDeleteModal}>
+              Cancel
+            </Button>
+          </Box>
+        </Box>
       </Modal>
     </div>
   );

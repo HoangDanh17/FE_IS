@@ -1,4 +1,4 @@
-'use client';
+import React, { useState, MouseEvent, ChangeEvent, useEffect } from "react";
 import {
   Paper,
   Table,
@@ -12,15 +12,15 @@ import {
   styled,
   tableCellClasses,
   Button,
+  CircularProgress,
   Modal,
 } from "@mui/material";
-import React, { useState, MouseEvent, ChangeEvent } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import AddModal from "./AddModal";
 import EditIcon from '@mui/icons-material/Edit';
-import EditModal from "./EditModal";
 import DeleteIcon from '@mui/icons-material/Delete';
-import DeleteModal from "./DeleteModal";
+import internApiRequest from "@/apiRequests/intern";
+import { InternListResType } from "@/schemaValidations/intern.schema";
+import AddModal from "./AddModal";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -33,11 +33,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
+  '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
-  },
-  "&:last-child td, &:last-child th": {
-    border: 0,
   },
 }));
 
@@ -47,113 +44,72 @@ const CustomTablePagination = styled(TablePagination)(({ theme }) => ({
   },
 }));
 
-interface RowData {
-  id: string;
-  name: string;
+export interface RowData {
+  "account-id": string;
+  "user-name": string;
   email: string;
-  phoneNumber: string;
-  skill: string[];
+  "student-code": string;
+  "ojt-semester": string;
+  gender: string;
+  "phone-number": string;
+  address: string;
+  "dob-from": string;
+  "dob-to": string;
 }
 
-function createData(
-  accountID: string,
-  name: string,
-  email: string,
-  phoneNumber: string,
-  ojtid: string,
-  skill: string[]
-): RowData {
-  return { id: accountID, name, email, phoneNumber, skill };
+export interface FormFilterData {
+  'user-name': string;
+  email: string;
+  'student-code': string;
+  'ojt-semester': string;
+  gender: string;
+  'phone-number': string;
+  address: string;
 }
 
-const rows: RowData[] = [
-  createData(
-    "SE170001",
-    "Nguyễn Văn A",
-    "test@gmail.com",
-    "012345789",
-    "NB0001",
-    ["Coding", "Design"]
-  ),
-  createData(
-    "SE170002",
-    "Nguyễn Văn B",
-    "test@gmail.com",
-    "012345789",
-    "NB0002",
-    ["Coding"]
-  ),
-  createData(
-    "SE170003",
-    "Nguyễn Văn C",
-    "test@gmail.com",
-    "012345789",
-    "NB0003",
-    ["Design"]
-  ),
-  createData(
-    "SE170004",
-    "Nguyễn Văn D",
-    "test@gmail.com",
-    "012345789",
-    "NB0004",
-    ["Coding", "Design", "Project Management"]
-  ),
-  createData(
-    "SE170005",
-    "Nguyễn Văn E",
-    "test@gmail.com",
-    "012345789",
-    "NB0005",
-    ["Coding", "Design"]
-  ),
-  createData(
-    "SE170006",
-    "Nguyễn Văn F",
-    "test@gmail.com",
-    "012345789",
-    "NB0006",
-    ["Project Management"]
-  ),
-  createData(
-    "SE170007",
-    "Nguyễn Văn G",
-    "test@gmail.com",
-    "012345789",
-    "NB0007",
-    ["Coding"]
-  ),
-  createData(
-    "SE170008",
-    "Nguyễn Văn H",
-    "test@gmail.com",
-    "012345789",
-    "NB0008",
-    ["Design"]
-  ),
-  createData(
-    "SE170009",
-    "Nguyễn Văn I",
-    "test@gmail.com",
-    "012345789",
-    "NB0009",
-    ["Project Management"]
-  ),
-  createData(
-    "SE170010",
-    "Nguyễn Văn J",
-    "test@gmail.com",
-    "012345789",
-    "NB0010",
-    ["Coding", "Design"]
-  ),
-];
+const InternTable = ({
+  isFilter,
+  dataFilter,
+  handleReset,
+}: {
+  isFilter: boolean;
+  dataFilter: FormFilterData | null;
+  handleReset: () => void;
+}) => {
+  const [data, setData] = useState<InternListResType | null>(null);
+  const [loading, setLoading] = useState(true);
 
-const InternTable: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [selectedRow, setSelectedRow] = useState<string | null>(null);
   const [selectedRowData, setSelectedRowData] = useState<RowData | null>(null);
+
+  const [selectedValue, setSelectedValue] = useState<RowData | null>();
+
+  const handleDeselectAll = () => {
+    setSelectedValue(null);
+    setSelectedRowData(null);
+  };
+
+  const handleRadioChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    row: {
+      "account-id": string;
+      "user-name": string;
+      email: string;
+      "student-code": string;
+      "ojt-semester": string;
+      gender: string;
+      "phone-number": string;
+      address: string;
+      "dob-from": string;
+      "dob-to": string;
+    }
+  ) => {
+    setSelectedValue(row);
+    setSelectedRowData(row);
+    console.log("Selected row: ", row);
+  };
 
   // Add
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -169,7 +125,7 @@ const InternTable: React.FC = () => {
     setOpenEditModal(true);
   };
   const handleCloseEditModal = () => setOpenEditModal(false);
-  
+
   // Delete
   const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
@@ -177,7 +133,7 @@ const InternTable: React.FC = () => {
   const handleDelete = () => {
     if (selectedRowData) {
       // Perform the delete operation here
-      console.log(`Deleted: ${selectedRowData.name}`);
+      console.log(`Deleted: ${selectedRowData['user-name']}`);
       // Close the modal after deletion
       handleCloseDeleteModal();
       // Optionally, remove the deleted row from the state
@@ -199,78 +155,97 @@ const InternTable: React.FC = () => {
   };
 
   const handleSelectRow = (row: RowData) => {
-    if (selectedRow === row.id) {
+    if (selectedRow === row["account-id"]) {
       setSelectedRow(null);
       setSelectedRowData(null);
     } else {
-      setSelectedRow(row.id);
+      setSelectedRow(row["account-id"]);
       setSelectedRowData(row); // Store selected row data
     }
   };
 
   const isSelected = (id: string) => selectedRow === id;
 
-  return (
-    <div>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 1150 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell padding="checkbox">
-                {/* No need for a select all checkbox in single selection mode */}
-              </StyledTableCell>
-              <StyledTableCell align="center">STT</StyledTableCell>
-              <StyledTableCell>Họ và Tên</StyledTableCell>
-              <StyledTableCell>Email</StyledTableCell>
-              <StyledTableCell>Số điện thoại</StyledTableCell>
-              <StyledTableCell>Kỹ năng</StyledTableCell>
-            </TableRow>
-          </TableHead>
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const { payload } = await internApiRequest.getListIntern(page + 1, rowsPerPage, isFilter ? dataFilter : {});
+        setData(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [isFilter, page, rowsPerPage, dataFilter]);
 
-          <TableBody>
-            {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row, index) => {
-              const isItemSelected = isSelected(row.id);
-              return (
-                <StyledTableRow
-                  key={row.id}
-                  hover
-                  onClick={() => handleSelectRow(row)}
-                  role="checkbox"
-                  aria-checked={isItemSelected}
-                  selected={isItemSelected}
-                >
-                  <StyledTableCell padding="checkbox">
+  return (
+    <div style={{ maxHeight: 762, width: "100%", marginTop: "10px" }}>
+      <TableContainer component={Paper}>
+        {loading ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <CircularProgress />
+          </div>
+        ) : (
+          <Table sx={{ minWidth: 640 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell sx={{ width: 70 }} align="center">
+                  <Radio
+                    onClick={handleDeselectAll}
+                    className="radio-buttons"
+                    color="secondary"
+                  />
+                </StyledTableCell>
+                <StyledTableCell>Họ và Tên</StyledTableCell>
+                <StyledTableCell>Email</StyledTableCell>
+                <StyledTableCell>Mã số sinh viên</StyledTableCell>
+                <StyledTableCell>Kì OJT</StyledTableCell>
+                <StyledTableCell>Giới tính</StyledTableCell>
+                <StyledTableCell>Số điện thoại</StyledTableCell>
+                <StyledTableCell>Địa chỉ</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data?.data.map((account, index) => (
+                <StyledTableRow key={index}>
+                  <div
+                    className="radio-cell"
+                    style={{ margin: "3px 0 0 14px" }}
+                  >
                     <Radio
-                      color="primary"
-                      checked={isItemSelected}
-                      onChange={() => handleSelectRow(row)}
-                      value={row.id}
-                      name="radio-buttons"
-                      inputProps={{
-                        "aria-labelledby": `enhanced-table-radio-${index}`,
-                      }}
+                      checked={selectedValue?.["account-id"] === account["account-id"]}
+                      onChange={(event) => handleRadioChange(event, account)}
+                      value={account.toString()}
+                      className="radio-buttons"
                     />
-                  </StyledTableCell>
-                  <StyledTableCell component="th" scope="row" align="center">
-                    {page * rowsPerPage + index + 1}
-                  </StyledTableCell>
-                  <StyledTableCell>{row.name}</StyledTableCell>
-                  <StyledTableCell>{row.email}</StyledTableCell>
-                  <StyledTableCell>{row.phoneNumber}</StyledTableCell>
-                  <StyledTableCell>{row.skill.join(", ")}</StyledTableCell>
+                  </div>
+                  <StyledTableCell>{account["user-name"]}</StyledTableCell>
+                  <StyledTableCell>{account.email}</StyledTableCell>
+                  <StyledTableCell>{account["student-code"]}</StyledTableCell>
+                  <StyledTableCell>{account["ojt-semester"]}</StyledTableCell>
+                  <StyledTableCell>{account.gender}</StyledTableCell>
+                  <StyledTableCell>{account["phone-number"]}</StyledTableCell>
+                  <StyledTableCell>{account.address}</StyledTableCell>
                 </StyledTableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
 
       <CustomTablePagination
         rowsPerPageOptions={[5, 10]}
-        count={rows.length}
+        count={data?.data.length ?? 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -313,9 +288,9 @@ const InternTable: React.FC = () => {
         open={openAddModal}
         onClose={handleCloseAddModal}
       >  
-        <AddModal />
+        <AddModal onClose={handleCloseAddModal} />
       </Modal>
-      <Modal
+      {/* <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openEditModal}
@@ -332,10 +307,10 @@ const InternTable: React.FC = () => {
         <DeleteModal
           open={openDeleteModal}
           onClose={handleCloseDeleteModal}
-          onDelete={handleOpenDeleteModal}
+          onDelete={handleDelete}
           rowData={selectedRowData} // Pass selectedRowData to DeleteModal
         />
-      </Modal>
+      </Modal>  */}
     </div>
   );
 };
