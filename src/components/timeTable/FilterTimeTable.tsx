@@ -15,7 +15,7 @@ import dayjs, { Dayjs } from "dayjs";
 import ListTimeTable from "@/components/timeTable/ListTimeTable";
 
 const FilterTimeTable = ({ selectedDay }: { selectedDay: Dayjs | null }) => {
-  const [status, setStatus] = useState("processing");
+  const [status, setStatus] = useState("all");
 
   const handleStatusChange = (event: any) => {
     const { value } = event.target;
@@ -42,14 +42,16 @@ const FilterTimeTable = ({ selectedDay }: { selectedDay: Dayjs | null }) => {
             value={status}
             onChange={handleStatusChange}
             label="Status"
+            defaultValue=""
           >
+            <MenuItem value="all">All</MenuItem>
             <MenuItem value="processing">Processing</MenuItem>
             <MenuItem value="denied">Denied</MenuItem>
             <MenuItem value="approved">Approved</MenuItem>
           </Select>
         </FormControl>
       </Box>
-      <ListTimeTable />
+      <ListTimeTable status={status} selectedDay={selectedDay} />
     </LocalizationProvider>
   );
 };
