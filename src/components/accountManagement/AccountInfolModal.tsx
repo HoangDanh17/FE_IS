@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Typography, Box, TextField, Grid, FormControl, Button } from '@mui/material';
 import "@/styles/accountManagement/ModalBox.css"
-
+import dayjs from 'dayjs';
 interface DetailModalProps {
     open: boolean;
     handleClose: () => void;
@@ -22,7 +22,7 @@ const AccountInfolModal: React.FC<DetailModalProps> = ({ open, handleClose, sele
                                 <FormControl fullWidth>
                                     <TextField
                                         label="Tên người dùng"
-                                        value={selectedRow.userName}
+                                        value={selectedRow["user-name"]}
                                         InputProps={{ readOnly: true }}
                                     />
                                 </FormControl>
@@ -52,7 +52,7 @@ const AccountInfolModal: React.FC<DetailModalProps> = ({ open, handleClose, sele
                                 <FormControl fullWidth>
                                     <TextField
                                         label="Ngày tạo"
-                                        value={selectedRow.createDate}
+                                        value={dayjs(selectedRow['created-at']).format("DD/MM/YYYY")}
                                         InputProps={{ readOnly: true }}
                                     />
                                 </FormControl>

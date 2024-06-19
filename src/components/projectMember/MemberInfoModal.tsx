@@ -1,24 +1,26 @@
 import React from 'react';
-import { Modal, Button, Typography, FormControl, Grid, TextField, Box } from '@mui/material';
+import { Modal, Button, Typography, FormControl, Grid, TextField, Box, Avatar, AvatarGroup, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import '@/styles/projectMember/InfoModal.css';
-
+import { ProjectMemberListResType } from '@/schemaValidations/projectMember/projectMember.schema';
 interface MemberInfoModalProps {
     open: boolean;
     handleClose: () => void;
     selectedMember: {
-        idAccount: string;
-        userName: string;
-        email: string;
-        role: string;
-        createDate: string;
+        id: string,
+        "user-name": string,
+        "student-code": string,
+        avatar: string,
+        "ojt-semester-university": string,
+        "technical_skills": string,
     } | null;
-    handleEdit: (member: any) => void;
+    // handleEdit: (member: any) => void;
     handleDelete: (member: any) => void;
+    listImage: ProjectMemberListResType
 }
 
-const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, selectedMember, handleDelete, handleEdit }) => {
+const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, selectedMember, handleDelete, listImage }) => {
     return (
         <Modal open={open} onClose={handleClose}>
             <Box className="modal-detail-box">
@@ -33,7 +35,7 @@ const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, se
                                 <FormControl fullWidth>
                                     <TextField
                                         label="Tên người dùng"
-                                        value={selectedMember.userName}
+                                        value={selectedMember['user-name']}
                                     />
                                 </FormControl>
                             </Grid>
@@ -41,8 +43,8 @@ const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, se
                             <Grid item xs={4}>
                                 <FormControl fullWidth>
                                     <TextField
-                                        label="Email"
-                                        value={selectedMember.email}
+                                        label="Mã sinh viên"
+                                        value={selectedMember['student-code']}
                                     />
                                 </FormControl>
                             </Grid>
@@ -50,32 +52,50 @@ const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, se
                             <Grid item xs={4}>
                                 <FormControl fullWidth>
                                     <TextField
-                                        label="Role"
-                                        value={selectedMember.role}
+                                        label="Kỳ OJT"
+                                        value={selectedMember['ojt-semester-university']}
                                     />
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={4}>
+                            <Grid item xs={12}>
                                 <FormControl fullWidth>
                                     <TextField
-                                        label="Ngày tạo"
-                                        value={selectedMember.createDate}
+                                        label="Kỹ năng công nghệ"
+                                        value={selectedMember.technical_skills}
                                     />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <FormControl fullWidth>
+                                    <Box display="flex" flexDirection="column" alignItems="flex-start">
+                                        <Typography variant="h6">Hình ảnh </Typography>
+                                        <AvatarGroup>
+                                            {/* {listImage?.data.map((image, index) => ( */}
+                                            <Tooltip title="tam">
+                                                <Avatar
+                                                    //alt={image['user-name']}
+                                                    src="/images/avatar.jpg"
+                                                />
+                                            </Tooltip>
+                                            {/* ))} */}
+                                        </AvatarGroup>
+                                    </Box>
                                 </FormControl>
                             </Grid>
                         </Grid>
 
                         <Box display="flex" justifyContent="flex-end">
-                            <Button
+                            {/* <Button
                                 variant='contained'
                                 onClick={() => handleEdit(selectedMember)}
                                 color="warning"
                                 startIcon={<EditIcon />}
-                                style={{marginRight: "5px"}}
+                                style={{ marginRight: "5px" }}
                             >
                                 Sửa
-                            </Button>
+                            </Button> */}
 
                             <Button
                                 variant='contained'

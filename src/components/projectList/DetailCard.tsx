@@ -65,8 +65,7 @@ const DetailCard = ({
   row: RowData;
   handleCloseCard: () => void;
 }) => {
-  const [listMemberInProject, setListMemberInProject] =
-    useState<MemberInProjectResType>();
+  const [listMemberInProject, setListMemberInProject] = useState<MemberInProjectResType>();
 
   useEffect(() => {
     projectApiRequest.getListPMInProject(row.id).then(({ payload }) => {

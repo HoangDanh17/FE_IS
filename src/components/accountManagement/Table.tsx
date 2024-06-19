@@ -1,7 +1,5 @@
 'use client'
 import * as React from 'react';
-//import { DataGrid, GridColDef } from '@mui/x-data-grid';
-
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,36 +8,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { TablePagination, Radio, Button } from '@mui/material';
+import { TablePagination, Radio, Button, CircularProgress } from '@mui/material';
 import "@/styles/accountManagement/DataTable.css";
 import AccountInfolModal from './AccountInfolModal';
-
-function createData(
-  id: string,
-  idAccount: string,
-  userName: string,
-  email: string,
-  role: string,
-  createDate: string
-) {
-  return { idAccount, userName, email, role, createDate };
-}
-
-const initialRows = [
-  { idAccount: "a385jaad2", userName: 'Nguyễn Văn A', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn B', email: 'test@gmail.com', role: "admin", createDate: "02/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn C', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn D', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn E', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn F', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn G', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn H', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn I', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn J', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-
-];
-
-const rows = initialRows.map((row, index) => ({ id: index + 1, ...row }));
+import { AccountListResType, AccountType } from '@/schemaValidations/accountManagement/account.schema';
+import accountApiRequest from '@/apiRequests/accountManagement/account';
+import dayjs from 'dayjs';
+import ButtonGroupAccount from "@/components/accountManagement/ButtonGroup";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -57,25 +32,42 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-interface TableRow {
-  id: number;
-  userName: string;
+export interface FormFilterData {
+  id: string
+  "username": string;
   email: string;
   role: string;
-  createDate: string;
+  "created-at-from": string;
+  "created-at-to": string;
+}
+export interface RowData {
+  id: string
+  "user-name": string;
+  email: string;
+  role: string;
+  "created-at": string;
 }
 
+function TableAccount({
+  isFilter,
+  dataFilter,
+}: {
+  isFilter: boolean;
+  dataFilter: FormFilterData | null;
+}) {
+  const [data, setData] = React.useState<AccountListResType | null>(null);
+  const [loading, setLoading] = React.useState(false);
 
-const TableAccount = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [selectedValue, setSelectedValue] = React.useState<string | null>(null);
+  const [selectedValue, setSelectedValue] = React.useState<RowData>();
 
   // handle detail modal
   const [openModal, setOpenModal] = React.useState<boolean>(false);
-  const [selectedRow, setSelectedRow] = React.useState<TableRow | null>(null);
+  const [accountDetail, setAccountDetail] = React.useState<AccountType | null>(null);
 
   const handleChangePage = (event: unknown, newPage: number) => {
+    setLoading(true);
     setPage(newPage);
   };
 
@@ -84,75 +76,94 @@ const TableAccount = () => {
     setPage(0);
   };
 
-  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedValue(event.target.value);
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>, row: RowData) => {
+    setSelectedValue(row);
+    console.log("co len: ", row)
   };
 
   const handleDeselectAll = () => {
-    setSelectedValue(null);
+    setSelectedValue(undefined);
   };
 
-  const handleViewDetail = (row: TableRow) => {
-    setSelectedRow(row);
+  const handleViewDetail = (row: AccountType) => {
+    setAccountDetail(row);
     setOpenModal(true);
   };
 
+  React.useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const { payload } = await accountApiRequest.getListAccount(page + 1, rowsPerPage, isFilter ? dataFilter : {});
+        setData(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [isFilter, page, rowsPerPage, dataFilter]);
+
   return (
-    <div style={{ maxHeight: 762, width: '180%' }}>
+    <div style={{ maxHeight: 762, width: '100%', marginTop: "10px" }}>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 640 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell sx={{ width: 70 }} align='center'>
-                <Radio
-                  onClick={handleDeselectAll}
-                  className="radio-buttons"
-                  color='secondary'
-                />
-              </StyledTableCell>
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <CircularProgress />
+          </div>
+        ) : (
+          <Table sx={{ minWidth: 640 }} aria-label="customized table">
+            <TableHead>
 
-              <StyledTableCell>Tên Người Dùng</StyledTableCell>
-              <StyledTableCell>Email</StyledTableCell>
-              <StyledTableCell>Role</StyledTableCell>
-              <StyledTableCell>Ngày tạo</StyledTableCell>
-              <StyledTableCell>Xem chi tiết</StyledTableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
-            ).map((row) => (
-              <StyledTableRow key={row.id}>
-
-                <div className="radio-cell" style={{ margin: "3px 0 0 14px" }}>
+              <TableRow>
+                <StyledTableCell sx={{ width: 70 }} align='center'>
                   <Radio
-                    checked={selectedValue === row.id.toString()}
-                    onChange={handleRadioChange}
-                    value={row.id.toString()}
+                  onClick={handleDeselectAll}
                     className="radio-buttons"
+                    color='secondary'
                   />
-                </div>
-
-                <StyledTableCell>{row.userName}</StyledTableCell>
-                <StyledTableCell>{row.email}</StyledTableCell>
-                <StyledTableCell>{row.role}</StyledTableCell>
-                <StyledTableCell>{row.createDate}</StyledTableCell>
-
-                <StyledTableCell>
-                  <Button size='small' onClick={() => handleViewDetail(row)}>Click</Button>
                 </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
+
+                <StyledTableCell>Tên Người Dùng</StyledTableCell>
+                <StyledTableCell>Email</StyledTableCell>
+                <StyledTableCell>Role</StyledTableCell>
+                <StyledTableCell>Ngày tạo</StyledTableCell>
+                <StyledTableCell>Xem chi tiết</StyledTableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {data?.data.map((account, index) => (
+                <StyledTableRow key={index}>
+
+                  <div className="radio-cell" style={{ margin: "3px 0 0 14px" }}>
+                  <Radio
+                      checked={selectedValue?.id === account.id}
+                      onChange={(event) => handleRadioChange(event, account)}
+                      value={account.id.toString()}
+                      className="radio-buttons"
+                    />
+                  </div>
+                  <StyledTableCell>{account['user-name']}</StyledTableCell>
+                  <StyledTableCell>{account.email}</StyledTableCell>
+                  <StyledTableCell>{account.role}</StyledTableCell>
+                  <StyledTableCell>{dayjs(account['created-at']).format("DD/MM/YYYY")}</StyledTableCell>
+
+                  <StyledTableCell>
+                    <Button size='small' onClick={() => handleViewDetail(account)}>Click</Button>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
 
       <TablePagination
         rowsPerPageOptions={[5, 10]}
         component="div"
-        count={rows.length}
+        count={data?.paging.items || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -160,10 +171,11 @@ const TableAccount = () => {
         className="custom-row custom-pagination"
       />
 
-      <AccountInfolModal open={openModal} handleClose={() => setOpenModal(false)} selectedRow={selectedRow} />
-
+      <AccountInfolModal open={openModal} handleClose={() => setOpenModal(false)} selectedRow={accountDetail} />
+      
+      <ButtonGroupAccount row={selectedValue} />
+     
     </div>
   );
 }
-
 export default TableAccount;

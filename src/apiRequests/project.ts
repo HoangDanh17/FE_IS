@@ -31,6 +31,7 @@ const projectApiRequest = {
     ),
   createProject: (body: CreateProjectType) =>
     http.post<CreateProjectResType>("/api/v1/projects", body),
+  
   addPmIntoProject: (id: string, body: { "list-manager-id": string[] }) =>
     http.post<CreateProjectResType>(
       `api/v1/projects/${id}/project-managers`,
@@ -43,6 +44,11 @@ const projectApiRequest = {
       updateBody
     );
   },
+
+  getProject: () =>
+    http.get<ProjectListResType>(
+      `/api/v1/projects`
+    ),
 };
 
 export default projectApiRequest;

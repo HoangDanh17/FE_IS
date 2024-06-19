@@ -1,14 +1,24 @@
 'use client'
 import * as React from 'react';
-import { Button, Card, CardContent, Modal } from "@mui/material";
+import { Button, Card, CardContent, Modal, Box, Typography } from "@mui/material";
 import "@/styles/accountManagement/ButtonGroup.css";
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import AddModalAccount from './AddAccountModal';
 import EditModalAccount from './EditModal';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
+import { RowData } from './Table';
+import { useRouter } from "next/navigation";
 
-const ButtonGroupAccount = () => {
+interface ButtonGroupAccountProps {
+    row: RowData | undefined;
+}
+
+const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row }) => {
+    const [loading, setLoading] = React.useState(false);
+    const router = useRouter();
+
     //useState Modal Add
     const [openAddModal, setOpenAddModal] = React.useState(false);
     const handleOpenAddModal = () => setOpenAddModal(true);
@@ -19,10 +29,14 @@ const ButtonGroupAccount = () => {
     const handleOpenEditModal = () => setOpenEditModal(true);
     const handleCloseEditModal = () => setOpenEditModal(false);
 
+    // useState Modal Confirm Delete
+    const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
+    const handleOpenDeleteModal = () => setOpenDeleteModal(true);
+    const handleCloseDeleteModal = () => setOpenDeleteModal(false);
+
     return (
         <Card style={{ marginTop: "10px" }}>
             <CardContent style={{ height: "68px" }}>
-                {/* <Button variant="contained" color="success" className="import-btn">Nhập Excel</Button> */}
 
                 <Button
                     variant="contained"
@@ -48,6 +62,7 @@ const ButtonGroupAccount = () => {
                     color='error'
                     className="delete-btn"
                     startIcon={<DeleteOutlineOutlinedIcon />}
+                    onClick={handleOpenDeleteModal}
                 >
                     Xóa
                 </Button>
@@ -56,19 +71,25 @@ const ButtonGroupAccount = () => {
                 <Modal
                     open={openAddModal}
                     onClose={handleCloseAddModal}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
+
                 >
                     <AddModalAccount onClose={handleCloseAddModal} />
                 </Modal>
 
+                  {/* Modal Edit */}
                 <Modal
                     open={openEditModal}
                     onClose={handleCloseEditModal}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
                 >
-                    <EditModalAccount onClose={handleCloseEditModal} />
+                    <EditModalAccount onClose={handleCloseEditModal} row={row} />
+                </Modal>
+
+                {/* Modal Confirm Delete */}
+                <Modal
+                    open={openDeleteModal}
+                    onClose={handleCloseDeleteModal}
+                >
+                   <ConfirmDeleteModal onClose={handleCloseDeleteModal} row={row}/>
                 </Modal>
             </CardContent>
         </Card>
