@@ -14,7 +14,6 @@ interface AddModalProps {
   onClose: () => void;
 }
 
-  
 const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
   const [formData, setFormData] = useState<CreateTermType>({
     semester: '',
@@ -34,14 +33,14 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
   const handleDateChange = (name: string, date: Dayjs | null) => {
     setFormData({
       ...formData,
-      [name]: date,
+      [name]: date ? date.toISOString() : '',
     });
   };
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  async function handleAdd () {
+  const handleAdd = async () => {
     setLoading(true);
     const formattedData = {
       ...formData,
@@ -50,24 +49,24 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
     };
     console.log("Form Data:", formattedData);
     try {
-        const result = await termApiRequest.createTerm(formattedData);
-        toast({
-          title: `${result.payload.message}`,
-          duration: 2000,
-          variant: "success",
-        });
-        console.log(result);
-        router.refresh();
-      } catch (error: any) {
-        toast({
-          title: `${error}`,
-          duration: 2000,
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-        onClose();
-      }
+      const result = await termApiRequest.createTerm(formattedData);
+      toast({
+        title: `${result.payload.message}`,
+        duration: 2000,
+        variant: "success",
+      });
+      console.log(result);
+      router.refresh();
+    } catch (error: any) {
+      toast({
+        title: `${error.message}`,
+        duration: 2000,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      onClose();
+    }
   };
 
   return (
@@ -84,6 +83,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 <TextField
                   label="Kì"
                   name="semester"
+                  size='small'
                   value={formData.semester}
                   onChange={handleChange}
                 />
@@ -94,6 +94,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
               <FormControl fullWidth>
                 <TextField
                   label="Trường"
+                  size='small'
                   name="university"
                   value={formData.university}
                   onChange={handleChange}
@@ -105,7 +106,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
               <FormControl fullWidth>
                 <DatePicker
                   label="Start Date"
-                  value={dayjs(formData["start-at"])}
+                  value={formData["start-at"] ? dayjs(formData["start-at"]) : null}
                   onChange={(date) => handleDateChange('start-at', date)}
                   slotProps={{ textField: { fullWidth: true, size: "small" } }}
                 />
@@ -116,7 +117,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
               <FormControl fullWidth>
                 <DatePicker
                   label="End Date"
-                  value={dayjs(formData["end-at"])}
+                  value={formData["end-at"] ? dayjs(formData["end-at"]) : null}
                   onChange={(date) => handleDateChange('end-at', date)}
                   slotProps={{ textField: { fullWidth: true, size: "small" } }}
                 />
@@ -129,8 +130,9 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
               variant="contained"
               color="primary"
               onClick={handleAdd}
+              disabled={loading}
             >
-              Add
+              {loading ? "Loading..." : "Add"}
             </Button>
           </Box>
         </FormControl>

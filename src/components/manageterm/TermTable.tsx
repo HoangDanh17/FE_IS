@@ -14,7 +14,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditModal from "./EditModal2";
 import "@/components/css/manageintern/DataTable.css";
-import { Button, CircularProgress, Modal, Box, Typography, Radio } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Modal,
+  Box,
+  Typography,
+  Radio,
+} from "@mui/material";
 import AddModal from "./AddModal2";
 import termApiRequest from "@/apiRequests/term";
 import { TermListResType } from "@/schemaValidations/term.schema";
@@ -64,14 +71,15 @@ const TermTable = ({
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState<RowData2 | null>();
+  const [selectedRowData, setSelectedRowData] = useState<RowData2 | null>(null);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [selectedValue, setSelectedValue] = useState<RowData2 | null>();
+  const [selectedValue, setSelectedValue] = useState<RowData2 | null>(null);
 
   const [data, setData] = useState<TermListResType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setLoading(true);
@@ -100,7 +108,12 @@ const TermTable = ({
   };
 
   const handleOpenAddModal = () => setOpenAddModal(true);
-  const handleCloseAddModal = () => setOpenAddModal(false);
+  const handleCloseAddModal = () => {
+    setOpenAddModal(false);
+    setSelectedValue(null);
+    setSelectedRowData(null);
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
 
   const handleOpenEditModal = () => {
     if (selectedRowData) {
@@ -108,32 +121,42 @@ const TermTable = ({
     }
     setOpenEditModal(true);
   };
-  const handleCloseEditModal = () => setOpenEditModal(false);
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+    setSelectedValue(null);
+    setSelectedRowData(null);
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
 
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
-  const handleCloseDeleteModal = () => setOpenDeleteModal(false);
-  const router = useRouter();
-  const handleDelete = () => {
-    if (selectedRowData && selectedRowData.id) { // Ensure selectedRowData and its id are defined
-      console.log(`Deleted: ${selectedRowData.id}`);
-      termApiRequest.deleteTerm(selectedRowData.id).then(() => {
-        router.refresh();
-        toast({
-          title: 'Đã xóa thành công',
-          duration: 2000,
-          variant: "success",
-        });
-      });
-    }
-    handleCloseDeleteModal();
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+    setSelectedValue(null);
     setSelectedRowData(null);
+  };
+
+  const handleDelete = () => {
+    if (selectedRowData && selectedRowData.id) {
+      termApiRequest.deleteTerm(selectedRowData.id);
+    }
+    setRefreshKey((prevKey) => prevKey + 1);
+    toast({
+      title: "Đã xóa thành công",
+      duration: 2000,
+      variant: "success",
+    });
+    handleCloseDeleteModal();
   };
 
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
       try {
-        const { payload } = await termApiRequest.getListTerm(page + 1, rowsPerPage, isFilter ? dataFilter : {});
+        const { payload } = await termApiRequest.getListTerm(
+          page + 1,
+          rowsPerPage,
+          isFilter ? dataFilter : {}
+        );
         setData(payload);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -142,7 +165,7 @@ const TermTable = ({
       }
     };
     fetchData();
-  }, [isFilter, page, rowsPerPage, dataFilter]);
+  }, [isFilter, page, rowsPerPage, dataFilter, refreshKey]);
 
   return (
     <div style={{ maxHeight: 762, width: "100%", marginTop: "10px" }}>
@@ -199,7 +222,7 @@ const TermTable = ({
                   </StyledTableCell>
                   <StyledTableCell>
                     {dayjs(account["end-at"]).format("DD/MM/YYYY")}
-                  </StyledTableCell>                
+                  </StyledTableCell>
                 </StyledTableRow>
               ))}
             </TableBody>
@@ -267,10 +290,7 @@ const TermTable = ({
         <EditModal row={selectedRowData} onClose={handleCloseEditModal} />
       </Modal>
 
-      <Modal
-        open={openDeleteModal}
-        onClose={handleCloseDeleteModal}
-      >
+      <Modal open={openDeleteModal} onClose={handleCloseDeleteModal}>
         <Box
           sx={{
             position: "absolute",

@@ -19,29 +19,31 @@ import termApiRequest from "@/apiRequests/term";
 import { toast } from "../ui/use-toast";
 import { useRouter } from "next/navigation";
 import { FormFilterData } from "./InternTable";
-import { UpdateInternType } from "@/schemaValidations/intern.schema";
+import {
+  InternSchemaType,
+  UpdateInternType,
+} from "@/schemaValidations/intern.schema";
 import internApiRequest from "@/apiRequests/intern";
-
 
 const EditModal = ({
   row,
   onClose,
 }: {
-  row: FormFilterData | null | undefined;
+  row: InternSchemaType | null;
   onClose: () => void;
 }) => {
   const [formData, setFormData] = useState<UpdateInternType>({
-    "account-id": '',
-    "intern-id": '',
-    "user-name": '',
-    email: '',
-    "student-code": '',
-    avatar: '',
-    gender: '',
-    "date-of-birth": '',
-    "phone-number": '',
-    address: '',
-    "ojt-semester": '',
+    "account-id": row?.["account-id"],
+    "intern-id": row?.["intern-id"],
+    "user-name": row?.["user-name"],
+    email: row?.email,
+    "student-code": row?.["student-code"],
+    avatar: row?.avatar,
+    gender: row?.gender,
+    "date-of-birth": row?.["date-of-birth"],
+    "phone-number": row?.["phone-number"],
+    address: row?.address,
+    "ojt-semester": row?.["ojt-semester"],
   });
 
   const handleDateChange = (name: string, date: Dayjs | null) => {
@@ -51,12 +53,14 @@ const EditModal = ({
     });
   };
 
-  const handleChange = (name: keyof UpdateInternType) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [name]: event.target.value,
-    });
-  };
+  const handleChange =
+    (name: keyof UpdateInternType) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData({
+        ...formData,
+        [name]: event.target.value,
+      });
+    };
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -65,7 +69,9 @@ const EditModal = ({
     setLoading(true);
     const formattedData = {
       ...formData,
+      "ojt-id": 1,
     };
+    delete formattedData["ojt-semester"];
     console.log("Form Data:", formattedData);
     try {
       const result = await internApiRequest.updateIntern(formattedData);
@@ -76,6 +82,7 @@ const EditModal = ({
       });
       console.log(result);
       router.refresh();
+      onClose();
     } catch (error: any) {
       toast({
         title: `${error}`,
@@ -84,9 +91,8 @@ const EditModal = ({
       });
     } finally {
       setLoading(false);
-      onClose();
     }
-  };
+  }
 
   return (
     <div>
@@ -125,7 +131,6 @@ const EditModal = ({
                   />
                 </FormControl>
               </Grid>
-              
 
               <Grid item xs={4}>
                 <FormControl fullWidth>
@@ -171,19 +176,30 @@ const EditModal = ({
                 <FormControl fullWidth>
                   <DatePicker
                     label="Ngày sinh"
-                    value={formData["date-of-birth"] ? dayjs(formData["date-of-birth"]) : null}
-                    onChange={(date) => handleDateChange('date-of-birth', date)}
-                    slotProps={{ textField: { fullWidth: true, size: "small" } }}
+                    value={
+                      formData["date-of-birth"]
+                        ? dayjs(formData["date-of-birth"])
+                        : null
+                    }
+                    onChange={(date) => handleDateChange("date-of-birth", date)}
+                    slotProps={{
+                      textField: { fullWidth: true, size: "small" },
+                    }}
                   />
                 </FormControl>
               </Grid>
             </Grid>
-            </FormControl>
-            <Box display="flex" justifyContent="flex-end">
-              <Button variant="contained" color="primary" onClick={handleAdd} disabled={loading}>
-                Edit
-              </Button>
-            </Box>
+          </FormControl>
+          <Box display="flex" justifyContent="flex-end">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAdd}
+              disabled={loading}
+            >
+              Edit
+            </Button>
+          </Box>
         </Box>
       </LocalizationProvider>
     </div>

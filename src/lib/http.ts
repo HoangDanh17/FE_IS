@@ -85,6 +85,8 @@ const request = async <Response>(
     ? `${baseUrl}${url}`
     : `${baseUrl}/${url}`;
 
+  let payload: Response = {} as Response; // Initialize payload with a default value
+
   const res = await fetch(fullUrl, {
     ...options,
     headers: {
@@ -94,20 +96,14 @@ const request = async <Response>(
     body,
     method,
   });
-  const payload: Response = await res.json();
-  const data = {
-    status: res.status,
-    payload,
-  };
-  // Interceptor là nời chúng ta xử lý request và response trước khi trả về cho phía component
+
+  // Nếu không thành công (res.ok === false)
   if (!res.ok) {
     if (res.status === ENTITY_ERROR_STATUS) {
-      throw new EntityError(
-        data as {
-          status: 422;
-          payload: EntityErrorPayload;
-        }
-      );
+      throw new EntityError({
+        status: 422,
+        payload: await res.json() as EntityErrorPayload,
+      });
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
       if (isClient()) {
         if (!clientLogoutRequest) {
@@ -121,6 +117,7 @@ const request = async <Response>(
           try {
             await clientLogoutRequest;
           } catch (error) {
+            // Handle logout request error
           } finally {
             localStorage.removeItem("sessionToken");
             localStorage.removeItem("sessionTokenExpiresAt");
@@ -129,15 +126,30 @@ const request = async <Response>(
           }
         }
       } else {
-        const sessionToken = (options?.headers as any)?.Authorization.split(
+        const sessionToken = (options?.headers as any)?.Authorization?.split(
           "Bearer "
         )[1];
         redirect(`/logout?sessionToken=${sessionToken}`);
       }
     } else {
-      throw new HttpError(data);
+      throw new HttpError({
+        status: res.status,
+        payload: await res.json(),
+      });
     }
+  } else {
+    // Nếu thành công và res.status !== 204, thực hiện lấy json
+    if (res.status !== 204) {
+      payload = await res.json();
+    }
+    // Nếu res.status === 204, payload sẽ là giá trị mặc định đã được gán ở trên
   }
+
+  const data = {
+    status: res.status,
+    payload,
+  };
+
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isClient()) {
     if (["api/v1/login"].some((item) => item === normalizePath(url))) {
@@ -149,6 +161,7 @@ const request = async <Response>(
       localStorage.removeItem("sessionTokenExpiresAt");
     }
   }
+
   return data;
 };
 

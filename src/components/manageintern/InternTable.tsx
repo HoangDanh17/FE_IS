@@ -1,4 +1,10 @@
-import React, { useState, MouseEvent, ChangeEvent, useEffect } from "react";
+import React, {
+  useState,
+  MouseEvent,
+  ChangeEvent,
+  useEffect,
+  useCallback,
+} from "react";
 import {
   Paper,
   Table,
@@ -14,13 +20,20 @@ import {
   Button,
   CircularProgress,
   Modal,
+  Box,
+  Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import internApiRequest from "@/apiRequests/intern";
-import { InternListResType } from "@/schemaValidations/intern.schema";
+import {
+  InternListResType,
+  InternSchemaType,
+} from "@/schemaValidations/intern.schema";
 import AddModal from "./AddModal";
+import EditModal from "@/components/manageintern/EditModal";
+import { useRouter } from "next/navigation";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -33,7 +46,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
+  "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
 }));
@@ -43,27 +56,13 @@ const CustomTablePagination = styled(TablePagination)(({ theme }) => ({
     color: theme.palette.primary.main,
   },
 }));
-
-export interface RowData {
-  "account-id": string;
+export interface FormFilterData {
   "user-name": string;
   email: string;
   "student-code": string;
   "ojt-semester": string;
   gender: string;
   "phone-number": string;
-  address: string;
-  "dob-from": string;
-  "dob-to": string;
-}
-
-export interface FormFilterData {
-  'user-name': string;
-  email: string;
-  'student-code': string;
-  'ojt-semester': string;
-  gender: string;
-  'phone-number': string;
   address: string;
 }
 
@@ -82,10 +81,11 @@ const InternTable = ({
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [selectedRow, setSelectedRow] = useState<string | null>(null);
-  const [selectedRowData, setSelectedRowData] = useState<RowData | null>(null);
+  const [selectedRowData, setSelectedRowData] =
+    useState<InternSchemaType | null>(null);
 
-  const [selectedValue, setSelectedValue] = useState<RowData | null>();
-
+  const [selectedValue, setSelectedValue] = useState<InternSchemaType | null>();
+  const [refreshKey, setRefreshKey] = useState(0);
   const handleDeselectAll = () => {
     setSelectedValue(null);
     setSelectedRowData(null);
@@ -93,18 +93,7 @@ const InternTable = ({
 
   const handleRadioChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    row: {
-      "account-id": string;
-      "user-name": string;
-      email: string;
-      "student-code": string;
-      "ojt-semester": string;
-      gender: string;
-      "phone-number": string;
-      address: string;
-      "dob-from": string;
-      "dob-to": string;
-    }
+    row: InternSchemaType
   ) => {
     setSelectedValue(row);
     setSelectedRowData(row);
@@ -114,7 +103,12 @@ const InternTable = ({
   // Add
   const [openAddModal, setOpenAddModal] = useState(false);
   const handleOpenAddModal = () => setOpenAddModal(true);
-  const handleCloseAddModal = () => setOpenAddModal(false);
+  const handleCloseAddModal = () => {
+    setOpenAddModal(false);
+    setSelectedRowData(null);
+    setRefreshKey((prevKey) => prevKey + 1);
+    setSelectedValue(null);
+  };
 
   // Edit
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -124,37 +118,29 @@ const InternTable = ({
     }
     setOpenEditModal(true);
   };
-  const handleCloseEditModal = () => setOpenEditModal(false);
-
-  // Delete
-  const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
-  const handleOpenDeleteModal = () => setOpenDeleteModal(true);
-  const handleCloseDeleteModal = () => setOpenDeleteModal(false);
-  const handleDelete = () => {
-    if (selectedRowData) {
-      // Perform the delete operation here
-      console.log(`Deleted: ${selectedRowData['user-name']}`);
-      // Close the modal after deletion
-      handleCloseDeleteModal();
-      // Optionally, remove the deleted row from the state
-      setSelectedRow(null);
-      setSelectedRowData(null);
-    }
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+    setSelectedRowData(null);
+    setRefreshKey((prevKey) => prevKey + 1);
+    setSelectedValue(null);
   };
 
-  const handleChangePage = (
-    event: MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    setPage(newPage);
-  };
+  const handleChangePage = useCallback(
+    (event: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+      setPage(newPage);
+    },
+    []
+  );
 
-  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  const handleChangeRowsPerPage = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      setPage(0);
+    },
+    []
+  );
 
-  const handleSelectRow = (row: RowData) => {
+  const handleSelectRow = (row: InternSchemaType) => {
     if (selectedRow === row["account-id"]) {
       setSelectedRow(null);
       setSelectedRowData(null);
@@ -164,13 +150,15 @@ const InternTable = ({
     }
   };
 
-  const isSelected = (id: string) => selectedRow === id;
-
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
       try {
-        const { payload } = await internApiRequest.getListIntern(page + 1, rowsPerPage, isFilter ? dataFilter : {});
+        const { payload } = await internApiRequest.getListIntern(
+          page + 1,
+          rowsPerPage,
+          isFilter ? dataFilter : {}
+        );
         setData(payload);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -179,7 +167,37 @@ const InternTable = ({
       }
     };
     fetchData();
-  }, [isFilter, page, rowsPerPage, dataFilter]);
+  }, [isFilter, page, rowsPerPage, dataFilter, refreshKey]);
+
+  // const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  // const [selectedDeleteRowId, setSelectedDeleteRowId] = useState<string | null>(
+  //   null
+  // );
+
+  // const handleOpenDeleteModal = (id: string) => {
+  //   setSelectedDeleteRowId(id);
+  //   setOpenDeleteModal(true);
+  // };
+
+  // const handleCloseDeleteModal = () => {
+  //   setOpenDeleteModal(false);
+  //   setSelectedDeleteRowId(null);
+  // };
+  // const router = useRouter();
+
+  // const handleDelete = async () => {
+  //   if (selectedDeleteRowId) {
+  //     console.log("Deleting intern-id:", selectedDeleteRowId);
+  //     try {
+  //       await internApiRequest.deleteIntern(selectedDeleteRowId);
+  //       setRefreshKey((prevKey) => prevKey + 1);
+  //       handleCloseDeleteModal();
+  //       router.refresh();
+  //     } catch (error) {
+  //       console.error("Error deleting intern:", error);
+  //     }
+  //   }
+  // };
 
   return (
     <div style={{ maxHeight: 762, width: "100%", marginTop: "10px" }}>
@@ -223,7 +241,9 @@ const InternTable = ({
                     style={{ margin: "3px 0 0 14px" }}
                   >
                     <Radio
-                      checked={selectedValue?.["account-id"] === account["account-id"]}
+                      checked={
+                        selectedValue?.["account-id"] === account["account-id"]
+                      }
                       onChange={(event) => handleRadioChange(event, account)}
                       value={account.toString()}
                       className="radio-buttons"
@@ -243,9 +263,10 @@ const InternTable = ({
         )}
       </TableContainer>
 
-      <CustomTablePagination
+      <TablePagination
         rowsPerPageOptions={[5, 10]}
-        count={data?.data.length ?? 0}
+        component="div"
+        count={data?.paging.items || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -257,12 +278,12 @@ const InternTable = ({
         className="add-btn"
         startIcon={<AddIcon />}
         onClick={handleOpenAddModal}
-        style={{ marginRight: '10px' }}
+        style={{ marginRight: "10px" }}
       >
         Thêm
       </Button>
       <Button
-        style={{ marginRight: '10px' }}
+        style={{ marginRight: "10px" }}
         variant="contained"
         className="edit-btn"
         startIcon={<EditIcon />}
@@ -271,46 +292,71 @@ const InternTable = ({
       >
         Sửa
       </Button>
-      <Button
-        style={{ marginRight: '10px' }}
+      {/* <Button
+        style={{ marginRight: "10px" }}
         variant="contained"
         color="error"
         className="delete-btn"
         startIcon={<DeleteIcon />}
-        onClick={handleOpenDeleteModal}
+        onClick={() =>
+          handleOpenDeleteModal(selectedRowData?.["account-id"] || "")
+        }
         disabled={!selectedRowData} // Disable button if no row is selected
       >
         Xóa
-      </Button>
+      </Button> */}
+
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openAddModal}
         onClose={handleCloseAddModal}
-      >  
+      >
         <AddModal onClose={handleCloseAddModal} />
       </Modal>
-      {/* <Modal
+      <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openEditModal}
         onClose={handleCloseEditModal}
-      >  
-        <EditModal rowData={selectedRowData} />
-      </Modal>
-      <Modal
-        open={openDeleteModal}
-        onClose={handleCloseDeleteModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
       >
-        <DeleteModal
-          open={openDeleteModal}
-          onClose={handleCloseDeleteModal}
-          onDelete={handleDelete}
-          rowData={selectedRowData} // Pass selectedRowData to DeleteModal
-        />
-      </Modal>  */}
+        <EditModal row={selectedRowData} onClose={handleCloseEditModal} />
+      </Modal>
+      {/* <Modal open={openDeleteModal} onClose={handleCloseDeleteModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Confirm Deletion
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Are you sure you want to delete this row?
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDelete}
+              sx={{ mr: 1 }}
+            >
+              Delete
+            </Button>
+            <Button variant="contained" onClick={handleCloseDeleteModal}>
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal> */}
     </div>
   );
 };
