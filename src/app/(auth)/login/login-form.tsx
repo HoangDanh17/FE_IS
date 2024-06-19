@@ -50,13 +50,17 @@ const LoginForm = () => {
         sessionToken: result.payload.data.token,
       });
       toast({
-        title: `Chào mừng đăng nhập ${result.payload.data.account_info['user-name']}`,
+        title: `Chào mừng đăng nhập ${result.payload.data.account_info["user-name"]}`,
         duration: 2000,
         variant: "info",
       });
       setUser(result.payload.data.account_info);
       console.log(result);
-      router.push("/homePage");
+      if (result.payload.data.account_info.role === "admin") {
+        router.push("/homePage");
+      } else {
+        router.push("listCard");
+      }
     } catch (error: any) {
       handleErrorApi({
         error,

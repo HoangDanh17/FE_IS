@@ -38,7 +38,7 @@ const Header = () => {
   }));
 
   return (
-    <AppBarStyled position="sticky" color="default">
+    <AppBarStyled position="sticky" color="default" className="shadow-md">
       <ToolbarStyled>
         <IconButton
           color="inherit"

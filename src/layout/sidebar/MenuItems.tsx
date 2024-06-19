@@ -50,6 +50,37 @@ const Menuitems = [
     icon: AssignmentIcon,
     href: "/homePage/projectMember",
   },
+  {
+    id: 7,
+    title: "Lịch làm việc",
+    icon: AssignmentIcon,
+    href: "/homePage/timeTable",
+  },
 ];
 
-export default Menuitems;
+const MenuitemsOthers = [
+  {
+    navlabel: true,
+    subheader: "Quản lí dự án",
+  },
+  {
+    id: 1,
+    title: "Chi tiết dự án",
+    icon: AssignmentIcon,
+    href: "/homePage/projectList",
+  },
+  {
+    id: 2,
+    title: "Thành viên dự án",
+    icon: AssignmentIcon,
+    href: "/homePage/projectMember",
+  },
+  {
+    id: 3,
+    title: "Danh sách công việc",
+    icon: AssignmentIcon,
+    href: "/homePage/listTask",
+  },
+];
+
+export { Menuitems, MenuitemsOthers };

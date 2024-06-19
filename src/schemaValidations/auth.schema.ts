@@ -33,7 +33,7 @@ export const RegisterRes = z.object({
       id: z.number(),
       "user-name": z.string(),
       email: z.string(),
-      account_role: z.string(),
+      role: z.string(),
     }),
   }),
   message: z.string(),
