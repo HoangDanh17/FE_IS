@@ -25,6 +25,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ProjectListTable, {
   FormFilterData,
 } from "@/components/projectList/ProjectListTable";
+import ListTable from "@/components/pm/mainLayout/ListTable";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -64,7 +65,7 @@ const statusLabels: { [key: string]: string } = {
   cancel: "Cancel",
 };
 
-const FilterTable = () => {
+const FilterList = () => {
   const [formData, setFormData] = useState<FormFilterData>({
     name: "",
     status: "",
@@ -232,13 +233,13 @@ const FilterTable = () => {
           </Grid>
         </Grid>
       </LocalizationProvider>
-      <ProjectListTable
-        isFilter={isFilter}
-        dataFilter={dataFilter}
-        handleReset={handleReset}
-      ></ProjectListTable>
+      <ListTable
+        // isFilter={isFilter}
+        // dataFilter={dataFilter}
+        // handleReset={handleReset}
+      ></ListTable>
     </div>
   );
 };
 
-export default FilterTable;
+export default FilterList;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const privatePaths = ["/homePage"];
+const privatePaths = ["/homePage", "/listCard"];
 const authPaths = ["/login", "/register"];
 
 export function middleware(req: NextRequest) {
@@ -20,5 +20,5 @@ export function middleware(req: NextRequest) {
 
 // Chỉ định các đường dẫn mà middleware sẽ được áp dụng
 export const config = {
-  matcher: ["/login", "/register", "/homePage/:path*"],
+  matcher: ["/login", "/register", "/homePage/:path*", "/listCard"],
 };

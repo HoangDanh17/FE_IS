@@ -1,6 +1,4 @@
-import { LoadingSpinner } from "@/app/loading";
 import MainLayout from "@/layout/mainlayout/Mainlayout";
-import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -9,7 +7,7 @@ export default function RootLayout({
 }) {
   return (
     <div>
-        <MainLayout>{children}</MainLayout>
+      <MainLayout>{children}</MainLayout>
     </div>
   );
 }

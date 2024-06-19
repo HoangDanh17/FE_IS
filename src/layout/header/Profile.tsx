@@ -24,9 +24,9 @@ import { handleErrorApi } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "@/components/ui/input";
-
+import LogoutIcon from '@mui/icons-material/Logout';
 interface UserInfo {
-  user_name: string;
+  "user-name": string;
   email: string;
   account_role: string;
 }
@@ -40,13 +40,13 @@ const Profile = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   useEffect(() => {
-    setUserName(user?.user_name || "");
+    setUserName(user?.["user-name"] || "");
     setUserInfo(
       user
         ? {
-            user_name: user.user_name,
+            "user-name": user["user-name"],
             email: user.email,
-            account_role: user.account_role,
+            account_role: user.role,
           }
         : null
     );
@@ -137,6 +137,7 @@ const Profile = () => {
             variant="outlined"
             color="primary"
             fullWidth
+            startIcon={<LogoutIcon></LogoutIcon>}
           >
             Logout
           </Button>
@@ -184,7 +185,7 @@ const Profile = () => {
                   id="Tên"
                   placeholder="Tên"
                   disabled
-                  value={userInfo?.user_name}
+                  value={userInfo?.["user-name"]}
                   style={{ width: "70%" }}
                 />
               </Box>
