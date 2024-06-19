@@ -50,14 +50,12 @@ const Menuitems = [
     icon: AssignmentIcon,
     href: "/homePage/projectMember",
   },
-<<<<<<< HEAD
   {
     id: 7,
     title: "Lịch làm việc",
     icon: AssignmentIcon,
     href: "/homePage/timeTable",
   },
-=======
   // {
   //   navlabel: true,
   //   subheader: "Quản lí dự án của PM",
@@ -80,7 +78,6 @@ const Menuitems = [
   //   icon: AssignmentIcon,
   //   href: "/homePage",
   // },
->>>>>>> Tam
 ];
 
 const MenuitemsOthers = [
