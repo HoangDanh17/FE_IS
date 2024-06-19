@@ -10,13 +10,10 @@ import EditModalAccount from './EditModal';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import { RowData } from './Table';
 import { useRouter } from "next/navigation";
-import { toast } from "@/components/ui/use-toast";
-import accountApiRequest from '@/apiRequests/accountManagement/account';
 
 interface ButtonGroupAccountProps {
     row: RowData | undefined;
 }
-
 
 const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row }) => {
     const [loading, setLoading] = React.useState(false);

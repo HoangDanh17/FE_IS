@@ -7,9 +7,9 @@ const projectMember = () => {
                 <FilterProjectMember />
             </div>
 
-            <div className="table" style={{ marginTop: "10px" }}>
+            {/* <div className="table" style={{ marginTop: "10px" }}>
                 <TableProjectMember />
-            </div>
+            </div> */}
 
             {/* <div>
                 <ButtonGroupMemberProject />

@@ -50,6 +50,28 @@ const Menuitems = [
     icon: AssignmentIcon,
     href: "/homePage/projectMember",
   },
+  // {
+  //   navlabel: true,
+  //   subheader: "Quản lí dự án của PM",
+  // },
+  // {
+  //   id: 7,
+  //   title: "Chi tiết dự án",
+  //   icon: AssignmentIcon,
+  //   href: "/homePage/projectDetail",
+  // },
+  // {
+  //   id: 8,
+  //   title: "Thành viên dự án",
+  //   icon: AssignmentIcon,
+  //   href: "/homePage/projectMemberPM",
+  // },
+  // {
+  //   id: 9,
+  //   title: "Danh sách công việc",
+  //   icon: AssignmentIcon,
+  //   href: "/homePage",
+  // },
 ];
 
 export default Menuitems;

@@ -10,51 +10,21 @@ import { Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTi
 import { ScrollArea } from "@/components/ui/scroll-area"
 import MemberInfoModal from './MemberInfoModal';
 import "@/styles/accountManagement/DataTable.css";
+import { ProjectMemberListResType } from '@/schemaValidations/projectMember/projectMember.schema';
 
-function createData(
-  id: string,
-  idAccount: string,
-  userName: string,
-  email: string,
-  role: string,
-  createDate: string
-) {
-  return { idAccount, userName, email, role, createDate };
-}
-interface Member {
-  id: number;
-  idAccount: string;
-  userName: string;
-  email: string;
-  role: string;
-  createDate: string;
-}
 
-const initialRows = [
-  { idAccount: "a385jaad2", userName: 'Nguyễn Văn A', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn B', email: 'test@gmail.com', role: "admin", createDate: "02/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn C', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn D', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn D', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn D', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn D', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn D', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn E', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn F', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn G', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-  { idAccount: "a385jaad3", userName: 'Nguyễn Văn H', email: 'test@gmail.com', role: "admin", createDate: "01/06/2024" },
-];
-
-const rows = initialRows.map((row, index) => ({ id: index + 1, ...row }));
-
-const TableProjectMember = () => {
-  const [selectedMember, setSelectedMember] = React.useState<Member | null>(null);
+function TableProjectMember({
+  cardMem
+}: {
+  cardMem: ProjectMemberListResType
+}) {
+  const [selectedMember, setSelectedMember] = React.useState<ProjectMemberListResType | null>(null);
   const [open, setOpen] = React.useState(false);
 
   // confirm Delete
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
-  const handleClickOpen = (member: Member) => {
+  const handleClickOpen = (member: ProjectMemberListResType) => {
     setSelectedMember(member);
     setOpen(true);
   };
@@ -64,12 +34,12 @@ const TableProjectMember = () => {
     setSelectedMember(null);
   };
 
-  const handleEdit = (member: Member) => {
-    console.log("Edit member:", member);
-    // Implement your edit logic here
-  };
+  // const handleEdit = (member: ProjectMemberListResType) => {
+  //   console.log("Edit member:", member);
+  //   // Implement your edit logic here
+  // };
 
-  const handleDelete = (member: Member) => {
+  const handleDelete = (member: ProjectMemberListResType) => {
     setSelectedMember(member);
     setConfirmOpen(true);
   };
@@ -96,8 +66,8 @@ const TableProjectMember = () => {
       <Typography variant='h4'>Thành viên dự án</Typography>
       <ScrollArea className="h-[350px] rounded-md border p-4 mt-3">
         <Grid container spacing={2}>
-          {(rows).map((row) => (
-            <Grid item xs={12} sm={6} md={4} key={row.id}>
+          {cardMem?.data && cardMem.data.map((member) => (
+            <Grid item xs={12} sm={6} md={4} key={member.id}>
               <Card
                 style={{
                   boxShadow: "0 2px 2px 0 rgba(0, 0, 0, 0.2)",
@@ -105,7 +75,7 @@ const TableProjectMember = () => {
                 elevation={10}
                 variant="outlined"
                 className="w-[330px] hover:scale-110 duration-300"
-                onClick={() => handleClickOpen(row)}
+                onClick={() => handleClickOpen(member)}
               >
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -117,14 +87,18 @@ const TableProjectMember = () => {
 
                     <Box>
                       <Typography variant="body1">
-                        Tên Thành Viên: {row.userName}
+                        Tên Thành Viên: {member['user-name']}
                       </Typography>
 
                       <Typography variant="body1">
-                        Ngày Tham Gia: {row.createDate}
+                        Mã số sinh viên: {member['student-code']}
                       </Typography>
 
-                      <Chip style={{ marginTop: "10px" }} size="small" label="in progress" />
+                      <Typography variant="body1">
+                        Kỳ thực tập: {member['ojt-semester-university']}
+                      </Typography>
+
+                      {/* <Chip style={{ marginTop: "10px" }} size="small" label="in progress" /> */}
                     </Box>
                   </Box>
                 </CardContent>
@@ -139,7 +113,7 @@ const TableProjectMember = () => {
         open={open}
         handleClose={handleClose}
         selectedMember={selectedMember}
-        handleEdit={handleEdit}
+        // handleEdit={handleEdit}
         handleDelete={handleDelete}
       />
 
