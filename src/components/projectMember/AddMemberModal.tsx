@@ -42,6 +42,7 @@ function AddMemberModal({
     const [dataFilter, setDataFilter] = useState<FormFilterData | null>(null);
     const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
     const router = useRouter();
+    const [refreshKey, setRefreshKey] = useState(false);
 
     // Get list member not in project
     useEffect(() => {
@@ -53,12 +54,13 @@ function AddMemberModal({
             )
                 .then(({ payload }) => {
                     setMember(payload);
+                    
                 })
                 .catch(error => {
                     console.error("Failed to fetch project members", error);
                 });
         }
-    }, [selectedProjectId, isFilter, dataFilter, quantity]);
+    }, [selectedProjectId, isFilter, dataFilter, quantity, refreshKey]);
 
 
     console.log("Thành viên: ", member)
@@ -116,22 +118,21 @@ function AddMemberModal({
 
     // Handle add 
     const handleAdd = (selectedMembers: Member[]) => {
-        // Extract IDs from selected members
         const memberIds = selectedMembers.map((member) => member.id);
 
         const submitData = {
-            "member-id": memberIds.map((id) => String(id)),
+            "mem-id": String(memberIds),
         };
 
-        projectMemberApiRequest.addMemberIntoProject(selectedProjectId,submitData)
+        projectMemberApiRequest.addMemberIntoProject(selectedProjectId, submitData)
             .then((response) => {
                 toast({
                     title: `${response.payload.message}`,
                     duration: 2000,
                     variant: "success",
                 });
-                onClose();
-                //router.refresh();
+                setRefreshKey(!refreshKey);
+                resetAndClose();
             })
             .catch((error) => {
                 toast({
@@ -228,45 +229,45 @@ function AddMemberModal({
                     </Grid>
 
                     <Grid item xs={6}>
-                            {selectedMembers.length > 0 ? (
-                                <TableContainer component={Paper}>
-                                    <Table>
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>Thành viên đã được chọn</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <ScrollArea className="h-[450px] rounded-md border p-4 mt-3">
-                                            <TableBody>
-                                                {selectedMembers.map((member) => (
-                                                    <TableRow key={member.id}>
-                                                        <TableCell>
-                                                            <Typography variant="subtitle1">Tên: {member['user-name']} </Typography>
-                                                            <Typography variant="subtitle1">MSSV: {member['student-code']} </Typography>
-                                                            <Typography variant="subtitle1">Kỳ thực tập: {member['ojt-semester-university']} </Typography>
-                                                            <Typography variant="subtitle1">Kỹ năng công nghệ: {member.technical_skills} </Typography>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </ScrollArea>
-                                    </Table>
-                                </TableContainer>
-                            ) : (
-                                <Typography variant="subtitle1">Chưa có thành viên nào được chọn</Typography>
-                            )}
-                            <Button onClick={resetAndClose} variant="contained" color="error" sx={{ mt: 2, mr: 1 }}>
-                                Hủy
-                            </Button>
-                            <Button
-                                onClick={() => handleAdd(selectedMembers)}
-                                variant="contained"
-                                color="primary"
-                                sx={{ mt: 2 }}
-                            >
-                                Thêm
-                            </Button>
-                        
+                        {selectedMembers.length > 0 ? (
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Thành viên đã được chọn</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <ScrollArea className="h-[450px] rounded-md border p-4 mt-3">
+                                        <TableBody>
+                                            {selectedMembers.map((member) => (
+                                                <TableRow key={member.id}>
+                                                    <TableCell>
+                                                        <Typography variant="subtitle1">Tên: {member['user-name']} </Typography>
+                                                        <Typography variant="subtitle1">MSSV: {member['student-code']} </Typography>
+                                                        <Typography variant="subtitle1">Kỳ thực tập: {member['ojt-semester-university']} </Typography>
+                                                        <Typography variant="subtitle1">Kỹ năng công nghệ: {member.technical_skills} </Typography>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </ScrollArea>
+                                </Table>
+                            </TableContainer>
+                        ) : (
+                            <Typography variant="subtitle1">Chưa có thành viên nào được chọn</Typography>
+                        )}
+                        <Button onClick={resetAndClose} variant="contained" color="error" sx={{ mt: 2, mr: 1 }}>
+                            Hủy
+                        </Button>
+                        <Button
+                            onClick={() => handleAdd(selectedMembers)}
+                            variant="contained"
+                            color="primary"
+                            sx={{ mt: 2 }}
+                        >
+                            Thêm
+                        </Button>
+
                     </Grid>
                 </Grid>
             </Box>

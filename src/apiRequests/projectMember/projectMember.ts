@@ -16,7 +16,7 @@ const projectMemberApiRequest = {
             `
         ),
 
-    addMemberIntoProject: (id: string | null, body: { "member-id": string[] }) =>
+    addMemberIntoProject: (id: string | null, body: { "mem-id": string}) =>
         http.post<ProjectMemberResType>(
             `api/v1/projects/${id}/member`,
             body

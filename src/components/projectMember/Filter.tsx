@@ -39,6 +39,11 @@ const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
     const [isFilter, setIsFilter] = useState<boolean>(false);
     const [dataFilter, setDataFilter] = useState<FormFilterData | null>(null);
 
+    const [refreshKey, setRefreshKey] = useState(0);
+    const triggerRefresh = () => {
+        setRefreshKey((prevKey) => prevKey + 1);
+    };
+
     // Get list project to select
     useEffect(() => {
         projectApiRequest.getProject()
@@ -60,7 +65,7 @@ const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
                     console.error("Failed to fetch project members", error);
                 });
         }
-    }, [selectedProjectId]);
+    }, [selectedProjectId, refreshKey]);
 
     console.log("listProject: ", project)
 
@@ -74,6 +79,7 @@ const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
 
     const handleCloseModal = () => {
         setModalOpen(false);
+        triggerRefresh();
     };
 
     return (
