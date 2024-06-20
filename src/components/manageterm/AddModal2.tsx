@@ -38,8 +38,6 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
   };
 
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-
   const handleAdd = async () => {
     setLoading(true);
     const formattedData = {
@@ -56,7 +54,6 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
         variant: "success",
       });
       console.log(result);
-      router.refresh();
     } catch (error: any) {
       toast({
         title: `${error.message}`,

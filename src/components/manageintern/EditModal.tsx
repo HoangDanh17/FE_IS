@@ -63,7 +63,6 @@ const EditModal = ({
     };
 
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleAdd() {
     setLoading(true);
@@ -81,7 +80,6 @@ const EditModal = ({
         variant: "success",
       });
       console.log(result);
-      router.refresh();
       onClose();
     } catch (error: any) {
       toast({

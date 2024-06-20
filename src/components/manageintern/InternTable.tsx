@@ -33,7 +33,6 @@ import {
 } from "@/schemaValidations/intern.schema";
 import AddModal from "./AddModal";
 import EditModal from "@/components/manageintern/EditModal";
-import { useRouter } from "next/navigation";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -48,12 +47,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-const CustomTablePagination = styled(TablePagination)(({ theme }) => ({
-  "& .MuiTablePagination-root": {
-    color: theme.palette.primary.main,
   },
 }));
 export interface FormFilterData {

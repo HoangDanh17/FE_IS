@@ -127,7 +127,6 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
   };
 
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleAdd() {
     // Validate all fields before submitting
@@ -200,7 +199,6 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
         variant: "success",
       });
       console.log(result);
-      router.refresh();
       onClose();
     } catch (error: any) {
       if (
