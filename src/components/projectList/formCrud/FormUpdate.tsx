@@ -58,7 +58,6 @@ const FormUpdate = ({
   };
 
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: FormEvent) {
     if (loading) return;
@@ -78,7 +77,6 @@ const FormUpdate = ({
         variant: "success",
       });
       handleClose();
-      router.refresh();
     } catch (error: any) {
       toast({
         title: `${error}`,

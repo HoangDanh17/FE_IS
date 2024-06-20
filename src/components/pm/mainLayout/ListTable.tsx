@@ -11,11 +11,9 @@ import Paper from "@mui/material/Paper";
 import TablePagination from "@mui/material/TablePagination";
 import Tooltip from "@mui/material/Tooltip";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
-import DetailTaskModal from '@/components/pm/mainLayout/DetailTaskModal';
+import DetailTaskModal from "@/components/pm/mainLayout/DetailTaskModal";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -24,7 +22,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    padding: "8px", // Giảm padding để thu nhỏ kích thước cell
+    padding: "8px",
   },
 }));
 
@@ -148,12 +146,7 @@ export default function ListTable() {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-      <Dialog 
-        open={open} 
-        onClose={handleClose}
-        maxWidth="xl" 
-        fullWidth
-      >
+      <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
         <DialogTitle>Chi tiết công việc</DialogTitle>
         <DialogContent>
           {selectedRow && (

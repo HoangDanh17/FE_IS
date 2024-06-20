@@ -127,7 +127,6 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
   };
 
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleAdd() {
     // Validate all fields before submitting
@@ -192,17 +191,19 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
         : "",
     };
     console.log("Form Data:", formattedData);
+
     try {
-      const result = await internApiRequest.createIntern(formattedData);
+      const { payload } = await internApiRequest.createIntern(formattedData);
       toast({
-        title: result.payload.message,
+        title: payload.message,
         duration: 2000,
         variant: "success",
       });
-      console.log(result);
-      router.refresh();
+      console.log(payload);
       onClose();
     } catch (error: any) {
+      const errorRes = { error };
+      console.log(errorRes.error.payload);
       if (
         error.response &&
         error.response.data &&

@@ -85,7 +85,7 @@ const Filter: React.FC = () => {
                   <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
                       <Input
-                        name="student-code"
+                        name="student-code" 
                         placeholder="Student Code"
                         value={formData["student-code"]}
                         onChange={handleChange}

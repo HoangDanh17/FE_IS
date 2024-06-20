@@ -42,8 +42,6 @@ export default function FormAddPM({
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
-  const router = useRouter();
-
   useEffect(() => {
     if (listMemberInProject) {
       const originalManagers = listMemberInProject.data.map((m) => ({
@@ -108,7 +106,6 @@ export default function FormAddPM({
           variant: "success",
         });
         handleClose();
-        router.refresh();
       })
       .catch((error) => {
         toast({
