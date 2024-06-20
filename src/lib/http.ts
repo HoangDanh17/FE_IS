@@ -102,7 +102,7 @@ const request = async <Response>(
     if (res.status === ENTITY_ERROR_STATUS) {
       throw new EntityError({
         status: 422,
-        payload: await res.json() as EntityErrorPayload,
+        payload: (await res.json()) as EntityErrorPayload,
       });
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
       if (isClient()) {
