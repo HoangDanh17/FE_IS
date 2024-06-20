@@ -45,7 +45,7 @@ const AddModalAccount: React.FC<AddModalProps> = ({ onClose }) => {
                 variant: "success",
             });
             console.log(result);
-            router.refresh();
+           // router.refresh();
 
         } catch (error: any) {
             toast({

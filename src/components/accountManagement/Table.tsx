@@ -66,6 +66,11 @@ function TableAccount({
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [accountDetail, setAccountDetail] = React.useState<AccountType | null>(null);
 
+  const [refreshKey, setRefreshKey] = React.useState(0);
+    const triggerRefresh = () => {
+        setRefreshKey((prevKey) => prevKey + 1);
+    };
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setLoading(true);
     setPage(newPage);
@@ -103,7 +108,7 @@ function TableAccount({
       }
     };
     fetchData();
-  }, [isFilter, page, rowsPerPage, dataFilter]);
+  }, [isFilter, page, rowsPerPage, dataFilter, refreshKey]);
 
   return (
     <div style={{ maxHeight: 762, width: '100%', marginTop: "10px" }}>
@@ -173,7 +178,7 @@ function TableAccount({
 
       <AccountInfolModal open={openModal} handleClose={() => setOpenModal(false)} selectedRow={accountDetail} />
       
-      <ButtonGroupAccount row={selectedValue} />
+      <ButtonGroupAccount row={selectedValue} triggerRefresh={triggerRefresh} />
      
     </div>
   );
