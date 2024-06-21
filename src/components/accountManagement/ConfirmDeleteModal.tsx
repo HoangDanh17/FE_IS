@@ -27,7 +27,7 @@ const ConfirmDeleteModal: React.FC<DeleteModalAccountProps> = ({ onClose, row })
                     variant: "success",
                 });
 
-                router.refresh();
+               // router.refresh();
             } catch (error: any) {
                 toast({
                     title: `${error}`,

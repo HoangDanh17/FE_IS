@@ -47,7 +47,7 @@ const EditModalAccount: React.FC<EditModalAccountProps> = ({ onClose, row }) => 
                 variant: "success",
             });
             onClose();
-            router.refresh();
+          //  router.refresh();
 
         } catch (error: any) {
             toast({

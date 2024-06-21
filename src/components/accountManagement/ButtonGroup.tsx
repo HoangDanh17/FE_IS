@@ -13,27 +13,36 @@ import { useRouter } from "next/navigation";
 
 interface ButtonGroupAccountProps {
     row: RowData | undefined;
+    triggerRefresh: () => void;
 }
 
-const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row }) => {
+const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row, triggerRefresh }) => {
     const [loading, setLoading] = React.useState(false);
     const router = useRouter();
 
     //useState Modal Add
     const [openAddModal, setOpenAddModal] = React.useState(false);
     const handleOpenAddModal = () => setOpenAddModal(true);
-    const handleCloseAddModal = () => setOpenAddModal(false);
+    const handleCloseAddModal = () => {
+        setOpenAddModal(false);
+        triggerRefresh(); 
+    }
 
     //useState Modal Edit
     const [openEditModal, setOpenEditModal] = React.useState(false);
     const handleOpenEditModal = () => setOpenEditModal(true);
-    const handleCloseEditModal = () => setOpenEditModal(false);
+    const handleCloseEditModal = () => {
+        setOpenEditModal(false);
+        triggerRefresh(); 
+    }
 
     // useState Modal Confirm Delete
     const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
     const handleOpenDeleteModal = () => setOpenDeleteModal(true);
-    const handleCloseDeleteModal = () => setOpenDeleteModal(false);
-
+    const handleCloseDeleteModal = () => {
+        setOpenDeleteModal(false);
+        triggerRefresh(); 
+    }
     return (
         <Card style={{ marginTop: "10px" }}>
             <CardContent style={{ height: "68px" }}>
