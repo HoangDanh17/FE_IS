@@ -28,7 +28,7 @@ interface ProjectProps {
     row: RowData;
 }
 
-const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
+const FilterProjectMember = () => {
     const [modalOpen, setModalOpen] = useState(false);
     // List Project
     const [project, setProject] = useState<Project[]>([]);
