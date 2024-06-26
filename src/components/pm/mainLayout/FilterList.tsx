@@ -67,8 +67,8 @@ const FilterList = () => {
   const [formData, setFormData] = useState<TaskFilterType>({
     name: "",
     status: "",
-    "assginee-name": "",
-    "assginee-code": "",
+    "assignee-name": "",
+    "assignee-code": "",
     "is-approved": "",
   });
 
@@ -94,8 +94,8 @@ const FilterList = () => {
     setFormData({
       name: "",
       status: "",
-      "assginee-name": "",
-      "assginee-code": "",
+      "assignee-name": "",
+      "assignee-code": "",
       "is-approved": "",
     });
     setIsFilter(false);
@@ -150,16 +150,17 @@ const FilterList = () => {
                         <MenuItem disabled value="">
                           <em>Chọn trạng thái</em>
                         </MenuItem>
-                        <MenuItem value="todo">Todo</MenuItem>
-                        <MenuItem value="done">Done</MenuItem>
+                        <MenuItem value="todo">Chưa bắt đầu</MenuItem>
+                        <MenuItem value="inprogress">Đang thực hiện</MenuItem>
+                        <MenuItem value="done">Hoàn thành</MenuItem>
                       </Select>
                     </Grid>
                     <Grid item xs={3}>
                       <TextField
-                        name="assginee-name"
-                        value={formData["assginee-name"]}
+                        name="assignee-name"
+                        value={formData["assignee-name"]}
                         onChange={handleChange}
-                        id="assginee-name"
+                        id="assignee-name"
                         label="Tên người làm"
                         variant="standard"
                         size="small"
@@ -168,10 +169,10 @@ const FilterList = () => {
                     </Grid>
                     <Grid item xs={3}>
                       <TextField
-                        name="assginee-code"
-                        value={formData["assginee-code"]}
+                        name="assignee-code"
+                        value={formData["assignee-code"]}
                         onChange={handleChange}
-                        id="assginee-code"
+                        id="assignee-code"
                         label="Mã người làm"
                         variant="standard"
                         size="small"

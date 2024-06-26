@@ -22,6 +22,7 @@ import {
 import { useEffect, useState } from "react";
 import taskApiRequest from "@/apiRequests/task";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Chip } from "@mui/material";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -105,6 +106,36 @@ export default function ListTable({
     fetchData();
   }, [isFilter, page, rowsPerPage, dataFilter]);
 
+  const getStatusChipColor = (status: string) => {
+    switch (status) {
+      case "todo":
+        return { backgroundColor: "#FFB6C1", color: "white" }; // Màu hồng pastel đậm hơn
+      case "inprogress":
+        return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
+      case "done":
+        return { backgroundColor: "#90EE90", color: "white" }; // Màu xanh lá pastel đậm hơn
+      case "cancel":
+        return { backgroundColor: "#FFA07A", color: "white" }; // Màu cam pastel đậm hơn
+      default:
+        return { backgroundColor: "#D3D3D3", color: "white" }; // Màu xám
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "todo":
+        return "Chưa bắt đầu";
+      case "inprogress":
+        return "Đang thực hiện";
+      case "done":
+        return "Hoàn thành";
+      case "cancel":
+        return "Hủy bỏ";
+      default:
+        return "Không xác định";
+    }
+  };
+
   return (
     <TableContainer component={Paper} className="mt-4">
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -130,12 +161,18 @@ export default function ListTable({
                 </StyledTableCell>
                 <StyledTableCell align="left">{row.name}</StyledTableCell>
                 <StyledTableCell align="center">
-                  {row["Actual-effort"]}
+                  {row["actual-effort"]}
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   {row["estimated-effort"]}
                 </StyledTableCell>
-                <StyledTableCell align="center">{row.status}</StyledTableCell>
+                <StyledTableCell align="center">
+                  <Chip
+                    size="small"
+                    label={getStatusLabel(row.status)}
+                    sx={getStatusChipColor(row.status)}
+                  ></Chip>
+                </StyledTableCell>
                 <StyledTableCell align="center">
                   {row["assigned-name"]}
                 </StyledTableCell>

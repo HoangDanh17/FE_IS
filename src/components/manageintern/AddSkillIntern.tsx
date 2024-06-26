@@ -19,7 +19,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import internApiRequest from "@/apiRequests/intern";
 import { toast } from "@/components/ui/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Skill = {
   "technical-skill": string;
@@ -40,15 +39,14 @@ const AddSkillIntern = ({
   const [availableSkills, setAvailableSkills] = useState<TechnicalType[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+  const [validationErrors, setValidationErrors] = useState<boolean[]>([]);
 
   useEffect(() => {
     if (technicalList?.data?.["detail-skill"]) {
-      const originalSkills = technicalList.data["detail-skill"].map(
-        (skill) => ({
-          ...skill,
-          isOriginal: true,
-        })
-      );
+      const originalSkills = technicalList.data["detail-skill"].map((skill) => ({
+        ...skill,
+        isOriginal: true,
+      }));
       setSkills(originalSkills);
     }
   }, [technicalList]);
@@ -68,6 +66,9 @@ const AddSkillIntern = ({
         isOriginal: false,
       };
       setSkills(updatedSkills);
+      const newErrors = [...validationErrors];
+      newErrors[index] = false;
+      setValidationErrors(newErrors);
     }
   };
 
@@ -77,14 +78,19 @@ const AddSkillIntern = ({
   };
 
   const handleAddSkill = () => {
+    const defaultSkill = availableSkills.find(
+      (skill) => !skills.some((s) => s["technical-skill"] === skill["Technical-skill"])
+    );
+
     setSkills([
       ...skills,
       {
-        "technical-skill": "",
+        "technical-skill": defaultSkill ? defaultSkill["Technical-skill"] : "",
         "skill-level": "basic",
         isOriginal: false,
       },
     ]);
+    setValidationErrors([...validationErrors, true]);
   };
 
   const handleConfirmDelete = () => {
@@ -92,6 +98,9 @@ const AddSkillIntern = ({
       const updatedSkills = [...skills];
       updatedSkills.splice(deleteIndex, 1);
       setSkills(updatedSkills);
+      const newErrors = [...validationErrors];
+      newErrors.splice(deleteIndex, 1);
+      setValidationErrors(newErrors);
       setDeleteIndex(null);
       setOpenDialog(false);
     }
@@ -103,6 +112,17 @@ const AddSkillIntern = ({
   };
 
   const handleSubmit = () => {
+    const newErrors = skills.map((skill) => !skill["technical-skill"] || !skill["skill-level"]);
+    if (newErrors.some((error) => error)) {
+      setValidationErrors(newErrors);
+      toast({
+        title: "Vui lòng chọn tất cả kỹ năng và trình độ",
+        duration: 2000,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const formattedSkills = skills.map((skill) => ({
       "technical-skill": skill["technical-skill"],
       "skill-level": skill["skill-level"],
@@ -141,9 +161,9 @@ const AddSkillIntern = ({
   };
 
   return (
-    <Box sx={{ minWidth: 120 }}>
+    <Box sx={{minWidth: 120}}>
       <Typography variant="h4">Thêm kĩ năng</Typography>
-      <ScrollArea className="h-[450px] p-5">
+      <Box sx={{maxHeight: 380,overflow:"auto"}}>
         {skills.map((skill, index) => (
           <Box
             display="flex"
@@ -163,7 +183,10 @@ const AddSkillIntern = ({
               }
               onChange={(event, newValue) => handleChange(newValue, index)}
               renderInput={(params) => (
-                <TextField {...params} label="Kỹ năng kỹ thuật" />
+                <TextField 
+                  {...params} 
+                  label="Kỹ năng kỹ thuật" 
+                />
               )}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               getOptionDisabled={(option) =>
@@ -187,12 +210,17 @@ const AddSkillIntern = ({
                   "skill-level": level,
                 };
                 setSkills(updatedSkills);
+                const newErrors = [...validationErrors];
+                newErrors[index] = false;
+                setValidationErrors(newErrors);
               }}
               SelectProps={{
                 native: true,
               }}
               fullWidth
               sx={{ marginLeft: 2 }}
+              error={validationErrors[index] && !skill["skill-level"]}
+              helperText={validationErrors[index] && !skill["skill-level"] ? "Bắt buộc phải chọn" : ""}
             >
               <option value="basic">Cơ bản</option>
               <option value="intermediate">Trung cấp</option>
@@ -206,19 +234,19 @@ const AddSkillIntern = ({
             </IconButton>
           </Box>
         ))}
-        <Button
-          onClick={handleAddSkill}
-          style={{
-            marginTop: 20,
-            width: "100%",
-            backgroundColor: "#94a3b8",
-            color: "#334155",
-          }}
-          startIcon={<AddIcon />}
-        >
-          Thêm kỹ năng
-        </Button>
-      </ScrollArea>
+      </Box>
+      <Button
+        onClick={handleAddSkill}
+        style={{
+          marginTop: 20,
+          width: "100%",
+          backgroundColor: "#94a3b8",
+          color: "#334155",
+        }}
+        startIcon={<AddIcon />}
+      >
+        Thêm kỹ năng
+      </Button>
       <Button
         variant="contained"
         onClick={handleSubmit}

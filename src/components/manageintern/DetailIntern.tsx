@@ -15,8 +15,6 @@ import internApiRequest from "@/apiRequests/intern";
 import EditModal from "@/components/manageintern/EditModal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import AddSkillIntern from "@/components/manageintern/AddSkillIntern";
-import technicalApiRequest from "@/apiRequests/technical";
-import { TechnicalListResType } from "@/schemaValidations/technical.schema";
 
 const Div = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,

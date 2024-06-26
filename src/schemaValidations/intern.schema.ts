@@ -65,7 +65,7 @@ export const UpdateIntern = z.object({
   "date-of-birth": z.string(),
   email: z.string(),
   gender: z.string(),
-  "ojt-id": z.number(),
+  "ojt-id": z.number().optional(),
   "phone-number": z.string(),
   "student-code": z.string(),
   "user-name": z.string(),
@@ -92,6 +92,7 @@ export const InternByIdSchema = z.object({
   "phone-number": z.string(),
   address: z.string(),
   "detail-skill": z.array(InternSkillSchema),
+  "ojt-id": z.number(),
 });
 
 export const InternByIdRes = z.object({

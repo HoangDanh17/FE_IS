@@ -23,7 +23,6 @@ import EditIcon from "@mui/icons-material/Edit";
 
 import {
   InternByIdResType,
-  InternSchemaType,
   UpdateInternType,
 } from "@/schemaValidations/intern.schema";
 import internApiRequest from "@/apiRequests/intern";
@@ -47,7 +46,7 @@ const EditModal = ({
     "date-of-birth": row?.data["date-of-birth"] || "",
     "phone-number": row?.data["phone-number"] || "",
     address: row?.data.address || "",
-    "ojt-id": 1 || "",
+    "ojt-id": row?.data["ojt-id"],
   });
 
   const [errors, setErrors] = useState({

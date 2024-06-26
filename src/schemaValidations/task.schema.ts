@@ -11,7 +11,7 @@ export const TaskSchema = z.object({
   name: z.string(),
   description: z.string(),
   "estimated-effort": z.string(),
-  "Actual-effort": z.string(),
+  "actual-effort": z.string(),
 });
 
 export const TaskPageSchema = z.object({
@@ -24,8 +24,8 @@ export const TaskPageSchema = z.object({
 export const TaskFilterSchema = z.object({
   name: z.string().optional(),
   status: z.string().optional(),
-  "assginee-name": z.string().optional(),
-  "assginee-code": z.string().optional(),
+  "assignee-name": z.string().optional(),
+  "assignee-code": z.string().optional(),
   "is-approved": z.string().optional(),
 });
 

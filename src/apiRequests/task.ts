@@ -15,12 +15,12 @@ const taskApiRequest = {
       `/api/v1/projects/${id}/tasks?page=${page}&psize=${psize}${
         body?.name ? `&name=${body.name}` : ""
       }${body?.status ? `&status=${body.status}` : ""}${
-        body?.["assginee-name"]
-          ? `&assginee-name=${body?.["assginee-name"]}`
+        body?.["assignee-name"]
+          ? `&assignee-name=${body?.["assignee-name"]}`
           : ""
       }${
-        body?.["assginee-code"]
-          ? `&assginee-code=${body?.["assginee-code"]}`
+        body?.["assignee-code"]
+          ? `&assignee-code=${body?.["assignee-code"]}`
           : ""
       }${body?.["is-approved"] ? `&is-approved=${body?.["is-approved"]}` : ""}`
     ),

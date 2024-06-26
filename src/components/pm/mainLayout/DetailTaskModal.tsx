@@ -18,6 +18,7 @@ import {
   Tooltip,
   useTheme,
   LinearProgress,
+  Chip,
 } from "@mui/material";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TaskType } from "@/schemaValidations/task.schema";
@@ -141,11 +142,6 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
     setComments(newComments);
   };
 
-  const taskName =
-    "Thiết kế giao diện website cực dài có nhiều chi tiết cần hiển thị";
-  const description =
-    "Thiết kế giao diện người dùng cho website bán hàng, bao gồm trang chủ, trang sản phẩm, và trang giỏ hàng. Đảm bảo rằng tất cả các thành phần UI/UX đều thân thiện với người dùng và dễ sử dụng. Ngoài ra, cần phải tuân thủ các nguyên tắc thiết kế hiện đại và phù hợp với thương hiệu của công ty.";
-
   const assignedPerson = {
     name: "Nguyễn Văn A",
     status: "in_progress",
@@ -165,6 +161,36 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
         return 0;
       default:
         return 0;
+    }
+  };
+
+  const getStatusChipColor = (status: string) => {
+    switch (status) {
+      case "todo":
+        return { backgroundColor: "#FFB6C1", color: "white" }; // Màu hồng pastel đậm hơn
+      case "inprogress":
+        return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
+      case "done":
+        return { backgroundColor: "#90EE90", color: "white" }; // Màu xanh lá pastel đậm hơn
+      case "cancel":
+        return { backgroundColor: "#FFA07A", color: "white" }; // Màu cam pastel đậm hơn
+      default:
+        return { backgroundColor: "#D3D3D3", color: "white" }; // Màu xám
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "todo":
+        return "Chưa bắt đầu";
+      case "inprogress":
+        return "Đang thực hiện";
+      case "done":
+        return "Hoàn thành";
+      case "cancel":
+        return "Hủy bỏ";
+      default:
+        return "Không xác định";
     }
   };
 
@@ -192,10 +218,16 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                 </Tooltip>
                 <Typography variant="body1" fontWeight="bold" className="flex">
                   Trạng thái:&#160;
-                  <Typography>{selectedRow.status}</Typography>
+                  <Typography>
+                    <Chip
+                      size="small"
+                      label={getStatusLabel(selectedRow.status)}
+                      sx={getStatusChipColor(selectedRow.status)}
+                    ></Chip>
+                  </Typography>
                 </Typography>
                 <Typography variant="body1" fontWeight="bold" className="flex">
-                  Tình trạng task:&#160;
+                  Xác nhận:&#160;
                   <Typography
                     style={{
                       color: selectedRow["is-approved"] ? "#00FF00" : "#FF0000",
@@ -206,7 +238,7 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                         <DoneAllIcon style={{ color: "#00FF00" }} />
                         &#160;{selectedRow["is-approved"]}
                       </>
-                    ) : (
+                    ) : ( 
                       <>
                         <CloseIcon style={{ color: "#FF0000" }} />
                         &#160;{selectedRow["is-approved"]}
@@ -377,7 +409,13 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
               <Typography variant="body1" fontWeight="bold">
                 Trạng thái công việc:
               </Typography>
-              <Typography variant="body1">{selectedRow.status}</Typography>
+              <Typography variant="body1">
+                <Chip
+                  size="small"
+                  label={getStatusLabel(selectedRow.status)}
+                  sx={getStatusChipColor(selectedRow.status)}
+                ></Chip>
+              </Typography>
             </Box>
             <Box
               display="flex"
@@ -400,7 +438,7 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                 Thời gian cho task(thực tế):
               </Typography>
               <Typography variant="body1">
-                {selectedRow["Actual-effort"]}
+                {selectedRow["actual-effort"]}
               </Typography>
             </Box>
             <Box>
