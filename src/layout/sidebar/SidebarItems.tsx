@@ -21,6 +21,8 @@ const SidebarItems = ({ toggleMobileSidebar }: any) => {
   const getMenuItems = () => {
     if (user?.role === "admin") {
       return Menuitems;
+    } else if (user?.role === "manager") {
+      return MenuitemsOthers;
     } else {
       return MenuitemsOthers;
     }

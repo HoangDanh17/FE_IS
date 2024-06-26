@@ -128,6 +128,8 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(
     null
   );
+  const [reportSelected, setReportSelected] = useState<boolean>(false);
+  const [selectedReportDetail, setSelectedReportDetail] = useState<string>("");
 
   const handleCommentChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -161,11 +163,11 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
       }
     }
   };
-  const [selectedReportDetail, setSelectedReportDetail] = useState<string>("");
   const handleCardClick = (index: number) => {
     setSelectedComments(submittedComments[index]);
     setSelectedCardIndex(index);
     setSelectedReportDetail(reportDetails[index]);
+    setReportSelected(true);
   };
 
   const assignedPerson = {
@@ -230,7 +232,7 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
 
   return (
     <Box display="flex" flexDirection="row" flex={1}>
-      <Box flex={1} mr={2} maxHeight="500px">
+      <Box flex={30} mr={2} maxHeight="500px">
         <Typography variant="h6" color="primary">
           Thông tin người được giao
         </Typography>
@@ -362,7 +364,7 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                 </Typography>
               )}
             </Box>
-            <Box display="flex" flexDirection="column" width="320px">
+            <Box display="flex" flexDirection="column">
               <Typography variant="body1" fontWeight="bold">
                 Mô tả task:
               </Typography>
@@ -371,7 +373,7 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                   variant="body1"
                   noWrap
                   style={{
-                    maxWidth: "350px",
+                    maxWidth: "1200px",
                     wordBreak: "break-word",
                     whiteSpace: "pre-wrap",
                     overflowWrap: "break-word",
@@ -394,84 +396,95 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
         </Box>
       </Box>
       <Divider orientation="vertical" flexItem />
-      <Box display="flex" flexDirection="column" flex={2}>
+      <Box display="flex" flexDirection="column" flex={30}>
         <Box flexGrow={1} height="60%">
           <Typography variant="h6" color="primary" className="ml-2">
             Các báo cáo
           </Typography>
           <ScrollArea className="h-[530px] p-5 rounded-md m-4 shadow-lg border">
-            <Stack spacing={2}>
-              {cards.map((card, index) => (
-                <Card
-                  key={index}
-                  sx={getCardStyle(index)}
-                  onClick={() => handleCardClick(index)}
-                  className="border rounded-lg"
-                >
-                  <CardActionArea>
-                    <CardContent>
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        flexGrow={1}
-                      >
-                        <Tooltip title={card.title} arrow>
-                          <Typography
-                            variant="body1"
-                            fontWeight="bold"
-                            noWrap
-                            style={{ maxWidth: "150px" }}
-                          >
-                            {card.title}
-                          </Typography>
-                        </Tooltip>
+            {cards.length > 0 ? (
+              <Stack spacing={2}>
+                {cards.map((card, index) => (
+                  <Card
+                    key={index}
+                    sx={getCardStyle(index)}
+                    onClick={() => handleCardClick(index)}
+                    className="border rounded-lg"
+                  >
+                    <CardActionArea>
+                      <CardContent>
                         <Box
                           display="flex"
                           alignItems="center"
-                          sx={{ marginLeft: "10px" }}
+                          justifyContent="space-between"
+                          flexGrow={1}
                         >
-                          <Typography
-                            variant="body2"
-                            style={{ fontSize: 15, fontWeight: 700 }}
+                          <Tooltip title={card.title} arrow>
+                            <Typography
+                              variant="body1"
+                              fontWeight="bold"
+                              noWrap
+                              style={{ maxWidth: "150px" }}
+                            >
+                              {card.title}
+                            </Typography>
+                          </Tooltip>
+                          <Box
+                            display="flex"
+                            alignItems="center"
+                            sx={{ marginLeft: "10px" }}
                           >
-                            {card.progress}%
-                          </Typography>
+                            <Typography
+                              variant="body2"
+                              style={{ fontSize: 15, fontWeight: 700 }}
+                            >
+                              {card.progress}%
+                            </Typography>
+                          </Box>
                         </Box>
-                      </Box>
-                      {/* <Typography mt={2}>{card.description}</Typography> */}
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              ))}
-            </Stack>
+                        {/* <Typography mt={2}>{card.description}</Typography> */}
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                ))}
+              </Stack>
+            ) : (
+              <Typography variant="body1">Chưa có báo cáo nào.</Typography>
+            )}
           </ScrollArea>
         </Box>
       </Box>
       <Divider orientation="vertical" flexItem />
-      <Box display="flex" flexDirection="column" flex={3}>
+      <Box display="flex" flexDirection="column" flex={40}>
         <Typography variant="h6" color="primary" className="ml-2">
           Chi tiết báo cáo
         </Typography>
         <ScrollArea className="h-[110px] w-full">
           <Box mb={2} mx={2} marginTop="10px">
-            <Typography
-              variant="body1"
-              style={{
-                maxWidth: "800px",
-                wordBreak: "break-word",
-                whiteSpace: "pre-wrap",
-                overflowWrap: "break-word",
-              }}
-            >
-              {selectedReportDetail}
-            </Typography>
+            {reportSelected ? (
+              <Typography
+                variant="body1"
+                style={{
+                  maxWidth: "800px",
+                  wordBreak: "break-word",
+                  whiteSpace: "pre-wrap",
+                  overflowWrap: "break-word",
+                }}
+              >
+                {selectedReportDetail}
+              </Typography>
+            ) : (
+              <Typography variant="body1">
+                Chưa có chi tiết báo cáo. Vui lòng chọn một báo cáo.
+              </Typography>
+            )}
           </Box>
         </ScrollArea>
         <Typography variant="h6" color="primary" className="ml-2">
           Các bình luận
         </Typography>
         <ScrollArea className="h-[250px] p-5 rounded-md m-4 shadow-lg border">
+        {reportSelected ? (
           <Box>
             {selectedComments.map((comment, commentIndex) => (
               <React.Fragment key={commentIndex}>
@@ -515,6 +528,11 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
               </React.Fragment>
             ))}
           </Box>
+          ) : (
+            <Typography variant="body1">
+              Chưa có bình luận. Vui lòng chọn một báo cáo.
+            </Typography>
+          )}
         </ScrollArea>
         <Box mt={2} mx={2}>
           <TextField
