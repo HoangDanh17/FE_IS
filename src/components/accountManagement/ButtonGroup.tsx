@@ -18,31 +18,45 @@ interface ButtonGroupAccountProps {
 
 const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row, triggerRefresh }) => {
     const [loading, setLoading] = React.useState(false);
-    const router = useRouter();
 
     //useState Modal Add
     const [openAddModal, setOpenAddModal] = React.useState(false);
     const handleOpenAddModal = () => setOpenAddModal(true);
+    
     const handleCloseAddModal = () => {
         setOpenAddModal(false);
-        triggerRefresh(); 
+        triggerRefresh();
     }
 
     //useState Modal Edit
     const [openEditModal, setOpenEditModal] = React.useState(false);
-    const handleOpenEditModal = () => setOpenEditModal(true);
+    const handleOpenEditModal = () => {
+        if (row) {
+            setOpenEditModal(true);
+        }
+    }
     const handleCloseEditModal = () => {
         setOpenEditModal(false);
-        triggerRefresh(); 
+        triggerRefresh();
     }
 
     // useState Modal Confirm Delete
     const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
-    const handleOpenDeleteModal = () => setOpenDeleteModal(true);
+    const handleOpenDeleteModal = () => {
+        if (row) {
+            setOpenDeleteModal(true);
+        }
+    }
     const handleCloseDeleteModal = () => {
         setOpenDeleteModal(false);
-        triggerRefresh(); 
     }
+
+    // handle close for all
+    const closeForAll = () => {
+        setOpenAddModal(false),
+        setOpenEditModal(false)
+    }
+
     return (
         <Card style={{ marginTop: "10px" }}>
             <CardContent style={{ height: "68px" }}>
@@ -79,16 +93,16 @@ const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row, triggerRef
                 {/* Modal Add */}
                 <Modal
                     open={openAddModal}
-                    onClose={handleCloseAddModal}
+                    onClose={closeForAll}
 
                 >
                     <AddModalAccount onClose={handleCloseAddModal} />
                 </Modal>
 
-                  {/* Modal Edit */}
+                {/* Modal Edit */}
                 <Modal
                     open={openEditModal}
-                    onClose={handleCloseEditModal}
+                    onClose={closeForAll}
                 >
                     <EditModalAccount onClose={handleCloseEditModal} row={row} />
                 </Modal>
@@ -96,9 +110,9 @@ const ButtonGroupAccount: React.FC<ButtonGroupAccountProps> = ({ row, triggerRef
                 {/* Modal Confirm Delete */}
                 <Modal
                     open={openDeleteModal}
-                    onClose={handleCloseDeleteModal}
+                    onClose={closeForAll}
                 >
-                   <ConfirmDeleteModal onClose={handleCloseDeleteModal} row={row}/>
+                    <ConfirmDeleteModal onClose={handleCloseDeleteModal} row={row} />
                 </Modal>
             </CardContent>
         </Card>

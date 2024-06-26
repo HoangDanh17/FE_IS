@@ -1,8 +1,8 @@
 'use client'
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import {
-    Modal, Box, Grid, Table, TableBody, TableCell, TableContainer, Input,
-    TableHead, TableRow, Paper, Typography, Button, Checkbox, CircularProgress
+    Modal, Box, Grid, Table, TableBody, TableCell, TableContainer, Input, Radio, Tooltip,
+    TableHead, TableRow, Paper, Typography, Button, CircularProgress, AvatarGroup, Avatar
 } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -23,16 +23,22 @@ type Member = {
 export interface FormFilterData {
     "user-name": string,
     "student-code": string,
+    semester: string,
+    university: string,
 }
 
 function AddMemberModal({
     open,
     onClose,
     selectedProjectId,
+    Filter,
+    DataFilter
 }: {
     open: boolean;
     onClose: () => void;
     selectedProjectId: string | null;
+    Filter: boolean;
+    DataFilter: FormFilterData | null;
 
 }) {
     const [member, setMember] = useState<MemberNotInProListResType | null>(null);
@@ -41,7 +47,6 @@ function AddMemberModal({
     const [isFilter, setIsFilter] = useState<boolean>(false);
     const [dataFilter, setDataFilter] = useState<FormFilterData | null>(null);
     const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
-    const router = useRouter();
     const [refreshKey, setRefreshKey] = useState(false);
 
     // Get list member not in project
@@ -54,7 +59,7 @@ function AddMemberModal({
             )
                 .then(({ payload }) => {
                     setMember(payload);
-                    
+
                 })
                 .catch(error => {
                     console.error("Failed to fetch project members", error);
@@ -69,6 +74,8 @@ function AddMemberModal({
     const [formData, setFormData] = useState<FormFilterData>({
         "user-name": "",
         "student-code": "",
+        semester: "",
+        university: ""
     });
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -85,6 +92,8 @@ function AddMemberModal({
         setFormData({
             "user-name": "",
             "student-code": "",
+            semester: "",
+            university: ""
         });
         setIsFilter(false);
         setDataFilter(null);
@@ -95,21 +104,27 @@ function AddMemberModal({
     const handleLoadMore = () => setQuantity(quantity + 5);
 
     // Handle Select
-    const handleSelectMember = (member: Member) => {
-        setSelectedMembers((prevSelected) => {
-            if (prevSelected.find((m) => m.id === member.id)) {
-                return prevSelected.filter((m) => m.id !== member.id);
-            } else {
-                return [...prevSelected, member];
-            }
-        });
+    const handleSelectMember = (selectedMember: Member) => {
+        setSelectedMembers([selectedMember]);
     };
+
+    // const handleSelectMember = (member: Member) => {
+    //     setSelectedMembers((prevSelected) => {
+    //         if (prevSelected.find((m) => m.id === member.id)) {
+    //             return prevSelected.filter((m) => m.id !== member.id);
+    //         } else {
+    //             return [...prevSelected, member];
+    //         }
+    //     });
+    // };
 
     // Handle cancel add member
     const resetAndClose = () => {
         setFormData({
             "user-name": "",
             "student-code": "",
+            semester: "",
+            university: ""
         });
         setSelectedMembers([]);
         onClose();
@@ -121,7 +136,7 @@ function AddMemberModal({
         const memberIds = selectedMembers.map((member) => member.id);
 
         const submitData = {
-            "mem-id": String(memberIds),
+            "member-id": String(memberIds),
         };
 
         projectMemberApiRequest.addMemberIntoProject(selectedProjectId, submitData)
@@ -174,6 +189,26 @@ function AddMemberModal({
                                 </Grid>
 
                                 <Grid item xs={3}>
+                                    <Input
+                                        name='semester'
+                                        placeholder="Kỳ OJT"
+                                        value={formData.semester}
+                                        onChange={handleChange}
+                                        fullWidth
+                                    />
+                                </Grid>
+
+                                <Grid item xs={3}>
+                                    <Input
+                                        name='university'
+                                        placeholder="Trường Đại học"
+                                        value={formData.university}
+                                        onChange={handleChange}
+                                        fullWidth
+                                    />
+                                </Grid>
+
+                                <Grid item xs={3}>
                                     <Button type="submit" variant="contained" startIcon={<Search />} className='search-btn'>
                                         Search
                                     </Button>
@@ -194,37 +229,42 @@ function AddMemberModal({
                                 </Box>
                             ) : (
                                 <Table>
-                                    <TableHead>
+                                    {/* <TableHead>
                                         <TableRow>
                                             <TableCell>Chọn</TableCell>
                                             <TableCell>Thành viên</TableCell>
                                         </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {member?.data.map((member) => (
-                                            <TableRow key={member.id} hover>
-                                                <TableCell padding="checkbox">
-                                                    <Checkbox
-                                                        color="primary"
-                                                        checked={selectedMembers.some((m) => m.id === member.id)}
-                                                        onChange={() => handleSelectMember(member)}
-                                                    />
-                                                </TableCell>
+                                    </TableHead> */}
+                                    <ScrollArea className="h-[300px] ">
+                                        <TableBody>
+                                            {member?.data.map((member) => (
+                                                <TableRow key={member.id} hover>
+                                                    <TableCell padding="checkbox">
+                                                        <Radio
+                                                            color="primary"
+                                                            checked={selectedMembers.length > 0 && selectedMembers[0].id === member.id}
+                                                            onChange={() => handleSelectMember(member)}
+                                                        />
+                                                    </TableCell>
 
-                                                <TableCell>{member['user-name']}</TableCell>
-                                                <TableCell>{member['student-code']}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
+                                                    <TableCell>{member['user-name']}</TableCell>
+                                                    <TableCell>{member['student-code']}</TableCell>
+                                                    <TableCell>{member['ojt-semester-university']}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </ScrollArea>
                                 </Table>
                             )}
                         </TableContainer>
 
-                        <div className="flex justify-center">
-                            <Button onClick={handleLoadMore} style={{ marginTop: 16 }}>
-                                Load More
-                            </Button>
-                        </div>
+                        {!loading && member?.data && member.data.length >= quantity && (
+                            <div className="flex justify-center">
+                                <Button onClick={handleLoadMore} style={{ marginTop: 10 }}>
+                                    Load More
+                                </Button>
+                            </div>
+                        )}
 
                     </Grid>
 
@@ -234,18 +274,44 @@ function AddMemberModal({
                                 <Table>
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Thành viên đã được chọn</TableCell>
+                                            <TableCell>
+                                                <Typography variant="h6">
+                                                    Thành viên đã được chọn
+                                                </Typography>
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
-                                    <ScrollArea className="h-[450px] rounded-md border p-4 mt-3">
+                                    <ScrollArea className="h-[450px] rounded-md border">
                                         <TableBody>
                                             {selectedMembers.map((member) => (
                                                 <TableRow key={member.id}>
                                                     <TableCell>
-                                                        <Typography variant="subtitle1">Tên: {member['user-name']} </Typography>
-                                                        <Typography variant="subtitle1">MSSV: {member['student-code']} </Typography>
-                                                        <Typography variant="subtitle1">Kỳ thực tập: {member['ojt-semester-university']} </Typography>
-                                                        <Typography variant="subtitle1">Kỹ năng công nghệ: {member.technical_skills} </Typography>
+                                                        <Typography variant="subtitle1">
+                                                            Tên: <Typography component="span" variant="subtitle1" fontWeight="bold">{member['user-name']}</Typography>
+                                                        </Typography>
+                                                        <Typography variant="subtitle1">
+                                                            MSSV: <Typography component="span" variant="subtitle1" fontWeight="bold">{member['student-code']}</Typography>
+                                                        </Typography>
+                                                        <Typography variant="subtitle1">
+                                                            Kỳ OJT: <Typography component="span" variant="subtitle1" fontWeight="bold">{member['ojt-semester-university']}</Typography>
+                                                        </Typography>
+                                                        <Typography variant="subtitle1">
+                                                            Kỹ năng công nghệ: <Typography component="span" variant="subtitle1" fontWeight="bold">{member.technical_skills}</Typography>
+                                                        </Typography>
+
+                                                        <Box sx={{ marginTop: 1 }} display="flex" flexDirection="column" alignItems="flex-start">
+                                                            <Typography variant="h6">Hình ảnh </Typography>
+                                                            <AvatarGroup>
+                                                                {/* {listImage?.data.map((image, index) => ( */}
+                                                                <Tooltip title="tam">
+                                                                    <Avatar
+                                                                        //alt={image['user-name']}
+                                                                        src="/images/avatar.jpg"
+                                                                    />
+                                                                </Tooltip>
+                                                                {/* ))} */}
+                                                            </AvatarGroup>
+                                                        </Box>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
@@ -254,7 +320,7 @@ function AddMemberModal({
                                 </Table>
                             </TableContainer>
                         ) : (
-                            <Typography variant="subtitle1">Chưa có thành viên nào được chọn</Typography>
+                            <Typography variant="h6">Chưa có thành viên nào được chọn</Typography>
                         )}
                         <Button onClick={resetAndClose} variant="contained" color="error" sx={{ mt: 2, mr: 1 }}>
                             Hủy
@@ -271,7 +337,7 @@ function AddMemberModal({
                     </Grid>
                 </Grid>
             </Box>
-        </Modal>
+        </Modal >
     );
 };
 

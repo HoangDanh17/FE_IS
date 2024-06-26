@@ -7,20 +7,15 @@ import { ProjectMemberListResType } from '@/schemaValidations/projectMember/proj
 interface MemberInfoModalProps {
     open: boolean;
     handleClose: () => void;
-    selectedMember: {
-        id: string,
-        "user-name": string,
-        "student-code": string,
-        avatar: string,
-        "ojt-semester-university": string,
-        "technical_skills": string,
-    } | null;
+    selectedMember: any;
     // handleEdit: (member: any) => void;
     handleDelete: (member: any) => void;
-    listImage: ProjectMemberListResType
+    // listImage: ProjectMemberListResType
 }
 
-const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, selectedMember, handleDelete, listImage }) => {
+const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, selectedMember, handleDelete }) => {
+    const [listImage, setListImage] = React.useState<ProjectMemberListResType>();
+
     return (
         <Modal open={open} onClose={handleClose}>
             <Box className="modal-detail-box">
@@ -33,37 +28,33 @@ const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, se
                         <Grid container spacing={2} marginY={2}>
                             <Grid item xs={4}>
                                 <FormControl fullWidth>
-                                    <TextField
-                                        label="Tên người dùng"
-                                        value={selectedMember['user-name']}
-                                    />
+                                    <Typography variant="subtitle1">
+                                        Tên: <Typography component="span" variant="subtitle1" fontWeight="bold"> {selectedMember['user-name']}</Typography>
+                                    </Typography>
                                 </FormControl>
                             </Grid>
 
                             <Grid item xs={4}>
                                 <FormControl fullWidth>
-                                    <TextField
-                                        label="Mã sinh viên"
-                                        value={selectedMember['student-code']}
-                                    />
+                                    <Typography variant="subtitle1">
+                                        MSSV: <Typography component="span" variant="subtitle1" fontWeight="bold"> {selectedMember['student-code']}</Typography>
+                                    </Typography>
                                 </FormControl>
                             </Grid>
 
                             <Grid item xs={4}>
                                 <FormControl fullWidth>
-                                    <TextField
-                                        label="Kỳ OJT"
-                                        value={selectedMember['ojt-semester-university']}
-                                    />
+                                    <Typography variant="subtitle1">
+                                        Kỳ OJT: <Typography component="span" variant="subtitle1" fontWeight="bold"> {selectedMember['ojt-semester-university']}</Typography>
+                                    </Typography>
                                 </FormControl>
                             </Grid>
 
                             <Grid item xs={12}>
                                 <FormControl fullWidth>
-                                    <TextField
-                                        label="Kỹ năng công nghệ"
-                                        value={selectedMember.technical_skills}
-                                    />
+                                    <Typography variant="subtitle1">
+                                        Kỹ năng công nghệ: <Typography component="span" variant="subtitle1" fontWeight="bold"> {selectedMember.technical_skills}</Typography>
+                                    </Typography>
                                 </FormControl>
                             </Grid>
 
@@ -86,17 +77,8 @@ const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, se
                             </Grid>
                         </Grid>
 
-                        <Box display="flex" justifyContent="flex-end">
-                            {/* <Button
-                                variant='contained'
-                                onClick={() => handleEdit(selectedMember)}
-                                color="warning"
-                                startIcon={<EditIcon />}
-                                style={{ marginRight: "5px" }}
-                            >
-                                Sửa
-                            </Button> */}
 
+                        <Box display="flex" justifyContent="flex-end">
                             <Button
                                 variant='contained'
                                 onClick={() => handleDelete(selectedMember)}

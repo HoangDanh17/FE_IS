@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Typography, Box, TextField, Grid, FormControl, Button } from '@mui/material';
+import { Modal, Typography, Box, TextField, Grid, FormControl } from '@mui/material';
 import "@/styles/accountManagement/ModalBox.css"
 import dayjs from 'dayjs';
 interface DetailModalProps {
@@ -15,46 +15,40 @@ const AccountInfolModal: React.FC<DetailModalProps> = ({ open, handleClose, sele
                 {selectedRow && (
                     <FormControl>
                         <Typography id="modal-modal-title" variant="h6" component="h2">
-                            Thông tin tài khoản 
+                            Thông tin tài khoản
                         </Typography>
                         <Grid container spacing={2} marginY={2}>
                             <Grid item xs={4}>
                                 <FormControl fullWidth>
-                                    <TextField
-                                        label="Tên người dùng"
-                                        value={selectedRow["user-name"]}
-                                        InputProps={{ readOnly: true }}
-                                    />
+                                    <Typography variant="subtitle1">
+                                        Tên người dùng: <Typography component="span" variant="subtitle1" fontWeight="bold"> {selectedRow['user-name']}</Typography>
+                                    </Typography>
                                 </FormControl>
                             </Grid>
 
                             <Grid item xs={4}>
                                 <FormControl fullWidth>
-                                    <TextField
-                                        label="Email"
-                                        value={selectedRow.email}
-                                        InputProps={{ readOnly: true }}
-                                    />
+                                    <Typography variant="subtitle1">
+                                        Email: <Typography component="span" variant="subtitle1" fontWeight="bold"> {selectedRow.email}</Typography>
+                                    </Typography>
                                 </FormControl>
                             </Grid>
 
                             <Grid item xs={4}>
                                 <FormControl fullWidth>
-                                    <TextField
-                                        label="Role"
-                                        value={selectedRow.role}
-                                        InputProps={{ readOnly: true }}
-                                    />
+                                    <Typography variant="subtitle1">
+                                        Role: <Typography component="span" variant="subtitle1" fontWeight="bold"> {selectedRow.role}</Typography>
+                                    </Typography>
                                 </FormControl>
                             </Grid>
 
                             <Grid item xs={4}>
                                 <FormControl fullWidth>
-                                    <TextField
-                                        label="Ngày tạo"
-                                        value={dayjs(selectedRow['created-at']).format("DD/MM/YYYY")}
-                                        InputProps={{ readOnly: true }}
-                                    />
+                                   
+
+                                    <Typography variant="subtitle1">
+                                        Ngày tạo: <Typography component="span" variant="subtitle1" fontWeight="bold"> {dayjs(selectedRow['created-at']).format("DD/MM/YYYY")}</Typography>
+                                    </Typography>
                                 </FormControl>
                             </Grid>
                         </Grid>
