@@ -105,4 +105,29 @@ const MenuitemsOthers = [
   },
 ];
 
+const MenuitemsPm = [
+  {
+    navlabel: true,
+    subheader: "Quản lí dự án",
+  },
+  {
+    id: 1,
+    title: "Chi tiết dự án",
+    icon: AssignmentIcon,
+    href: "/homePage/projectList",
+  },
+  {
+    id: 2,
+    title: "Thành viên dự án",
+    icon: AssignmentIcon,
+    href: "/homePage/projectMember",
+  },
+  {
+    id: 3,
+    title: "Danh sách công việc",
+    icon: AssignmentIcon,
+    href: "/homePage/listTask",
+  },
+];
+
 export { Menuitems, MenuitemsOthers };

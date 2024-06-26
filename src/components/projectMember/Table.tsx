@@ -1,30 +1,73 @@
 'use client'
 import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Avatar from '@mui/material/Avatar';
-import Grid from '@mui/material/Grid';
-import { Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { styled } from '@mui/material/styles';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import { Table, TableBody, TableContainer, TableHead, TableRow, Paper, Avatar, TablePagination, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import MemberInfoModal from './MemberInfoModal';
 import "@/styles/accountManagement/DataTable.css";
-import { ProjectMemberListResType } from '@/schemaValidations/projectMember/projectMember.schema';
+import { ProjectMemberListResType, ProjectMemberType } from '@/schemaValidations/projectMember/projectMember.schema';
 
+const StyledCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+    textAlign: 'center',
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+}));
+
+const CenteredAvatarCell = styled(TableCell)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+}));
+
+const StyledRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+export interface FormFilter {
+  "user-name": string,
+  "student-code": string,
+  semester: string,
+  university: string,
+}
 
 function TableProjectMember({
+  isFilter,
+  dataFilter,
   cardMem
 }: {
-  cardMem: ProjectMemberListResType
+  isFilter: boolean;
+  dataFilter: FormFilter | null;
+  cardMem: ProjectMemberListResType | null;
 }) {
-  const [selectedMember, setSelectedMember] = React.useState<ProjectMemberListResType | null>(null);
+  const [selectedMember, setSelectedMember] = React.useState<ProjectMemberType | null>(null);
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   // confirm Delete
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
-  const handleClickOpen = (member: ProjectMemberListResType) => {
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setLoading(true);
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleClickOpen = (member: ProjectMemberType) => {
     setSelectedMember(member);
     setOpen(true);
   };
@@ -34,13 +77,8 @@ function TableProjectMember({
     setSelectedMember(null);
   };
 
-  // const handleEdit = (member: ProjectMemberListResType) => {
-  //   console.log("Edit member:", member);
-  //   // Implement your edit logic here
-  // };
-
-  const handleDelete = (member: ProjectMemberListResType) => {
-    setSelectedMember(member);
+  const handleDelete = (member: ProjectMemberListResType["data"][0]) => {
+    //setSelectedMember({ status: 204, data: [member] });
     setConfirmOpen(true);
   };
 
@@ -52,68 +90,69 @@ function TableProjectMember({
   };
 
   const cancelDelete = () => {
+    setOpen(false);
+    setSelectedMember(null);
     setConfirmOpen(false);
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        backgroundColor: "white",
-        padding: 20,
-      }}
-    >
-      <Typography variant='h4'>Thành viên dự án</Typography>
-      <ScrollArea className="h-[350px] rounded-md border p-4 mt-3">
-        <Grid container spacing={2}>
-          {cardMem?.data && cardMem.data.map((member) => (
-            <Grid item xs={12} sm={6} md={4} key={member.id}>
-              <Card
-                style={{
-                  boxShadow: "0 2px 2px 0 rgba(0, 0, 0, 0.2)",
-                }}
-                elevation={10}
-                variant="outlined"
-                className="w-[330px] hover:scale-110 duration-300"
-                onClick={() => handleClickOpen(member)}
-              >
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar
-                      //alt={`Avatar of ${row.internID}`}
-                      //src={row.avatarUrl}
-                      sx={{ width: 56, height: 56, marginRight: 2 }}
-                    />
+    <Box sx={{ width: '115.5%' }}>
+      {/* <Typography variant='h4'>Thành viên dự án</Typography> */}
+      {/* <ScrollArea className="h-[350px] rounded-md border p-4 mt-3"> */}
+      <TableContainer sx={{ width: '100%', overflowX: 'auto' }} component={Paper}>
+        <Table sx={{ minWidth: 640 }} aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              <StyledCell>Avatar</StyledCell>
+              <StyledCell>Tên Thành Viên</StyledCell>
+              <StyledCell>Mã số sinh viên</StyledCell>
+              <StyledCell>Kỳ thực tập</StyledCell>
+              <StyledCell>Kỹ năng công nghệ</StyledCell>
+              <StyledCell>Hành động</StyledCell>
+            </TableRow>
+          </TableHead>
 
-                    <Box>
-                      <Typography variant="body1">
-                        Tên Thành Viên: {member['user-name']}
-                      </Typography>
+          <TableBody>
+            {cardMem?.data.map((member) => (
+              <StyledRow key={member.id}>
+                <CenteredAvatarCell>
+                  <Avatar
+                    //alt={`Avatar of ${row.internID}`}
+                    //src={row.avatarUrl}
+                    sx={{ width: 45, height: 45 }}
+                  />
+                </CenteredAvatarCell>
+                <StyledCell>{member['user-name']}</StyledCell>
+                <StyledCell>{member['student-code']}</StyledCell>
+                <StyledCell>{member['ojt-semester-university']}</StyledCell>
+                <StyledCell>{member.technical_skills}</StyledCell>
 
-                      <Typography variant="body1">
-                        Mã số sinh viên: {member['student-code']}
-                      </Typography>
+                <StyledCell>
+                  <Button size='small' onClick={() => handleClickOpen(member)}>Click</Button>
+                </StyledCell>
+              </StyledRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-                      <Typography variant="body1">
-                        Kỳ thực tập: {member['ojt-semester-university']}
-                      </Typography>
-
-                      {/* <Chip style={{ marginTop: "10px" }} size="small" label="in progress" /> */}
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </ScrollArea>
+      <TablePagination
+        rowsPerPageOptions={[5, 10]}
+        component="div"
+       // count={cardMem?.paging.items || 0}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        className="custom-row custom-pagination"
+      />
+      {/* </ScrollArea> */}
 
       {/* Thông tin từng trong card */}
       <MemberInfoModal
         open={open}
         handleClose={handleClose}
         selectedMember={selectedMember}
-        // handleEdit={handleEdit}
         handleDelete={handleDelete}
       />
 
@@ -138,7 +177,7 @@ function TableProjectMember({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 }
 

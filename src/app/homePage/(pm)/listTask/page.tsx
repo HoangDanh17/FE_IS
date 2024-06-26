@@ -1,4 +1,4 @@
-import FilterList from "@/components/manager/mainLayout/FilterList";
+import FilterList from "@/components/projectManager/FilterList";
 
 const listTask = () => {
     return (

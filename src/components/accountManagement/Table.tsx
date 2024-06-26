@@ -67,9 +67,10 @@ function TableAccount({
   const [accountDetail, setAccountDetail] = React.useState<AccountType | null>(null);
 
   const [refreshKey, setRefreshKey] = React.useState(0);
-    const triggerRefresh = () => {
-        setRefreshKey((prevKey) => prevKey + 1);
-    };
+  const triggerRefresh = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+    setSelectedValue(undefined);
+  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setLoading(true);
@@ -124,7 +125,7 @@ function TableAccount({
               <TableRow>
                 <StyledTableCell sx={{ width: 70 }} align='center'>
                   <Radio
-                  onClick={handleDeselectAll}
+                    onClick={handleDeselectAll}
                     className="radio-buttons"
                     color='secondary'
                   />
@@ -143,7 +144,7 @@ function TableAccount({
                 <StyledTableRow key={index}>
 
                   <div className="radio-cell" style={{ margin: "3px 0 0 14px" }}>
-                  <Radio
+                    <Radio
                       checked={selectedValue?.id === account.id}
                       onChange={(event) => handleRadioChange(event, account)}
                       value={account.id.toString()}
@@ -177,9 +178,9 @@ function TableAccount({
       />
 
       <AccountInfolModal open={openModal} handleClose={() => setOpenModal(false)} selectedRow={accountDetail} />
-      
+
       <ButtonGroupAccount row={selectedValue} triggerRefresh={triggerRefresh} />
-     
+
     </div>
   );
 }

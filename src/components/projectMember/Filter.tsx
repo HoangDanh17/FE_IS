@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Input, Button, FormControl, Grid, InputLabel, MenuItem, Typography, Autocomplete } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
@@ -16,8 +16,8 @@ import projectMemberApiRequest from '@/apiRequests/projectMember/projectMember';
 import { RowData } from '../projectList/DetailCard';
 import projectApiRequest from '@/apiRequests/project';
 import { ProjectMemberListResType } from '@/schemaValidations/projectMember/projectMember.schema';
-import TableProjectMember from './Table';
 import { FormFilterData } from './AddMemberModal';
+import TableProjectMember from './Table';
 
 type Project = {
     id: string | number;
@@ -36,6 +36,9 @@ const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
     const [members, setMembers] = useState<ProjectMemberListResType | null>(null);
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
+    const [page, setPage] = React.useState(0);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
     const [isFilter, setIsFilter] = useState<boolean>(false);
     const [dataFilter, setDataFilter] = useState<FormFilterData | null>(null);
 
@@ -44,7 +47,35 @@ const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
         setRefreshKey((prevKey) => prevKey + 1);
     };
 
-    // Get list project to select
+    const [formData, setFormData] = useState<FormFilterData>({
+        "user-name": "",
+        "student-code": "",
+        semester: "",
+        university: "",
+    });
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        setIsFilter(true);
+        setDataFilter(formData);
+    }
+
+    const handleReset = () => {
+        setFormData({
+            "user-name": "",
+            "student-code": "",
+            semester: "",
+            university: "",
+        });
+        setIsFilter(false);
+        setDataFilter(null);
+    };
+
+    // Get list project when select
     useEffect(() => {
         projectApiRequest.getProject()
             .then(({ payload }) => {
@@ -57,7 +88,7 @@ const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
 
     useEffect(() => {
         if (selectedProjectId) {
-            projectMemberApiRequest.getMemberInProject(selectedProjectId)
+            projectMemberApiRequest.getMemberInProject(selectedProjectId, page + 1, rowsPerPage, isFilter ? dataFilter : {})
                 .then(({ payload }) => {
                     setMembers(payload);
                 })
@@ -65,7 +96,7 @@ const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
                     console.error("Failed to fetch project members", error);
                 });
         }
-    }, [selectedProjectId, refreshKey]);
+    }, [selectedProjectId, refreshKey, isFilter, dataFilter, page, rowsPerPage]);
 
     console.log("listProject: ", project)
 
@@ -102,6 +133,18 @@ const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
                         </FormControl>
                     </CardContent>
                 </Card>
+
+                <Card sx={{marginTop: 1}}>
+                    <CardContent>
+                        <FormControl fullWidth>
+                            <Typography variant='h5'>Project Manager: Phước</Typography>
+                        </FormControl>
+
+                        <FormControl fullWidth>
+                            <Typography variant='h5'>Tổng số thành viên: {members?.data.length} </Typography>
+                        </FormControl>
+                    </CardContent>
+                </Card>
             </Grid>
 
             <Grid item xs={12} md={9}>
@@ -115,38 +158,92 @@ const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
                     </AccordionSummary>
 
                     <AccordionDetails>
-                        <FormControl fullWidth>
+                        <form onSubmit={handleSubmit}>
                             <Grid container spacing={2}>
-                                <Grid item xs={12} sm={4} md={4}>
-                                    <FormControl fullWidth>
-                                        <Typography variant='h5'>Project Manager: Phước</Typography>
-                                    </FormControl>
+                                <Grid item xs={3}>
+                                    <Input
+                                        name='user-name'
+                                        placeholder="Tên thành viên"
+                                        value={formData['user-name']}
+                                        onChange={handleChange}
+                                        fullWidth
+                                    />
                                 </Grid>
 
-                                <Grid item xs={12} sm={4} md={4}>
-                                    <FormControl fullWidth>
-                                        <Typography variant='h5'>Tổng số thành viên: {members?.data.length} </Typography>
-                                    </FormControl>
+                                <Grid item xs={3}>
+                                    <Input
+                                        name='student-code'
+                                        placeholder="MSSV"
+                                        type="email"
+                                        value={formData['student-code']}
+                                        onChange={handleChange}
+                                        fullWidth
+                                    />
                                 </Grid>
 
-                                <Grid item xs={12} sm={4} md={4}>
-                                    <Button onClick={handleOpenModal} variant="contained" startIcon={<AddIcon />} className='search-btn'>
-                                        Thêm thành viên
-                                    </Button>
+                                <Grid item xs={3}>
+                                    <Input
+                                        name='semester'
+                                        placeholder="Kỳ OJT"
+                                        value={formData.semester}
+                                        onChange={handleChange}
+                                        fullWidth
+                                    />
+                                </Grid>
+
+                                <Grid item xs={3}>
+                                    <Input
+                                        name='university'
+                                        placeholder="Trường Đại học"
+                                        value={formData.university}
+                                        onChange={handleChange}
+                                        fullWidth
+                                    />
+                                </Grid>
+
+                                <Grid container item xs={12} sm={12} md={4} lg={4} spacing={1}>
+                                    <Grid item>
+                                        <Button className='clean-btn' onClick={handleReset}>
+                                            Xóa Filter
+                                        </Button>
+                                    </Grid>
+                                    <Grid item>
+                                        <Button type="submit" variant="contained" startIcon={<Search />} className='search-btn'>
+                                            Search
+                                        </Button>
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                        </FormControl>
+                        </form>
+
+                        <Grid container spacing={2} sx={{ marginTop: 1 }}>
+                            <Grid item xs={12} sm={4} md={4}>
+                                <Button
+                                    onClick={handleOpenModal}
+                                    variant="contained"
+                                    startIcon={<AddIcon />}
+                                    className='search-btn'
+                                    disabled={!selectedProjectId}
+                                >
+                                    Thêm thành viên
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </AccordionDetails>
                 </Accordion>
             </Grid>
 
             <Grid sx={{ marginTop: "10px" }}>
-                <TableProjectMember cardMem={members || { data: [], status: 0 }} />
+                <TableProjectMember
+                    cardMem={members}
+                    isFilter={isFilter}
+                    dataFilter={dataFilter}
+                />
             </Grid>
 
             <AddMemberModal
-                isFilter={isFilter}
-                dataFilter={dataFilter}
+                Filter={isFilter}
+                DataFilter={dataFilter}
                 open={modalOpen}
                 onClose={handleCloseModal}
                 selectedProjectId={selectedProjectId}
