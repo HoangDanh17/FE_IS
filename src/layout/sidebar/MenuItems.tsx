@@ -80,7 +80,7 @@ const Menuitems = [
   // },
 ];
 
-const MenuitemsOthers = [
+const MenuitemsManager = [
   {
     navlabel: true,
     subheader: "Quản lí dự án",
@@ -101,7 +101,7 @@ const MenuitemsOthers = [
     id: 3,
     title: "Danh sách công việc",
     icon: AssignmentIcon,
-    href: "/homePage/listTask",
+    href: "/homePage/listCard",
   },
 ];
 
@@ -130,4 +130,4 @@ const MenuitemsPm = [
   },
 ];
 
-export { Menuitems, MenuitemsOthers };
+export { Menuitems, MenuitemsManager,MenuitemsPm };

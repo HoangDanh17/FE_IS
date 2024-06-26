@@ -2,7 +2,11 @@
 import { usePathname } from "next/navigation";
 import { Box, List } from "@mui/material";
 import NavGroup from "@/layout/sidebar/NavGroup/NavGroup";
-import { Menuitems, MenuitemsOthers } from "@/layout/sidebar/MenuItems";
+import {
+  Menuitems,
+  MenuitemsManager,
+  MenuitemsPm,
+} from "@/layout/sidebar/MenuItems";
 import NavItem from "@/layout/sidebar/NavItem";
 import { useEffect, useState } from "react";
 
@@ -22,9 +26,9 @@ const SidebarItems = ({ toggleMobileSidebar }: any) => {
     if (user?.role === "admin") {
       return Menuitems;
     } else if (user?.role === "manager") {
-      return MenuitemsOthers;
+      return MenuitemsManager;
     } else {
-      return MenuitemsOthers;
+      return MenuitemsPm;
     }
   };
 

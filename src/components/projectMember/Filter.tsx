@@ -18,6 +18,7 @@ import projectApiRequest from '@/apiRequests/project';
 import { ProjectMemberListResType } from '@/schemaValidations/projectMember/projectMember.schema';
 import { FormFilterData } from './AddMemberModal';
 import TableProjectMember from './Table';
+import { useAppContext } from '@/app/app-provider';
 
 type Project = {
     id: string | number;
@@ -30,7 +31,7 @@ interface ProjectProps {
 
 const FilterProjectMember: React.FC<ProjectProps> = ({ row }) => {
     const [modalOpen, setModalOpen] = useState(false);
-    // List Project
+    // const {project} = useAppContext();
     const [project, setProject] = useState<Project[]>([]);
 
     const [members, setMembers] = useState<ProjectMemberListResType | null>(null);
