@@ -38,7 +38,22 @@ export const CreateRes = z.object({
   message: z.string(),
 });
 
+export const WeekSchema = z.object({
+  "week-day": z.string(),
+  date: z.union([z.string().nullable(), z.date().nullable()]),
+  "total-approved": z.number(),
+  "total-denied": z.number(),
+  "total-waiting": z.number(),
+});
+
+export const WeekRes = z.object({
+  status: z.number(),
+  data: z.array(WeekSchema),
+});
+
 export type TimeTableResType = z.TypeOf<typeof TimeTableRes>;
 export type CreateResType = z.TypeOf<typeof CreateRes>;
 export type TimeTableType = z.TypeOf<typeof TimeTableSchema>;
 export type TimeTableFilterType = z.TypeOf<typeof TimeTableFilterSchema>;
+export type WeekType = z.TypeOf<typeof WeekSchema>;
+export type WeekResType = z.TypeOf<typeof WeekRes>;

@@ -19,7 +19,7 @@ export const Upgrade = () => {
             fontSize="16px"
             mb={1}
           >
-            Welcome to_Hell
+            WELCOME
           </Typography>
         </Box>
         <Box mt="-35px">

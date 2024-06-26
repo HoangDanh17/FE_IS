@@ -43,12 +43,6 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-
-// const confirmDeleteStyle = {
-//   ...style,
-//   width: 300,
-// };
-
 export interface RowData {
   id: string;
   name: string;
@@ -65,7 +59,8 @@ const DetailCard = ({
   row: RowData;
   handleCloseCard: () => void;
 }) => {
-  const [listMemberInProject, setListMemberInProject] = useState<MemberInProjectResType>();
+  const [listMemberInProject, setListMemberInProject] =
+    useState<MemberInProjectResType>();
 
   useEffect(() => {
     projectApiRequest.getListPMInProject(row.id).then(({ payload }) => {
@@ -85,40 +80,6 @@ const DetailCard = ({
     handleCloseCard();
   };
 
-  // delete modal
-
-  // const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
-
-  // const [rowToDelete, setRowToDelete] = useState<string | null>(null);
-
-  // const handleOpenDeleteConfirmModal = (id: string) => {
-  //   setRowToDelete(id);
-  //   setOpenDeleteConfirmModal(true);
-  // };
-
-  // const handleCloseDeleteConfirmModal = () => setOpenDeleteConfirmModal(false);
-
-  // const handleDelete = () => {
-  //   if (rowToDelete !== null) {
-  //     console.log(rowToDelete);
-  //     handleCloseDeleteConfirmModal();
-  //   }
-  // };
-  // add PM
-
-  const [openAddPMModal, setOpenAddPMModal] = useState(false);
-
-  const [data, setData] = useState<any>(null);
-  const handleOpenAddPMModal = (row: any) => {
-    setData(row);
-    setOpenAddPMModal(true);
-  };
-
-  const handleCloseAddPMModal = () => {
-    setOpenAddPMModal(false);
-    handleCloseCard();
-  };
-
   const getStatusChipColor = (status: string) => {
     switch (status) {
       case "not_start":
@@ -134,6 +95,35 @@ const DetailCard = ({
     }
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "not_start":
+        return "Chưa bắt đầu";
+      case "doing":
+        return "Đang thực hiện";
+      case "done":
+        return "Hoàn thành";
+      case "cancel":
+        return "Hủy bỏ";
+      default:
+        return "Không xác định";
+    }
+  };
+  // add PM
+
+  const [openAddPMModal, setOpenAddPMModal] = useState(false);
+
+  const [data, setData] = useState<any>(null);
+  const handleOpenAddPMModal = (row: any) => {
+    setData(row);
+    setOpenAddPMModal(true);
+  };
+
+  const handleCloseAddPMModal = () => {
+    setOpenAddPMModal(false);
+    handleCloseCard();
+  };
+
   return (
     <Div>
       <div
@@ -147,11 +137,11 @@ const DetailCard = ({
           Chi tiết dự án - Status:{" "}
           <Chip
             size="small"
-            label={row.status === "not_start" ? "not start" : row.status}
+            label={getStatusLabel(row.status)}
             sx={getStatusChipColor(row.status)}
           ></Chip>
         </Typography>
-        <Typography id="transition-modal-title" variant="h4" component="h2">
+        <Typography id="transition-modal-title" variant="h4" component="h2" className="mr-8">
           Hành động
         </Typography>
       </div>
@@ -159,73 +149,104 @@ const DetailCard = ({
         <Box sx={{ flexGrow: 1, marginTop: 2 }}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={8}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant="h6">Tên dự án</Typography>
-                  <TextField
-                    id="name"
-                    variant="outlined"
-                    fullWidth
-                    style={{ marginTop: 2 }}
-                    size="small"
-                    defaultValue={row.name}
-                    disabled
-                  />
+              <Grid container spacing={3}>
+                <Grid item xs={12} className="flex">
+                  <Grid container spacing={1}>
+                    <Grid item xs={4}>
+                      <Typography variant="h5">Tên dự án:</Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography
+                        variant="h6"
+                        className="mt-1"
+                        color="GrayText"
+                      >
+                        &#160;{row.name}
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="h6">Ngày bắt đầu</Typography>
-                  <TextField
-                    id="calories"
-                    variant="outlined"
-                    fullWidth
-                    style={{ marginTop: 2 }}
-                    disabled
-                    size="small"
-                    defaultValue={dayjs(row["start-date"]).format("YYYY-MM-DD")}
-                  />
+                <Grid item xs={12} className="flex">
+                  <Grid container spacing={1}>
+                    <Grid item xs={4}>
+                      <Typography variant="h5">Ngày bắt đầu:</Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography
+                        variant="h6"
+                        className="mt-1"
+                        color="GrayText"
+                      >
+                        &#160;{dayjs(row["start-date"]).format("DD/MM/YYYY")}
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="h6">Kéo dài </Typography>
-                  <TextField
-                    id="fat"
-                    variant="outlined"
-                    fullWidth
-                    style={{ marginTop: 2 }}
-                    size="small"
-                    disabled
-                    defaultValue={row.duration}
-                  />
+                <Grid item xs={12} className="flex">
+                  <Grid container spacing={1}>
+                    <Grid item xs={4}>
+                      <Typography variant="h5">Thời gian dự kiến: </Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography
+                        variant="h6"
+                        className="mt-1"
+                        color="GrayText"
+                      >
+                        &#160;{row.duration}
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="h6">Thông tin mô tả </Typography>
-                  <TextField
-                    id="fat"
-                    variant="outlined"
-                    fullWidth
-                    style={{ marginTop: 2 }}
-                    size="small"
-                    disabled
-                    defaultValue={row.description}
-                  />
+                <Grid item xs={12} className="flex">
+                  <Grid container spacing={1}>
+                    <Grid item xs={4}>
+                      <Typography variant="h5">Thông tin mô tả: </Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography
+                        variant="h6"
+                        className="mt-1"
+                        color="GrayText"
+                        style={{ maxWidth: 550, wordBreak: "break-word" }}
+                      >
+                        &#160;{row.description}
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="h6">Quản lí dự án </Typography>
-                  <div className="flex mt-2">
-                    {listMemberInProject?.data.length !== 0 ? (
-                      <AvatarGroup>
-                        {listMemberInProject?.data.map((name, index) => (
-                          <Tooltip title={name["user-name"]} key={index}>
-                            <Avatar
-                              alt={name["user-name"]}
-                              src="/images/avatar.jpg"
-                            />
-                          </Tooltip>
-                        ))}
-                      </AvatarGroup>
-                    ) : (
-                      <Typography variant="body1">Chưa có PM</Typography>
-                    )}
-                  </div>
+                <Grid item xs={12} className="flex">
+                  <Grid container spacing={1}>
+                    <Grid item xs={4}>
+                      <Typography variant="h5" className="mt-1">
+                        Quản lí dự án:{" "}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <div className="flex break-words max-w-[350px]">
+                        {listMemberInProject?.data.length !== 0 ? (
+                          <AvatarGroup>
+                            {listMemberInProject?.data.map((name, index) => (
+                              <Tooltip title={name["user-name"]} key={index}>
+                                <Avatar
+                                  alt={name["user-name"]}
+                                  src="/images/avatar.jpg"
+                                />
+                              </Tooltip>
+                            ))}
+                          </AvatarGroup>
+                        ) : (
+                          <Typography
+                            variant="h6"
+                            color="GrayText"
+                            className="mt-2 break-words max-w-[350px]"
+                          >
+                            Chưa có quản lí
+                          </Typography>
+                        )}
+                      </div>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
@@ -245,17 +266,7 @@ const DetailCard = ({
                     Sửa dự án
                   </Button>
                 </Grid>
-                {/* <Grid item>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    startIcon={<DeleteIcon />}
-                    onClick={() => handleOpenDeleteConfirmModal(row.id)}
-                    style={{ width: "100%", marginTop: 6 }}
-                  >
-                    Xóa dự án
-                  </Button>
-                </Grid> */}
+
                 <Grid item>
                   <Button
                     variant="contained"
@@ -295,42 +306,6 @@ const DetailCard = ({
           </Box>
         </Fade>
       </Modal>
-      {/* Modal Delete */}
-      {/* <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={openDeleteConfirmModal}
-        onClose={handleCloseDeleteConfirmModal}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
-        <Fade in={openDeleteConfirmModal}>
-          <Box sx={confirmDeleteStyle}>
-            <Typography id="transition-modal-title" variant="h6" component="h2">
-              Xác nhận xóa
-            </Typography>
-            <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-              Bạn có chắc chắn muốn xóa dự án này không?
-            </Typography>
-            <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-              <Button
-                onClick={handleCloseDeleteConfirmModal}
-                style={{ marginRight: 8 }}
-              >
-                Hủy
-              </Button>
-              <Button variant="contained" color="error" onClick={handleDelete}>
-                Xóa
-              </Button>
-            </Box>
-          </Box>
-        </Fade>
-      </Modal> */}
       {/* Modal Add PM */}
       <Modal
         aria-labelledby="transition-modal-title"

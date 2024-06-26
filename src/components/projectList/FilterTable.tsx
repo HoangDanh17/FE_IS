@@ -58,10 +58,10 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 }));
 
 const statusLabels: { [key: string]: string } = {
-  not_start: "Not start",
-  doing: "Doing",
-  done: "Done",
-  cancel: "Cancel",
+  not_start: "Chưa bắt đầu",
+  doing: "Đang thực hiện",
+  done: "Hoàn thành",
+  cancel: "Hủy bỏ",
 };
 
 const FilterTable = () => {
@@ -197,10 +197,10 @@ const FilterTable = () => {
                         <MenuItem disabled value="">
                           <em>Chọn trạng thái</em>
                         </MenuItem>
-                        <MenuItem value="not_start">Not start</MenuItem>
-                        <MenuItem value="doing">Doing</MenuItem>
-                        <MenuItem value="done">Done</MenuItem>
-                        <MenuItem value="cancel">Cancel</MenuItem>
+                        <MenuItem value="not_start">Chưa bắt đầu</MenuItem>
+                        <MenuItem value="doing">Đang thực hiện</MenuItem>
+                        <MenuItem value="done">Hoàn thành</MenuItem>
+                        <MenuItem value="cancel">Hủy bỏ</MenuItem>
                       </Select>
                     </Grid>
                     <Grid item xs={5} style={{ width: "100%" }}>

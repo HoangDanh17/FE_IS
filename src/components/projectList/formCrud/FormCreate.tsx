@@ -63,8 +63,6 @@ const FormCreate = ({ handleClose }: { handleClose: () => void }) => {
         duration: 2000,
         variant: "success",
       });
-      console.log(result);
-      router.refresh();
     } catch (error: any) {
       toast({
         title: `${error}`,
@@ -117,7 +115,7 @@ const FormCreate = ({ handleClose }: { handleClose: () => void }) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h6">Thời hạn</Typography>
+                <Typography variant="h6">Thời gian dự kiến</Typography>
                 <TextField
                   name="duration"
                   value={formData.duration}

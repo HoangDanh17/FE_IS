@@ -3,6 +3,7 @@ import {
   CreateResType,
   TimeTableFilterType,
   TimeTableResType,
+  WeekResType,
 } from "@/schemaValidations/timetable.schema";
 
 const timetableApiRequest = {
@@ -22,6 +23,8 @@ const timetableApiRequest = {
     ),
   approveTimeTable: (id: string, body: { status: string }) =>
     http.post<CreateResType>(`/api/v1/timetables/${id}/approve`, body),
+  getCurrentWeek: () =>
+    http.get<WeekResType>(`/api/v1/timetables/weekly`),
 };
 
 export default timetableApiRequest;

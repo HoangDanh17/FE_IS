@@ -238,7 +238,7 @@ const TermTable = ({
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        className="custom-row custom-pagination"
+        className="custom-row custom-pagination bg-white mb-4"
       />
 
       <Button
@@ -248,17 +248,18 @@ const TermTable = ({
         onClick={handleOpenAddModal}
         style={{ marginRight: "10px" }}
       >
-        Thêm
+        Tạo kỳ mới
       </Button>
       <Button
         style={{ marginRight: "10px" }}
         variant="contained"
         className="edit-btn"
+        color="warning"
         startIcon={<EditIcon />}
         onClick={handleOpenEditModal}
         disabled={!selectedRowData}
       >
-        Sửa
+        Sửa kỳ
       </Button>
       <Button
         style={{ marginRight: "10px" }}
@@ -269,7 +270,7 @@ const TermTable = ({
         onClick={handleOpenDeleteModal}
         disabled={!selectedRowData}
       >
-        Xóa
+        Xóa kỳ
       </Button>
 
       <Modal

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -19,8 +19,9 @@ import {
   Paper,
   TableBody,
   styled,
+  Select,
+  MenuItem,
   tableCellClasses,
-  Tooltip,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -30,60 +31,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   TimeTableResType,
   TimeTableType,
+  WeekResType,
 } from "@/schemaValidations/timetable.schema";
 import timetableApiRequest from "@/apiRequests/timetable";
-
-const daysOfWeek = [
-  "Thứ hai",
-  "Thứ ba",
-  "Thứ tư",
-  "Thứ năm",
-  "Thứ sáu",
-  "Thứ bảy",
-  "Chủ nhật",
-];
-
-const defaultData = {
-  approved: 10,
-  pending: 5,
-  canceled: 2,
-};
-
-const dummyData = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    dateInOffice: "2024-06-20",
-    status: "Đã duyệt",
-    actualArrivalTime: "08:30",
-    actualDepartureTime: "17:00",
-    scheduledArrivalTime: "08:00",
-    scheduledDepartureTime: "17:30",
-    internshipCode: "TPS001",
-  },
-  {
-    id: 2,
-    name: "Trần Thị B",
-    dateInOffice: "2024-06-21",
-    status: "Chờ duyệt",
-    actualArrivalTime: "09:00",
-    actualDepartureTime: "16:30",
-    scheduledArrivalTime: "09:30",
-    scheduledDepartureTime: "17:00",
-    internshipCode: "TPS002",
-  },
-  {
-    id: 3,
-    name: "Lê Văn C",
-    dateInOffice: "2024-06-22",
-    status: "Hủy",
-    actualArrivalTime: "08:45",
-    actualDepartureTime: "16:45",
-    scheduledArrivalTime: "08:30",
-    scheduledDepartureTime: "17:00",
-    internshipCode: "TPS003",
-  },
-];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -92,6 +42,9 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
 }));
 
@@ -106,12 +59,25 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const TimeTable: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<Dayjs | null>(null);
+  const [selectedDay, setSelectedDay] = useState<Dayjs | null>();
   const [selectedDayName, setSelectedDayName] = useState<string>("");
   const [filterDate, setFilterDate] = useState<Dayjs | null>(null); // Thêm state mới cho DatePicker lọc
   const [data, setData] = useState<TimeTableResType | undefined>();
+  const [dataWeek, setDataWeek] = useState<WeekResType>();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { payload } = await timetableApiRequest.getCurrentWeek();
+        setDataWeek(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, [refreshKey]);
 
   const handleFilterDateChange = (newValue: Dayjs | null) => {
     setFilterDate(newValue);
@@ -128,14 +94,9 @@ const TimeTable: React.FC = () => {
     );
   };
 
-  const startOfWeek = selectedDate?.startOf("week").add(1, "day"); // Ensure the week starts on Monday
-  const currentWeekDates = daysOfWeek.map((_, index) =>
-    startOfWeek?.add(index, "day")
-  );
-
-  const handleCardClick = (date: Dayjs | undefined, day: string) => {
+  const handleCardClick = (date: string | Date | null, day: string) => {
     if (date) {
-      setSelectedDay(date);
+      setSelectedDay(dayjs(date));
       setSelectedDayName(day);
       setDialogOpen(true);
     }
@@ -143,6 +104,17 @@ const TimeTable: React.FC = () => {
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
+    setRefreshKey((prevKey) => prevKey + 1);
+    setFilterDate(null);
+  };
+
+  const handleStatusChange = (
+    event: React.ChangeEvent<{ value: unknown }>,
+    internId: string
+  ) => {
+    const { value } = event.target;
+    // Logic to update status or handle submission
+    console.log(`Intern ID ${internId} status updated to: ${value}`);
   };
 
   return (
@@ -154,84 +126,80 @@ const TimeTable: React.FC = () => {
           </Typography>
         </Box>
         <Grid container spacing={3} justifyContent="space-between">
-          {daysOfWeek.map((day, index) => (
-            <Grid item xs={12 / 7} key={day}>
-              <Tooltip title="Ấn để xem chi tiết" arrow placement="top">
-                <Card
-                  onClick={() => handleCardClick(currentWeekDates[index], day)}
-                  sx={{
-                    cursor: "pointer",
-                    width: 150,
-                    height: 200,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    "&:hover": { boxShadow: 6 },
-                  }}
-                >
-                  <CardContent>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      style={{ textAlign: "center" }}
-                    >
-                      {day}
+          {dataWeek?.data.map((day, index) => (
+            <Grid item xs={12 / 7} key={index}>
+              <Card
+                onClick={() => handleCardClick(day.date, day["week-day"])}
+                sx={{
+                  cursor: "pointer",
+                  width: 150,
+                  height: 200,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  "&:hover": { boxShadow: 6 },
+                }}
+              >
+                <CardContent>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    style={{ textAlign: "center" }}
+                  >
+                    {day["week-day"]}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    style={{ textAlign: "center" }}
+                  >
+                    {dayjs(day.date).format("DD/MM/YYYY")}
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        backgroundColor: "green",
+                        mr: 1,
+                      }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      Đã duyệt: {day["total-approved"]}
                     </Typography>
-                    {currentWeekDates && currentWeekDates[index] && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        style={{ textAlign: "center" }}
-                      >
-                        {currentWeekDates[index]?.format("DD/MM/YYYY")}
-                      </Typography>
-                    )}
-                    <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-                      <Box
-                        sx={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: "50%",
-                          backgroundColor: "green",
-                          mr: 1,
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        Đã duyệt: {defaultData.approved}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-                      <Box
-                        sx={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: "50%",
-                          backgroundColor: "orange",
-                          mr: 1,
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        Chờ duyệt: {defaultData.pending}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-                      <Box
-                        sx={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: "50%",
-                          backgroundColor: "red",
-                          mr: 1,
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        Hủy: {defaultData.canceled}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Tooltip>
+                  </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        backgroundColor: "orange",
+                        mr: 1,
+                      }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      Chờ duyệt: {day["total-waiting"]}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        backgroundColor: "red",
+                        mr: 1,
+                      }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      Hủy: {day["total-denied"]}
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
             </Grid>
           ))}
         </Grid>
@@ -260,6 +228,7 @@ const TimeTable: React.FC = () => {
               <Table>
                 <TableHead>
                   <TableRow>
+                    <StyledTableCell>#</StyledTableCell>
                     <StyledTableCell>Tên thực tập</StyledTableCell>
                     <StyledTableCell>Mã thực tập sinh</StyledTableCell>
                     <StyledTableCell>Trạng thái</StyledTableCell>
@@ -268,25 +237,70 @@ const TimeTable: React.FC = () => {
                     <StyledTableCell>Giờ đến (lịch)</StyledTableCell>
                     <StyledTableCell>Giờ về (lịch)</StyledTableCell>
                     <StyledTableCell>Ngày lên văn phòng</StyledTableCell>
+                    {/* <StyledTableCell>Trạng thái điểm danh</StyledTableCell>
+                    <StyledTableCell>Chỉnh sửa thái điểm danh</StyledTableCell> */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {data && data.data.length > 0 ? (
-                    data.data.map((intern) => (
+                    data.data.map((intern, index) => (
                       <StyledTableRow key={intern.id}>
+                        <StyledTableCell>{index + 1}</StyledTableCell>
                         <StyledTableCell>{intern.intern_name}</StyledTableCell>
-                        <StyledTableCell>{intern["student-code"]}</StyledTableCell>
+                        <StyledTableCell>
+                          {intern["student-code"]}
+                        </StyledTableCell>
                         <StyledTableCell>{intern.status}</StyledTableCell>
                         <StyledTableCell>{intern["act-start"]}</StyledTableCell>
                         <StyledTableCell>{intern["act-end"]}</StyledTableCell>
                         <StyledTableCell>{intern["est-start"]}</StyledTableCell>
                         <StyledTableCell>{intern["est-end"]}</StyledTableCell>
-                        <StyledTableCell>{intern["office-time"]}</StyledTableCell>
+                        <StyledTableCell>
+                          {dayjs(intern["office-time"]).format("DD/MM/YYYY")}
+                        </StyledTableCell>
+                        {/* <StyledTableCell>{intern.statusIntern}</StyledTableCell>
+                        <StyledTableCell>
+                          {intern.statusIntern === "not-yet" && (
+                            <Select
+                              value={intern.attendanceStatus}
+                              onChange={(event) =>
+                                handleStatusChange(event, intern.id)
+                              }
+                              style={{ minWidth: 120 }}
+                            >
+                              <MenuItem value="absent">Absent</MenuItem>
+                              <MenuItem value="not-yet">Not Yet</MenuItem>
+                            </Select>
+                          )}
+                          {intern.statusIntern === "wait-for_admin" && (
+                            <Select
+                              value={intern.attendanceStatus}
+                              onChange={(event) =>
+                                handleStatusChange(event, intern.id)
+                              }
+                              style={{ minWidth: 120 }}
+                            >
+                              <MenuItem value="absent">Absent</MenuItem>
+                              <MenuItem value="admin-approve">
+                                Admin Approve
+                              </MenuItem>
+                            </Select>
+                          )}
+                          {intern.statusIntern !== "not-yet" &&
+                            intern.statusIntern !== "wait-for_admin" && (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                Cannot edit
+                              </Typography>
+                            )}
+                        </StyledTableCell> */}
                       </StyledTableRow>
                     ))
                   ) : (
                     <StyledTableRow>
-                      <StyledTableCell colSpan={8} align="center">
+                      <StyledTableCell colSpan={10} align="center">
                         Chọn ngày để xem lịch sử
                       </StyledTableCell>
                     </StyledTableRow>
@@ -303,12 +317,12 @@ const TimeTable: React.FC = () => {
           aria-describedby="dialog-description"
           maxWidth="xl"
         >
-          <DialogTitle id="dialog-title">
-            Chi tiết lich ngày: {selectedDayName},
-            {selectedDay ? selectedDay.format("DD/MM/YYYY") : ""}
-          </DialogTitle>
+          <DialogTitle id="dialog-title">Chi tiết lịch làm việc</DialogTitle>
           <DialogContent>
-            <FilterTimeTable selectedDay={selectedDay}></FilterTimeTable>
+            <FilterTimeTable
+              selectedDay={selectedDay}
+              selectedDayName={selectedDayName}
+            ></FilterTimeTable>
           </DialogContent>
         </Dialog>
       </Container>

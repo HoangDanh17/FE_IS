@@ -1,4 +1,4 @@
-import ListCardLayout from "@/components/pm/mainLayout/ListCardLayout";
+import ListCardLayout from "@/components/manager/mainLayout/ListCardLayout";
 
 export default function Card() {
   return (

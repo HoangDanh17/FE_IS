@@ -76,6 +76,7 @@ export const MemberInProjectRes = z.object({
 });
 
 export type ProjectListResType = z.TypeOf<typeof ProjectListRes>;
+export type ProjectType = z.TypeOf<typeof ProjectSchema>;
 export type ProjectFilterType = z.TypeOf<typeof ProjectFilterSchema>;
 
 export type CreateProjectResType = z.TypeOf<typeof CreateProjectRes>;

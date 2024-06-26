@@ -1,4 +1,4 @@
-import FilterList from "@/components/pm/mainLayout/FilterList";
+import FilterList from "@/components/manager/mainLayout/FilterList";
 
 const listTask = () => {
     return (

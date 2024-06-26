@@ -19,7 +19,6 @@ import { RowData } from "@/components/projectList/DetailCard";
 import { MemberInProjectResType } from "@/schemaValidations/project.schema";
 import { useEffect, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
 
 type Manager = {
   id: string | number;
@@ -41,6 +40,7 @@ export default function FormAddPM({
   const [availableManagers, setAvailableManagers] = useState<Manager[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+  const [validationErrors, setValidationErrors] = useState<boolean[]>([]);
 
   useEffect(() => {
     if (listMemberInProject) {
@@ -63,14 +63,26 @@ export default function FormAddPM({
       const newManagers = [...managers];
       newManagers[index] = { ...newValue, isOriginal: false };
       setManagers(newManagers);
+      const newErrors = [...validationErrors];
+      newErrors[index] = false;
+      setValidationErrors(newErrors);
     }
   };
+
   const handleAddManager = () => {
     const availableManager = availableManagers.find(
       (m) => !managers.some((existingM) => existingM.id === m.id)
     );
+
     if (availableManager) {
       setManagers([...managers, { ...availableManager, isOriginal: false }]);
+      setValidationErrors([...validationErrors, false]);
+    } else {
+      setManagers([
+        ...managers,
+        { id: '', "user-name": '', email: '', isOriginal: false }
+      ]);
+      setValidationErrors([...validationErrors, true]);
     }
   };
 
@@ -83,6 +95,9 @@ export default function FormAddPM({
     if (deleteIndex !== null) {
       const newManagers = managers.filter((_, i) => i !== deleteIndex);
       setManagers(newManagers);
+      const newErrors = [...validationErrors];
+      newErrors.splice(deleteIndex, 1);
+      setValidationErrors(newErrors);
       setDeleteIndex(null);
       setOpenDialog(false);
     }
@@ -94,6 +109,17 @@ export default function FormAddPM({
   };
 
   const handleSubmit = () => {
+    const newErrors = managers.map((manager) => !manager["user-name"]);
+    if (newErrors.some((error) => error)) {
+      setValidationErrors(newErrors);
+      toast({
+        title: "Vui lòng chọn tất cả quản lý dự án",
+        duration: 2000,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const submitData = {
       "list-manager-id": managers.map((manager) => String(manager.id)),
     };
@@ -119,6 +145,7 @@ export default function FormAddPM({
   return (
     <Box sx={{ minWidth: 120 }}>
       <Typography variant="h4">Quản lý dự án</Typography>
+      <Box sx={{maxHeight: 300,overflow:"auto"}}>
       {managers.map((manager, index) => (
         <Box
           display="flex"
@@ -135,7 +162,10 @@ export default function FormAddPM({
             onChange={(event, newValue) => handleChange(newValue, index)}
             disabled={manager.isOriginal}
             renderInput={(params) => (
-              <TextField {...params} label="Quản lý dự án" />
+              <TextField
+                {...params}
+                label="Quản lý dự án"
+              />
             )}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             getOptionDisabled={(option) =>
@@ -151,6 +181,7 @@ export default function FormAddPM({
           </IconButton>
         </Box>
       ))}
+      </Box>
       <Button
         onClick={handleAddManager}
         style={{

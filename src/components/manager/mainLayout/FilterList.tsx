@@ -22,10 +22,8 @@ import MuiAccordionSummary, {
 } from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import SearchIcon from "@mui/icons-material/Search";
-import ProjectListTable, {
-  FormFilterData,
-} from "@/components/projectList/ProjectListTable";
-import ListTable from "@/components/pm/mainLayout/ListTable";
+import ListTable from "@/components/manager/mainLayout/ListTable";
+import { TaskFilterType } from "@/schemaValidations/task.schema";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -59,50 +57,46 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 }));
 
 const statusLabels: { [key: string]: string } = {
-  not_start: "Not start",
-  doing: "Doing",
+  todo: "Todo",
   done: "Done",
-  cancel: "Cancel",
+  true: "Đã duyệt",
+  false: "Không duyệt",
 };
 
 const FilterList = () => {
-  const [formData, setFormData] = useState<FormFilterData>({
+  const [formData, setFormData] = useState<TaskFilterType>({
     name: "",
     status: "",
-    "start-date-from": "",
-    "start-date-to": "",
+    "assignee-name": "",
+    "assignee-code": "",
+    "is-approved": "",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSelectChange = (e: SelectChangeEvent<string>) => {
-    setFormData({ ...formData, status: e.target.value });
-  };
-
-  const handleDateChange = (name: string, date: Dayjs | null) => {
-    setFormData({
-      ...formData,
-      [name]: date ? date.format("YYYY-MM-DD") : "",
-    });
+  const handleSelectChange = (e: SelectChangeEvent<string>, name: string) => {
+    setFormData({ ...formData, [name]: e.target.value });
   };
 
   const [isFilter, setIsFilter] = useState<boolean>(false);
-  const [dataFilter, setDataFilter] = useState<FormFilterData | null>(null);
+  const [dataFilter, setDataFilter] = useState<any | null>(null);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setIsFilter(true);
     setDataFilter(formData);
+    console.log(formData);
   }
 
   const handleReset = () => {
     setFormData({
       name: "",
       status: "",
-      "start-date-from": "",
-      "start-date-to": "",
+      "assignee-name": "",
+      "assignee-code": "",
+      "is-approved": "",
     });
     setIsFilter(false);
     setDataFilter(null);
@@ -129,61 +123,19 @@ const FilterList = () => {
                         value={formData.name}
                         onChange={handleChange}
                         id="name"
-                        label="Tên dự án"
+                        label="Tên công việc"
                         variant="standard"
                         size="small"
                         style={{ width: "90%", marginTop: 6 }}
                       />
                     </Grid>
                     <Grid item xs={3}>
-                      <DatePicker
-                        label="Ngày bắt đầu từ"
-                        value={
-                          formData["start-date-from"]
-                            ? dayjs(formData["start-date-from"])
-                            : null
-                        }
-                        onChange={(date) =>
-                          handleDateChange("start-date-from", date)
-                        }
-                        slotProps={{
-                          textField: {
-                            variant: "standard",
-                            style: {
-                              marginTop: 3,
-                              marginRight: 6,
-                              width: "90%",
-                            },
-                          },
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      <DatePicker
-                        label="Ngày bắt đầu đến"
-                        value={
-                          formData["start-date-to"]
-                            ? dayjs(formData["start-date-to"])
-                            : null
-                        }
-                        onChange={(date) =>
-                          handleDateChange("start-date-to", date)
-                        }
-                        slotProps={{
-                          textField: {
-                            variant: "standard",
-                            style: { marginTop: 3, width: "90%" },
-                          },
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={3}>
-                      <InputLabel id="status-label">Trạng thái</InputLabel>
+                      <InputLabel id="status-label">Trạng thái công việc</InputLabel>
                       <Select
                         labelId="status-label"
                         id="status"
                         value={formData.status}
-                        onChange={handleSelectChange}
+                        onChange={(e) => handleSelectChange(e, "status")}
                         displayEmpty
                         variant="standard"
                         size="small"
@@ -198,13 +150,61 @@ const FilterList = () => {
                         <MenuItem disabled value="">
                           <em>Chọn trạng thái</em>
                         </MenuItem>
-                        <MenuItem value="not_start">Not start</MenuItem>
-                        <MenuItem value="doing">Doing</MenuItem>
-                        <MenuItem value="done">Done</MenuItem>
-                        <MenuItem value="cancel">Cancel</MenuItem>
+                        <MenuItem value="todo">Chưa bắt đầu</MenuItem>
+                        <MenuItem value="inprogress">Đang thực hiện</MenuItem>
+                        <MenuItem value="done">Hoàn thành</MenuItem>
                       </Select>
                     </Grid>
-                    <Grid item xs={5} style={{ width: "100%" }}>
+                    <Grid item xs={3}>
+                      <TextField
+                        name="assignee-name"
+                        value={formData["assignee-name"]}
+                        onChange={handleChange}
+                        id="assignee-name"
+                        label="Tên người làm"
+                        variant="standard"
+                        size="small"
+                        style={{ width: "90%", marginTop: 6 }}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <TextField
+                        name="assignee-code"
+                        value={formData["assignee-code"]}
+                        onChange={handleChange}
+                        id="assignee-code"
+                        label="Mã người làm"
+                        variant="standard"
+                        size="small"
+                        style={{ width: "90%", marginTop: 6 }}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <InputLabel id="is-approved-label">Tình trạng công việc</InputLabel>
+                      <Select
+                        labelId="is-approved-label"
+                        id="is-approved"
+                        value={formData["is-approved"]}
+                        onChange={(e) => handleSelectChange(e, "is-approved")}
+                        displayEmpty
+                        variant="standard"
+                        size="small"
+                        style={{ width: "90%" }}
+                        renderValue={(selected) => {
+                          if (selected.length === 0) {
+                            return <em>Chọn trạng thái</em>;
+                          }
+                          return statusLabels[selected];
+                        }}
+                      >
+                        <MenuItem disabled value="">
+                          <em>Chọn trạng thái</em>
+                        </MenuItem>
+                        <MenuItem value="true">Đã duyệt</MenuItem>
+                        <MenuItem value="false">Không duyệt</MenuItem>
+                      </Select>
+                    </Grid>
+                    <Grid item xs={4} style={{ width: "100%", marginTop: 10 }}>
                       <Button
                         type="submit"
                         variant="contained"
@@ -218,7 +218,7 @@ const FilterList = () => {
                         onClick={handleReset}
                         startIcon={<CleaningServicesIcon />}
                         style={{
-                          width: "40%",
+                          width: "45%",
                           marginTop: 4,
                         }}
                         color="error"
@@ -234,9 +234,9 @@ const FilterList = () => {
         </Grid>
       </LocalizationProvider>
       <ListTable
-        // isFilter={isFilter}
-        // dataFilter={dataFilter}
-        // handleReset={handleReset}
+      isFilter={isFilter}
+      dataFilter={dataFilter}
+      handleReset={handleReset}
       ></ListTable>
     </div>
   );

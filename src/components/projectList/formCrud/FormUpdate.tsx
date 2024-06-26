@@ -127,7 +127,7 @@ const FormUpdate = ({
                 />
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h6">Kéo dài</Typography>
+                <Typography variant="h6">Thời gian dự kiến</Typography>
                 <TextField
                   id="duration"
                   name="duration"
@@ -165,10 +165,10 @@ const FormUpdate = ({
                   sx={{ marginTop: 1 }}
                   style={{ width: "100%" }}
                 >
-                  <MenuItem value={"not_start"}>Not start</MenuItem>
-                  <MenuItem value={"doing"}>Doing</MenuItem>
-                  <MenuItem value={"done"}>Done</MenuItem>
-                  <MenuItem value={"cancel"}>Cancel</MenuItem>
+                  <MenuItem value={"not_start"}>Chưa bắt đầu</MenuItem>
+                  <MenuItem value={"doing"}>Đang thực hiện</MenuItem>
+                  <MenuItem value={"done"}>Hoàn thành</MenuItem>
+                  <MenuItem value={"cancel"}>Hủy bỏ</MenuItem>
                 </Select>
               </Grid>
               <Grid item xs={12}>
