@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   TextField,
@@ -10,19 +10,20 @@ import {
   MenuItem,
   FormHelperText,
   InputLabel,
+  Input,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import "@/components/css/manageintern/ModalBox.css";
-import { useRouter } from "next/navigation";
-
+import AddIcon from "@mui/icons-material/Add";
 import { toast } from "../ui/use-toast";
 import internApiRequest from "@/apiRequests/intern";
 import { CreateInternType } from "@/schemaValidations/intern.schema";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { SelectChangeEvent } from "@mui/material";
-
+import { TermListResType } from "@/schemaValidations/term.schema";
+import termApiRequest from "@/apiRequests/term";
 interface AddModalProps {
   onClose: () => void;
 }
@@ -33,7 +34,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
     avatar: "",
     "date-of-birth": "",
     email: "",
-    gender: "",
+    gender: "male",
     "ojt-id": 1,
     password: "",
     "phone-number": "",
@@ -48,7 +49,23 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
     gender: "",
     "user-name": "",
     "student-code": "",
+    "date-of-birth": "",
+    address: "",
   });
+
+  const [filterOjt, setFilterOjt] = useState<TermListResType>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { payload } = await termApiRequest.getListTerm(null, null, null);
+        setFilterOjt(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -109,20 +126,53 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
         setErrors((prev) => ({ ...prev, "student-code": "" }));
       }
     }
+
+    if (name === "date-of-birth") {
+      if (!value) {
+        setErrors((prev) => ({
+          ...prev,
+          "date-of-birth": "Ngày sinh không được để trống",
+        }));
+      } else {
+        setErrors((prev) => ({ ...prev, "date-of-birth": "" }));
+      }
+    }
+
+    if (name === "address") {
+      if (!value) {
+        setErrors((prev) => ({
+          ...prev,
+          address: "Địa chỉ không được để trống",
+        }));
+      } else {
+        setErrors((prev) => ({ ...prev, address: "" }));
+      }
+    }
   };
 
-  const handleSelectChange = (e: SelectChangeEvent) => {
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
     });
+    if (name === "gender" && value) {
+      setErrors((prev) => ({ ...prev, gender: "" }));
+    }
   };
 
   const handleDateChange = (name: string, date: Dayjs | null) => {
     setFormData({
       ...formData,
       [name]: date ? date.format("YYYY-MM-DD") : "",
+    });
+  };
+
+  const handleOjtIdChange = (e: SelectChangeEvent<number>) => {
+    const value = e.target.value as number;
+    setFormData({
+      ...formData,
+      "ojt-id": value,
     });
   };
 
@@ -179,6 +229,20 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
       newErrors.gender = "";
     }
 
+    if (!formData["date-of-birth"]) {
+      newErrors["date-of-birth"] = "Ngày sinh không được để trống";
+      valid = false;
+    } else {
+      newErrors["date-of-birth"] = "";
+    }
+
+    if (!formData.address) {
+      newErrors.address = "Địa chỉ không được để trống";
+      valid = false;
+    } else {
+      newErrors.address = "";
+    }
+
     setErrors(newErrors);
 
     if (!valid) return;
@@ -203,27 +267,35 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
       onClose();
     } catch (error: any) {
       const errorRes = { error };
-      console.log(errorRes.error.payload);
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        const errorMessages = error.response.data.message
-          .map((err: any) => `${err.field}: ${err["err-message"]}`)
-          .join(", ");
-        toast({
-          title: "Lỗi xác thực",
-          description: errorMessages,
-          duration: 2000,
-          variant: "destructive",
+      const errorMessage =
+        errorRes.error.payload.message || "Đã xảy ra lỗi, vui lòng thử lại";
+      if (errorRes.error.payload.log.includes("duplicate data")) {
+        const duplicates = errorRes.error.payload.log
+          .match(/\[(.*?)\]/)[1]
+          .split(", ");
+        const newFieldErrors = { ...errors };
+
+        duplicates.forEach((field: string) => {
+          switch (field) {
+            case "email":
+              newFieldErrors.email = "Email đã tồn tại hoặc không hợp lệ";
+              break;
+            case "phone-number":
+              newFieldErrors["phone-number"] =
+                "Số điện thoại đã tồn tại hoặc không hợp lệ";
+              break;
+            case "user-name":
+              newFieldErrors["user-name"] = "Tên người dùng đã tồn tại";
+              break;
+            case "student-code":
+              newFieldErrors["student-code"] = "Mã sinh viên đã tồn tại";
+              break;
+            default:
+              break;
+          }
         });
-      } else {
-        toast({
-          title: error.message,
-          duration: 2000,
-          variant: "destructive",
-        });
+
+        setErrors(newFieldErrors);
       }
     } finally {
       setLoading(false);
@@ -234,7 +306,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box className="modal-box">
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          Thêm thực tập sinh mới
+          Tạo thực tập sinh mới
         </Typography>
         <FormControl fullWidth>
           <Grid container spacing={2} marginY={2}>
@@ -243,6 +315,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 fullWidth
                 label="Tên đăng nhập"
                 name="user-name"
+                size="small"
                 value={formData["user-name"]}
                 onChange={handleChange}
                 error={Boolean(errors["user-name"])}
@@ -254,6 +327,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 fullWidth
                 label="Mật khẩu"
                 name="password"
+                size="small"
                 value={formData.password}
                 onChange={handleChange}
                 error={Boolean(errors.password)}
@@ -266,6 +340,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 label="Email"
                 name="email"
                 type="email"
+                size="small"
                 value={formData.email}
                 onChange={handleChange}
                 error={Boolean(errors.email)}
@@ -277,6 +352,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 fullWidth
                 label="Mã sinh viên"
                 name="student-code"
+                size="small"
                 value={formData["student-code"]}
                 onChange={handleChange}
                 error={Boolean(errors["student-code"])}
@@ -284,35 +360,52 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={4}>
-              <TextField
-                fullWidth
-                label="Mã OJT"
+              <Select
                 name="ojt-id"
                 value={formData["ojt-id"]}
-                onChange={handleChange}
-              />
+                onChange={handleOjtIdChange}
+                displayEmpty
+                style={{ width: "100%" }}
+                size="small"
+              >
+                <MenuItem value="" disabled>
+                  <em>OJT Semester</em>
+                </MenuItem>
+                {filterOjt?.data.map((semester) => (
+                  <MenuItem key={semester.id} value={semester.id}>
+                    {semester.semester}
+                  </MenuItem>
+                ))}
+              </Select>
             </Grid>
             <Grid item xs={4}>
               <FormControl fullWidth error={Boolean(errors.gender)}>
-                <InputLabel>Giới tính</InputLabel>
+                <InputLabel id="gender-label" shrink>
+                  Giới tính
+                </InputLabel>
                 <Select
+                  labelId="gender-label"
+                  id="gender-select"
                   name="gender"
                   value={formData.gender}
+                  size="small"
                   onChange={handleSelectChange}
                   label="Giới tính"
                   displayEmpty
                 >
-                  <MenuItem value="Nam">Nam</MenuItem>
-                  <MenuItem value="Nữ">Nữ</MenuItem>
+                  <MenuItem value="male">Nam</MenuItem>
+                  <MenuItem value="female">Nữ</MenuItem>
                 </Select>
                 <FormHelperText>{errors.gender}</FormHelperText>
               </FormControl>
             </Grid>
+
             <Grid item xs={4}>
               <TextField
                 fullWidth
                 label="Số điện thoại"
                 name="phone-number"
+                size="small"
                 value={formData["phone-number"]}
                 onChange={handleChange}
                 error={Boolean(errors["phone-number"])}
@@ -323,29 +416,46 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
               <TextField
                 fullWidth
                 label="Địa chỉ"
+                size="small"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
+                error={Boolean(errors.address)}
+                helperText={errors.address}
               />
             </Grid>
             <Grid item xs={4}>
               <DatePicker
-                label="Ngày sinh"
+                format="DD/MM/YYYY"
                 value={
                   formData["date-of-birth"]
                     ? dayjs(formData["date-of-birth"])
                     : null
                 }
                 onChange={(date) => handleDateChange("date-of-birth", date)}
-                slotProps={{ textField: { fullWidth: true, size: "small" } }}
+                slotProps={{
+                  textField: {
+                    label: "Ngày sinh",
+                    fullWidth: true,
+                    size: "small",
+                    error: Boolean(errors["date-of-birth"]),
+                    helperText: errors["date-of-birth"],
+                  },
+                }}
               />
             </Grid>
           </Grid>
-          <Box display="flex" justifyContent="flex-end" marginTop={2}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="flex-end"
+            marginTop={2}
+          >
             <Button
               variant="contained"
               color="primary"
               onClick={handleAdd}
+              startIcon={<AddIcon />}
               disabled={loading}
             >
               {loading ? "Adding..." : "Add"}

@@ -45,20 +45,33 @@ const LoginForm = () => {
     setLoading(true);
     try {
       const result = await authApiRequest.login(values);
-
-      await authApiRequest.auth({
-        sessionToken: result.payload.data.token,
-      });
-      toast({
-        title: `Chào mừng đăng nhập ${result.payload.data.account_info["user-name"]}`,
-        duration: 2000,
-        variant: "info",
-      });
-      setUser(result.payload.data.account_info);
-      console.log(result);
       if (result.payload.data.account_info.role === "admin") {
+        await authApiRequest.auth({
+          sessionToken: result.payload.data.token,
+        });
+        toast({
+          title: `Chào mừng đăng nhập ${result.payload.data.account_info["user-name"]}`,
+          duration: 2000,
+          variant: "info",
+        });
+        setUser(result.payload.data.account_info);
         router.push("/homePage");
+      } else if (result.payload.data.account_info.role === "user") {
+        toast({
+          title: `Thực tập sinh vui lòng sử dụng app`,
+          duration: 2000,
+          variant: "destructive",
+        });
       } else {
+        await authApiRequest.auth({
+          sessionToken: result.payload.data.token,
+        });
+        toast({
+          title: `Chào mừng đăng nhập ${result.payload.data.account_info["user-name"]}`,
+          duration: 2000,
+          variant: "info",
+        });
+        setUser(result.payload.data.account_info);
         router.push("listCard");
       }
     } catch (error: any) {

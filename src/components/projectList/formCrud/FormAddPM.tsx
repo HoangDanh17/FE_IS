@@ -19,7 +19,6 @@ import { RowData } from "@/components/projectList/DetailCard";
 import { MemberInProjectResType } from "@/schemaValidations/project.schema";
 import { useEffect, useState } from "react";
 import { toast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
 
 type Manager = {
   id: string | number;

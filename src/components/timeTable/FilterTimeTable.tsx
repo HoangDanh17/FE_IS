@@ -6,7 +6,6 @@ import {
   Select,
   MenuItem,
   Typography,
-  Grid,
   Box,
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -14,7 +13,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import ListTimeTable from "@/components/timeTable/ListTimeTable";
 
-const FilterTimeTable = ({ selectedDay }: { selectedDay: Dayjs | null }) => {
+const FilterTimeTable = ({
+  selectedDay,
+  selectedDayName,
+}: {
+  selectedDay: Dayjs | null | undefined;
+  selectedDayName: string;
+}) => {
   const [status, setStatus] = useState("all");
 
   const handleStatusChange = (event: any) => {
@@ -31,7 +36,10 @@ const FilterTimeTable = ({ selectedDay }: { selectedDay: Dayjs | null }) => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box display="flex" justifyContent="flex-end" mb={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography component="span" variant="h5">
+          {selectedDayName}, {selectedDay ? selectedDay.format("DD/MM/YYYY") : ""}
+        </Typography>
         <FormControl margin="normal" style={{ minWidth: 200 }}>
           <InputLabel id="status-label">Status</InputLabel>
           <Select

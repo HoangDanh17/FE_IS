@@ -1,12 +1,27 @@
 "use client";
-import { Box, Fade, Modal, Button, Chip, Fab, Skeleton } from "@mui/material";
+import {
+  Box,
+  Fade,
+  Modal,
+  Chip,
+  Fab,
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  styled,
+  TableCell,
+  tableCellClasses,
+  TableBody,
+  Tooltip,
+  TablePagination,
+} from "@mui/material";
 import Backdrop from "@mui/material/Backdrop";
 import FormCreate from "@/components/projectList/formCrud/FormCreate";
 import AddIcon from "@mui/icons-material/Add";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import DetailCard from "@/components/projectList/DetailCard";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import projectApiRequest from "@/apiRequests/project";
 import { ProjectListResType } from "@/schemaValidations/project.schema";
 import dayjs from "dayjs";
@@ -34,6 +49,29 @@ const styleCard = {
   p: 4,
 };
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    padding: "8px",
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+  height: "40px", // Giảm chiều cao của hàng
+  cursor: "pointer", // Thêm con trỏ để hiển thị rằng hàng có thể được chọn
+}));
+
 export interface FormFilterData {
   name: string;
   status: string;
@@ -51,12 +89,24 @@ export default function ProjectListTable({
   handleReset: () => void;
 }) {
   const [data, setData] = useState<ProjectListResType | null>(null);
-  const [limit, setLimit] = useState(9);
   const [loading, setLoading] = useState(false);
-  const handleLoadMore = () => setLimit(limit + 9);
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [refreshKey, setRefreshKey] = useState(0);
   const triggerRefresh = () => {
     setRefreshKey((prevKey) => prevKey + 1);
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setLoading(true);
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   useEffect(() => {
@@ -64,7 +114,8 @@ export default function ProjectListTable({
     const fetchData = async () => {
       try {
         const { payload } = await projectApiRequest.getListProject(
-          limit,
+          page + 1,
+          rowsPerPage,
           isFilter ? dataFilter : {}
         );
         setData(payload);
@@ -75,31 +126,23 @@ export default function ProjectListTable({
       }
     };
     fetchData();
-  }, [isFilter, dataFilter, limit, refreshKey]);
+  }, [isFilter, dataFilter, page, rowsPerPage, refreshKey]);
 
   // Card click
   const [openCardModal, setOpenCardModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<any>(null);
+
+  const handleDoubleClick = (row: object) => {
+    setSelectedCard(row);
+    setOpenCardModal(true);
+  };
 
   const handleCloseCardModal = () => {
     setOpenCardModal(false);
     handleReset();
     triggerRefresh();
   };
-
-  const handleOpenCardModal = (row: object) => {
-    setSelectedCard(row);
-    setOpenCardModal(true);
-  };
-
-  // Create modal
-  const [openCreateModal, setOpenCreateModal] = useState(false);
-  const handleOpenCreateModal = () => setOpenCreateModal(true);
-  const handleCloseCreateModal = () => {
-    setOpenCreateModal(false);
-    handleReset();
-  };
-
+  
   const getStatusChipColor = (status: string) => {
     switch (status) {
       case "not_start":
@@ -113,6 +156,30 @@ export default function ProjectListTable({
       default:
         return { backgroundColor: "#D3D3D3", color: "white" }; // Màu xám
     }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "not_start":
+        return "Chưa bắt đầu";
+      case "doing":
+        return "Đang thực hiện";
+      case "done":
+        return "Hoàn thành";
+      case "cancel":
+        return "Hủy bỏ";
+      default:
+        return "Không xác định";
+    }
+  };
+
+  // Create modal
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+  const handleOpenCreateModal = () => setOpenCreateModal(true);
+  const handleCloseCreateModal = () => {
+    setOpenCreateModal(false);
+    handleReset();
+    triggerRefresh();
   };
 
   return (
@@ -142,79 +209,56 @@ export default function ProjectListTable({
             Tạo dự án
           </Fab>
         </div>
-        
-        <ScrollArea className="h-[321px] rounded-md border p-2">
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-            {loading
-              ? Array.from(new Array(9)).map((_, index) => (
-                  <Card key={index} className="w-[360px]">
-                    <CardHeader>
-                      <Skeleton variant="text" width="80%" height={30} />
-                      <Skeleton
-                        variant="rectangular"
-                        width="100%"
-                        height={60}
-                      />
-                    </CardHeader>
-                  </Card>
-                ))
-              : data?.data.map((project, index) => (
-                  <Card
-                    onClick={() => handleOpenCardModal(project)}
-                    key={index}
-                    className="w-[360px] hover:scale-110 duration-300 cursor-grab shadow-lg"
-                  >
-                    <CardHeader>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          height: "auto",
-                        }}
-                      >
-                        <CardTitle style={{ alignContent: "center" }}>
-                          {project.name}
-                        </CardTitle>
-                        <Chip
-                          size="small"
-                          label={
-                            project.status === "not_start"
-                              ? "not start"
-                              : project.status
-                          }
-                          sx={getStatusChipColor(project.status)}
-                        />
-                      </div>
-                    </CardHeader>
-                    <CardContent style={{ paddingRight: 18 }}>
-                      <div className="flex flex-row space-x-2 w-full">
-                        <div className="grid w-full items-center gap-4">
-                          <div className="flex flex-row space-x-1">
-                            <Label>Startdate:</Label>
-                            <Label>
-                              {dayjs(project["start-date"]).format(
-                                "DD/MM/YYYY"
-                              )}
-                            </Label>
-                          </div>
-                        </div>
-                        <div className="grid w-full items-center gap-4">
-                          <div className="flex flex-row space-x-1.5">
-                            <Label>Duration:</Label>
-                            <Label>{project.duration}</Label>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-          </div>
-          <div className="flex justify-center">
-            <Button onClick={handleLoadMore} style={{ marginTop: 16 }}>
-              Load More
-            </Button>
-          </div>
-        </ScrollArea>
+
+        <TableContainer component={Paper} className="mt-4">
+          <Table sx={{ minWidth: 700 }} aria-label="customized table">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell align="center">#</StyledTableCell>
+                <StyledTableCell>Tên dự án</StyledTableCell>
+                <StyledTableCell align="center">Ngày tạo dự án</StyledTableCell>
+                <StyledTableCell align="center">
+                  Thời gian dự kiến
+                </StyledTableCell>
+                <StyledTableCell align="center">Trạng thái</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data?.data.map((row, index) => (
+                <Tooltip key={index} title="Ấn 2 lần để xem chi tiết" arrow>
+                  <StyledTableRow onDoubleClick={() => handleDoubleClick(row)}>
+                    <StyledTableCell align="center" component="th" scope="row">
+                      {index + 1}
+                    </StyledTableCell>
+                    <StyledTableCell align="left">{row.name}</StyledTableCell>
+                    <StyledTableCell align="center">
+                      {dayjs(row["start-date"]).format("DD/MM/YYYY")}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      {row.duration}
+                    </StyledTableCell>
+                    <StyledTableCell align="center">
+                      <Chip
+                        size="small"
+                        label={getStatusLabel(row.status)}
+                        sx={getStatusChipColor(row.status)}
+                      ></Chip>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                </Tooltip>
+              ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10]}
+            component="div"
+            count={data?.paging.items || 0}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
       </div>
       {/* Modal Create*/}
       <Modal

@@ -1,5 +1,4 @@
 "use client";
-import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -14,6 +13,15 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import DetailTaskModal from "@/components/pm/mainLayout/DetailTaskModal";
+import { useAppContext } from "@/app/app-provider";
+import {
+  TaskFilterType,
+  TaskListResType,
+  TaskType,
+} from "@/schemaValidations/task.schema";
+import { useEffect, useState } from "react";
+import taskApiRequest from "@/apiRequests/task";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -38,42 +46,32 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   cursor: "pointer", // Thêm con trỏ để hiển thị rằng hàng có thể được chọn
 }));
 
-function createData(
-  index: number,
-  name: string,
-  createdDate: string,
-  status: string,
-  assignee: string
-) {
-  return { index, name, createdDate, status, assignee };
-}
+export default function ListTable({
+  isFilter,
+  dataFilter,
+  handleReset,
+}: {
+  isFilter: boolean;
+  dataFilter: TaskFilterType | null;
+  handleReset: () => void;
+}) {
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  const [open, setOpen] = useState(false);
+  const { project } = useAppContext();
+  const [selectedRow, setSelectedRow] = useState<null | TaskType>(null);
 
-const rows = [
-  createData(1, "Công việc 1", "2024-01-01", "Not start", "Người A"),
-  createData(2, "Công việc 2", "2024-02-01", "Doing", "Người B"),
-  createData(3, "Công việc 3", "2024-03-01", "Done", "Người C"),
-  createData(4, "Công việc 4", "2024-04-01", "Cancel", "Người D"),
-  createData(5, "Công việc 5", "2024-05-01", "Not start", "Người E"),
-  createData(6, "Công việc 6", "2024-06-01", "Doing", "Người F"),
-  createData(7, "Công việc 7", "2024-07-01", "Done", "Người G"),
-  createData(8, "Công việc 8", "2024-08-01", "Not start", "Người H"),
-  createData(9, "Công việc 9", "2024-09-01", "Doing", "Người I"),
-  createData(10, "Công việc 10", "2024-10-01", "Done", "Người J"),
-];
+  const handleDoubleClick = (row: TaskType | null) => {
+    setSelectedRow(row);
+    setOpen(true);
+  };
 
-export default function ListTable() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [selectedRow, setSelectedRow] = React.useState<null | {
-    index: number;
-    name: string;
-    createdDate: string;
-    status: string;
-    assignee: string;
-  }>(null);
-  const [open, setOpen] = React.useState(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
+    setLoading(true);
     setPage(newPage);
   };
 
@@ -84,63 +82,75 @@ export default function ListTable() {
     setPage(0);
   };
 
-  const handleDoubleClick = (row: {
-    index: number;
-    name: string;
-    createdDate: string;
-    status: string;
-    assignee: string;
-  }) => {
-    setSelectedRow(row);
-    setOpen(true);
-  };
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<TaskListResType | null>(null);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  // Calculate the rows to display based on the current page and rows per page
-  const displayedRows = rows.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const { payload } = await taskApiRequest.getListTask(
+          project?.id,
+          page + 1,
+          rowsPerPage,
+          isFilter ? dataFilter : {}
+        );
+        setData(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [isFilter, page, rowsPerPage, dataFilter]);
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} className="mt-4">
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
             <StyledTableCell align="center">#</StyledTableCell>
             <StyledTableCell>Tên công việc</StyledTableCell>
-            <StyledTableCell align="center">Ngày tạo</StyledTableCell>
+            <StyledTableCell align="center">Thời gian (act)</StyledTableCell>
+            <StyledTableCell align="center">Thời gian (est)</StyledTableCell>
             <StyledTableCell align="center">Trạng thái</StyledTableCell>
             <StyledTableCell align="center">
               Người được phân công
             </StyledTableCell>
+            <StyledTableCell align="center">Mã thực tập</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {displayedRows.map((row) => (
-            <Tooltip key={row.index} title="Ấn 2 lần để mở" arrow>
+          {data?.data.map((row, index) => (
+            <Tooltip key={index} title="Ấn 2 lần để xem chi tiết" arrow>
               <StyledTableRow onDoubleClick={() => handleDoubleClick(row)}>
                 <StyledTableCell align="center" component="th" scope="row">
-                  {row.index}
+                  {index + 1}
                 </StyledTableCell>
                 <StyledTableCell align="left">{row.name}</StyledTableCell>
                 <StyledTableCell align="center">
-                  {row.createdDate}
+                  {row["Actual-effort"]}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {row["estimated-effort"]}
                 </StyledTableCell>
                 <StyledTableCell align="center">{row.status}</StyledTableCell>
-                <StyledTableCell align="center">{row.assignee}</StyledTableCell>
+                <StyledTableCell align="center">
+                  {row["assigned-name"]}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {row["assigned-code"]}
+                </StyledTableCell>
               </StyledTableRow>
             </Tooltip>
           ))}
         </TableBody>
       </Table>
       <TablePagination
-        rowsPerPageOptions={[5, 10, 15]}
+        rowsPerPageOptions={[5, 10]}
         component="div"
-        count={rows.length}
+        count={data?.paging.items || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -151,7 +161,7 @@ export default function ListTable() {
         <DialogContent>
           {selectedRow && (
             <>
-              <DetailTaskModal />
+              <DetailTaskModal selectedRow={selectedRow} />
             </>
           )}
         </DialogContent>

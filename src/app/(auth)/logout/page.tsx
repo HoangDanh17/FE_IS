@@ -7,7 +7,7 @@ import { Suspense, useEffect } from "react";
 function LogoutLogic() {
   const router = useRouter();
   const pathname = usePathname();
-  const { setUser } = useAppContext();
+  const { setUser,setProject } = useAppContext();
 
   const searchParams = useSearchParams();
   const sessionToken = searchParams.get("sessionToken");
@@ -19,6 +19,7 @@ function LogoutLogic() {
         .logoutFromNextClientToNextServer(true, signal)
         .then((res) => {
           setUser(null);
+          setProject(null);
           router.push(`/login?redirectFrom=${pathname}`);
         });
     }

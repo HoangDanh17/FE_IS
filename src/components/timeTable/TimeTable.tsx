@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -30,60 +30,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   TimeTableResType,
   TimeTableType,
+  WeekResType,
 } from "@/schemaValidations/timetable.schema";
 import timetableApiRequest from "@/apiRequests/timetable";
-
-const daysOfWeek = [
-  "Thứ hai",
-  "Thứ ba",
-  "Thứ tư",
-  "Thứ năm",
-  "Thứ sáu",
-  "Thứ bảy",
-  "Chủ nhật",
-];
-
-const defaultData = {
-  approved: 10,
-  pending: 5,
-  canceled: 2,
-};
-
-const dummyData = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    dateInOffice: "2024-06-20",
-    status: "Đã duyệt",
-    actualArrivalTime: "08:30",
-    actualDepartureTime: "17:00",
-    scheduledArrivalTime: "08:00",
-    scheduledDepartureTime: "17:30",
-    internshipCode: "TPS001",
-  },
-  {
-    id: 2,
-    name: "Trần Thị B",
-    dateInOffice: "2024-06-21",
-    status: "Chờ duyệt",
-    actualArrivalTime: "09:00",
-    actualDepartureTime: "16:30",
-    scheduledArrivalTime: "09:30",
-    scheduledDepartureTime: "17:00",
-    internshipCode: "TPS002",
-  },
-  {
-    id: 3,
-    name: "Lê Văn C",
-    dateInOffice: "2024-06-22",
-    status: "Hủy",
-    actualArrivalTime: "08:45",
-    actualDepartureTime: "16:45",
-    scheduledArrivalTime: "08:30",
-    scheduledDepartureTime: "17:00",
-    internshipCode: "TPS003",
-  },
-];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -106,12 +55,24 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const TimeTable: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<Dayjs | null>(null);
+  const [selectedDay, setSelectedDay] = useState<Dayjs | null>();
   const [selectedDayName, setSelectedDayName] = useState<string>("");
   const [filterDate, setFilterDate] = useState<Dayjs | null>(null); // Thêm state mới cho DatePicker lọc
   const [data, setData] = useState<TimeTableResType | undefined>();
+  const [dataWeek, setDataWeek] = useState<WeekResType>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { payload } = await timetableApiRequest.getCurrentWeek();
+        setDataWeek(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleFilterDateChange = (newValue: Dayjs | null) => {
     setFilterDate(newValue);
@@ -128,18 +89,14 @@ const TimeTable: React.FC = () => {
     );
   };
 
-  const startOfWeek = selectedDate?.startOf("week").add(1, "day"); // Ensure the week starts on Monday
-  const currentWeekDates = daysOfWeek.map((_, index) =>
-    startOfWeek?.add(index, "day")
-  );
-
-  const handleCardClick = (date: Dayjs | undefined, day: string) => {
+  const handleCardClick = (date: string | Date | null, day: string) => {
     if (date) {
-      setSelectedDay(date);
+      setSelectedDay(dayjs(date)); 
       setSelectedDayName(day);
       setDialogOpen(true);
     }
   };
+  
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
@@ -154,11 +111,11 @@ const TimeTable: React.FC = () => {
           </Typography>
         </Box>
         <Grid container spacing={3} justifyContent="space-between">
-          {daysOfWeek.map((day, index) => (
-            <Grid item xs={12 / 7} key={day}>
+          {dataWeek?.data.map((day, index) => (
+            <Grid item xs={12 / 7} key={index}>
               <Tooltip title="Ấn để xem chi tiết" arrow placement="top">
                 <Card
-                  onClick={() => handleCardClick(currentWeekDates[index], day)}
+                  onClick={() => handleCardClick(day.date, day["week-day"])}
                   sx={{
                     cursor: "pointer",
                     width: 150,
@@ -176,17 +133,15 @@ const TimeTable: React.FC = () => {
                       component="div"
                       style={{ textAlign: "center" }}
                     >
-                      {day}
+                      {day["week-day"]}
                     </Typography>
-                    {currentWeekDates && currentWeekDates[index] && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        style={{ textAlign: "center" }}
-                      >
-                        {currentWeekDates[index]?.format("DD/MM/YYYY")}
-                      </Typography>
-                    )}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      style={{ textAlign: "center" }}
+                    >
+                      {dayjs(day.date).format("DD/MM/YYYY")}
+                    </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
                       <Box
                         sx={{
@@ -198,7 +153,7 @@ const TimeTable: React.FC = () => {
                         }}
                       />
                       <Typography variant="body2" color="text.secondary">
-                        Đã duyệt: {defaultData.approved}
+                        Đã duyệt: {day["total-approved"]}
                       </Typography>
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
@@ -212,7 +167,7 @@ const TimeTable: React.FC = () => {
                         }}
                       />
                       <Typography variant="body2" color="text.secondary">
-                        Chờ duyệt: {defaultData.pending}
+                        Chờ duyệt: {day["total-waiting"]}
                       </Typography>
                     </Box>
                     <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
@@ -226,7 +181,7 @@ const TimeTable: React.FC = () => {
                         }}
                       />
                       <Typography variant="body2" color="text.secondary">
-                        Hủy: {defaultData.canceled}
+                        Hủy: {day["total-denied"]}
                       </Typography>
                     </Box>
                   </CardContent>
@@ -275,13 +230,17 @@ const TimeTable: React.FC = () => {
                     data.data.map((intern) => (
                       <StyledTableRow key={intern.id}>
                         <StyledTableCell>{intern.intern_name}</StyledTableCell>
-                        <StyledTableCell>{intern["student-code"]}</StyledTableCell>
+                        <StyledTableCell>
+                          {intern["student-code"]}
+                        </StyledTableCell>
                         <StyledTableCell>{intern.status}</StyledTableCell>
                         <StyledTableCell>{intern["act-start"]}</StyledTableCell>
                         <StyledTableCell>{intern["act-end"]}</StyledTableCell>
                         <StyledTableCell>{intern["est-start"]}</StyledTableCell>
                         <StyledTableCell>{intern["est-end"]}</StyledTableCell>
-                        <StyledTableCell>{intern["office-time"]}</StyledTableCell>
+                        <StyledTableCell>
+                          {intern["office-time"]}
+                        </StyledTableCell>
                       </StyledTableRow>
                     ))
                   ) : (
@@ -304,11 +263,10 @@ const TimeTable: React.FC = () => {
           maxWidth="xl"
         >
           <DialogTitle id="dialog-title">
-            Chi tiết lich ngày: {selectedDayName},
-            {selectedDay ? selectedDay.format("DD/MM/YYYY") : ""}
+            Chi tiết lich làm việc 
           </DialogTitle>
           <DialogContent>
-            <FilterTimeTable selectedDay={selectedDay}></FilterTimeTable>
+            <FilterTimeTable selectedDay={selectedDay} selectedDayName={selectedDayName}></FilterTimeTable>
           </DialogContent>
         </Dialog>
       </Container>

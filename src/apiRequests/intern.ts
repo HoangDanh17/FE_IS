@@ -1,11 +1,11 @@
 import http from "@/lib/http";
 import {
-  CreateIntern,
   CreateInternResType,
   CreateInternType,
+  InternByIdResType,
   InternFilterType,
   InternListResType,
-  InternSchemaType,
+  InternSkillType,
   UpdateInternResType,
   UpdateInternType,
 } from "@/schemaValidations/intern.schema";
@@ -21,18 +21,15 @@ const internApiRequest = {
       ${body?.gender ? `&gender=${body.gender}` : ""}
       ${body?.address ? `&username=${body.address}` : ""}`
     ),
+  getListInternById: (id: string) =>
+    http.get<InternByIdResType>(`/api/v1/interns/${id}`),
   createIntern: (body: CreateInternType) =>
     http.post<CreateInternResType>("/api/v1/interns", body),
-  updateIntern: (body: UpdateInternType) => {
-    const {
-      "intern-id": internId,
-      "account-id": account,
-      ...updateBody
-    } = body;
-    return http.put<UpdateInternResType>(
-      `/api/v1/interns/${internId}`,
-      updateBody
-    );
+  updateIntern: (id: string | undefined, body: UpdateInternType) => {
+    return http.put<UpdateInternResType>(`/api/v1/interns/${id}`, body);
+  },
+  updateInternSkill: (id: string | undefined, body: InternSkillType) => {
+    return http.post<UpdateInternResType>(`/api/v1/interns/${id}/skill`, body);
   },
   deleteIntern: (body: string) =>
     http.delete<CreateInternResType>(`/api/v1/ojts/${body}`),

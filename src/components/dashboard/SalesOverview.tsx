@@ -86,6 +86,7 @@ const SalesOverview = () => {
       fillSeriesColor: false,
     },
   };
+  
   const seriescolumnchart: any = [
     {
       name: "Task done this month",

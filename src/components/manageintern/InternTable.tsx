@@ -21,11 +21,12 @@ import {
   CircularProgress,
   Modal,
   Box,
-  Typography,
+  Tooltip,
+  Fade,
+  Backdrop,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import internApiRequest from "@/apiRequests/intern";
 import {
   InternListResType,
@@ -33,6 +34,7 @@ import {
 } from "@/schemaValidations/intern.schema";
 import AddModal from "./AddModal";
 import EditModal from "@/components/manageintern/EditModal";
+import DetailIntern from "@/components/manageintern/DetailIntern";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -49,6 +51,17 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     backgroundColor: theme.palette.action.hover,
   },
 }));
+
+const styleCard = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 800,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+};
 export interface FormFilterData {
   "user-name": string;
   email: string;
@@ -73,25 +86,10 @@ const InternTable = ({
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
-  const [selectedRow, setSelectedRow] = useState<string | null>(null);
   const [selectedRowData, setSelectedRowData] =
-    useState<InternSchemaType | null>(null);
+    useState<any>(null);
 
-  const [selectedValue, setSelectedValue] = useState<InternSchemaType | null>();
   const [refreshKey, setRefreshKey] = useState(0);
-  const handleDeselectAll = () => {
-    setSelectedValue(null);
-    setSelectedRowData(null);
-  };
-
-  const handleRadioChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    row: InternSchemaType
-  ) => {
-    setSelectedValue(row);
-    setSelectedRowData(row);
-    console.log("Selected row: ", row);
-  };
 
   // Add
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -100,22 +98,20 @@ const InternTable = ({
     setOpenAddModal(false);
     setSelectedRowData(null);
     setRefreshKey((prevKey) => prevKey + 1);
-    setSelectedValue(null);
   };
 
-  // Edit
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const handleOpenEditModal = () => {
-    if (selectedRowData) {
-      console.log(selectedRowData); // Log the selected row data
-    }
-    setOpenEditModal(true);
+  // Detail Card
+  const [openCardModal, setOpenCardModal] = useState(false);
+  
+  const handleDoubleClick = (row: any) => {
+    setSelectedRowData(row);
+    setOpenCardModal(true);
   };
-  const handleCloseEditModal = () => {
-    setOpenEditModal(false);
-    setSelectedRowData(null);
+
+  const handleCloseCardModal = () => {
+    setOpenCardModal(false);
+    handleReset();
     setRefreshKey((prevKey) => prevKey + 1);
-    setSelectedValue(null);
   };
 
   const handleChangePage = useCallback(
@@ -132,16 +128,6 @@ const InternTable = ({
     },
     []
   );
-
-  const handleSelectRow = (row: InternSchemaType) => {
-    if (selectedRow === row["account-id"]) {
-      setSelectedRow(null);
-      setSelectedRowData(null);
-    } else {
-      setSelectedRow(row["account-id"]);
-      setSelectedRowData(row); // Store selected row data
-    }
-  };
 
   useEffect(() => {
     setLoading(true);
@@ -162,36 +148,6 @@ const InternTable = ({
     fetchData();
   }, [isFilter, page, rowsPerPage, dataFilter, refreshKey]);
 
-  // const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  // const [selectedDeleteRowId, setSelectedDeleteRowId] = useState<string | null>(
-  //   null
-  // );
-
-  // const handleOpenDeleteModal = (id: string) => {
-  //   setSelectedDeleteRowId(id);
-  //   setOpenDeleteModal(true);
-  // };
-
-  // const handleCloseDeleteModal = () => {
-  //   setOpenDeleteModal(false);
-  //   setSelectedDeleteRowId(null);
-  // };
-  // const router = useRouter();
-
-  // const handleDelete = async () => {
-  //   if (selectedDeleteRowId) {
-  //     console.log("Deleting intern-id:", selectedDeleteRowId);
-  //     try {
-  //       await internApiRequest.deleteIntern(selectedDeleteRowId);
-  //       setRefreshKey((prevKey) => prevKey + 1);
-  //       handleCloseDeleteModal();
-  //       router.refresh();
-  //     } catch (error) {
-  //       console.error("Error deleting intern:", error);
-  //     }
-  //   }
-  // };
-
   return (
     <div style={{ maxHeight: 762, width: "100%", marginTop: "10px" }}>
       <TableContainer component={Paper}>
@@ -210,13 +166,7 @@ const InternTable = ({
           <Table sx={{ minWidth: 640 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell sx={{ width: 70 }} align="center">
-                  <Radio
-                    onClick={handleDeselectAll}
-                    className="radio-buttons"
-                    color="secondary"
-                  />
-                </StyledTableCell>
+                <StyledTableCell align="center">#</StyledTableCell>
                 <StyledTableCell>Họ và Tên</StyledTableCell>
                 <StyledTableCell>Email</StyledTableCell>
                 <StyledTableCell>Mã số sinh viên</StyledTableCell>
@@ -228,28 +178,27 @@ const InternTable = ({
             </TableHead>
             <TableBody>
               {data?.data.map((account, index) => (
-                <StyledTableRow key={index}>
-                  <div
-                    className="radio-cell"
-                    style={{ margin: "3px 0 0 14px" }}
+                <Tooltip key={index} title="Ấn 2 lần để xem chi tiết" arrow>
+                  <StyledTableRow
+                    key={index}
+                    onDoubleClick={() => handleDoubleClick(account)}
                   >
-                    <Radio
-                      checked={
-                        selectedValue?.["account-id"] === account["account-id"]
-                      }
-                      onChange={(event) => handleRadioChange(event, account)}
-                      value={account.toString()}
-                      className="radio-buttons"
-                    />
-                  </div>
-                  <StyledTableCell>{account["user-name"]}</StyledTableCell>
-                  <StyledTableCell>{account.email}</StyledTableCell>
-                  <StyledTableCell>{account["student-code"]}</StyledTableCell>
-                  <StyledTableCell>{account["ojt-semester"]}</StyledTableCell>
-                  <StyledTableCell>{account.gender}</StyledTableCell>
-                  <StyledTableCell>{account["phone-number"]}</StyledTableCell>
-                  <StyledTableCell>{account.address}</StyledTableCell>
-                </StyledTableRow>
+                    <StyledTableCell align="center" component="th" scope="row">
+                      {index + 1}
+                    </StyledTableCell>
+                    <StyledTableCell>{account["user-name"]}</StyledTableCell>
+                    <StyledTableCell>{account.email}</StyledTableCell>
+                    <StyledTableCell>{account["student-code"]}</StyledTableCell>
+                    <StyledTableCell>{account["ojt-semester"]}</StyledTableCell>
+                    <StyledTableCell>
+                      {account.gender !== "male" ? "Nữ" : "Nam"}
+                    </StyledTableCell>
+                    <StyledTableCell>{account["phone-number"]}</StyledTableCell>
+                    <StyledTableCell className="truncate max-w-[180px]">
+                      {account.address}
+                    </StyledTableCell>
+                  </StyledTableRow>
+                </Tooltip>
               ))}
             </TableBody>
           </Table>
@@ -264,7 +213,7 @@ const InternTable = ({
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        className="custom-row custom-pagination"
+        className="custom-row custom-pagination mb-4 bg-white"
       />
       <Button
         variant="contained"
@@ -273,32 +222,8 @@ const InternTable = ({
         onClick={handleOpenAddModal}
         style={{ marginRight: "10px" }}
       >
-        Thêm
+        Tạo thực tập
       </Button>
-      <Button
-        style={{ marginRight: "10px" }}
-        variant="contained"
-        className="edit-btn"
-        startIcon={<EditIcon />}
-        onClick={handleOpenEditModal}
-        disabled={!selectedRowData} // Disable button if no row is selected
-      >
-        Sửa
-      </Button>
-      {/* <Button
-        style={{ marginRight: "10px" }}
-        variant="contained"
-        color="error"
-        className="delete-btn"
-        startIcon={<DeleteIcon />}
-        onClick={() =>
-          handleOpenDeleteModal(selectedRowData?.["account-id"] || "")
-        }
-        disabled={!selectedRowData} // Disable button if no row is selected
-      >
-        Xóa
-      </Button> */}
-
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -310,45 +235,32 @@ const InternTable = ({
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
+        open={openCardModal}
+        onClose={handleCloseCardModal}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openCardModal}>
+          <Box sx={styleCard}>
+            <DetailIntern
+              row={selectedRowData}
+              onClose={handleCloseCardModal}
+            ></DetailIntern>
+          </Box>
+        </Fade>
+      </Modal>
+      {/* <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
         open={openEditModal}
         onClose={handleCloseEditModal}
       >
         <EditModal row={selectedRowData} onClose={handleCloseEditModal} />
-      </Modal>
-      {/* <Modal open={openDeleteModal} onClose={handleCloseDeleteModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Confirm Deletion
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Are you sure you want to delete this row?
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleDelete}
-              sx={{ mr: 1 }}
-            >
-              Delete
-            </Button>
-            <Button variant="contained" onClick={handleCloseDeleteModal}>
-              Cancel
-            </Button>
-          </Box>
-        </Box>
       </Modal> */}
     </div>
   );

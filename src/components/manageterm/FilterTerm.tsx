@@ -8,6 +8,11 @@ import {
   FormControl,
   Grid,
   CardContent,
+  CardHeader,
+  Accordion,
+  AccordionSummary,
+  Typography,
+  AccordionDetails,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { useRouter } from "next/navigation"; // Use next/navigation
@@ -57,10 +62,13 @@ const Filter: React.FC = () => {
   return (
     <>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Card sx={{ minWidth: 300 }}>
-          <CardContent style={{ height: "px" }}>
+        <Accordion defaultExpanded>
+          <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
+            <Typography>Tìm kiếm thông tin</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
             <form onSubmit={handleSubmit}>
-              <FormControl>
+              <FormControl fullWidth>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
@@ -92,30 +100,34 @@ const Filter: React.FC = () => {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      startIcon={<Search />}
-                      className="search-btn"
-                    >
-                      Search
-                    </Button>
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <Button
-                      type="button"
-                      onClick={handleReset}
-                      className="clean-btn"
-                    >
-                      Clean Filter
-                    </Button>
+                  <Grid item xs={12} sm={3} container spacing={2}>
+                    <Grid item xs={6}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        startIcon={<Search />}
+                        className="search-btn"
+                        fullWidth
+                      >
+                        Search
+                      </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Button
+                        type="button"
+                        onClick={handleReset}
+                        className="clean-btn"
+                        fullWidth
+                      >
+                        Clean Filter
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Grid>
               </FormControl>
             </form>
-          </CardContent>
-        </Card>
+          </AccordionDetails>
+        </Accordion>
       </LocalizationProvider>
       <TermTable
         isFilter={isFilter}

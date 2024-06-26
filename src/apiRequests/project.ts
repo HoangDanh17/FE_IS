@@ -15,9 +15,13 @@ const projectApiRequest = {
     http.get<MemberInProjectResType>(
       `/api/v1/projects/${id}/pm-outside-project`
     ),
-  getListProject: (psize: number, body: ProjectFilterType | null) =>
+  getListProject: (
+    page: number,
+    psize: number,
+    body: ProjectFilterType | null
+  ) =>
     http.get<ProjectListResType>(
-      `/api/v1/projects?page=1&psize=${psize}${
+      `/api/v1/projects?page=${page}&psize=${psize}${
         body?.name ? `&name=${body.name}` : ""
       }${body?.status ? `&status=${body.status}` : ""}${
         body?.["start-date-from"]
@@ -31,7 +35,7 @@ const projectApiRequest = {
     ),
   createProject: (body: CreateProjectType) =>
     http.post<CreateProjectResType>("/api/v1/projects", body),
-  
+
   addPmIntoProject: (id: string, body: { "list-manager-id": string[] }) =>
     http.post<CreateProjectResType>(
       `api/v1/projects/${id}/project-managers`,
@@ -45,10 +49,7 @@ const projectApiRequest = {
     );
   },
 
-  getProject: () =>
-    http.get<ProjectListResType>(
-      `/api/v1/projects`
-    ),
+  getProject: () => http.get<ProjectListResType>(`/api/v1/projects`),
 };
 
 export default projectApiRequest;

@@ -32,7 +32,7 @@ const ListTimeTable = ({
   selectedDay,
 }: {
   status: string;
-  selectedDay: Dayjs | null;
+  selectedDay: Dayjs | null| undefined;
 }) => {
   const [dataModal, setDataModal] = useState<TimeTableResType | undefined>();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -100,10 +100,7 @@ const ListTimeTable = ({
   }
 
   return (
-    <ScrollArea className="h-[350px]">
-      <Typography component="span" variant="h5">
-        Lịch làm việc của thực tập
-      </Typography>
+    <ScrollArea className="h-[370px] scale-15 shadow-2xl p-4 rounded-lg border">
       <List style={{ width: "1000px" }}>
         {dataModal?.data.length ? (
           dataModal.data.map((item, index) => (
@@ -185,7 +182,7 @@ const ListTimeTable = ({
             alignItems="center"
             height="100%"
           >
-            <Typography component="span" variant="h5">
+            <Typography component="span" variant="h5" className="mt-20">
               Chưa có lịch thực tập ngày hôm nay
             </Typography>
           </Box>

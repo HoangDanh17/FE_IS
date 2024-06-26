@@ -1,6 +1,6 @@
 "use client"; // Add this line at the top
 
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import {
   Card,
   Input,
@@ -8,14 +8,23 @@ import {
   FormControl,
   Grid,
   CardContent,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
+  CardHeader,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import InternTable, { FormFilterData } from "./InternTable";
+import termApiRequest from "@/apiRequests/term";
+import { TermListResType } from "@/schemaValidations/term.schema";
 
-const Filter: React.FC = () => {
-
+const Filter = () => {
   const [formData, setFormData] = useState<FormFilterData>({
     "user-name": "",
     email: "",
@@ -26,16 +35,34 @@ const Filter: React.FC = () => {
     address: "",
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e:
+      | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | SelectChangeEvent<string>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const [filterOjt, setFilterOjt] = useState<TermListResType>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { payload } = await termApiRequest.getListTerm(null, null, null);
+        setFilterOjt(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const [isFilter, setIsFilter] = useState<boolean>(false);
   const [dataFilter, setDataFilter] = useState<FormFilterData | null>(null);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log(formData); 
+    console.log(formData);
     setIsFilter(true);
     setDataFilter(formData);
   };
@@ -57,8 +84,11 @@ const Filter: React.FC = () => {
   return (
     <>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Card sx={{ minWidth: 300 }}>
-          <CardContent style={{ height: "px" }}>
+        <Accordion defaultExpanded>
+          <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
+            <Typography>Tìm kiếm thông tin</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
             <form onSubmit={handleSubmit}>
               <FormControl>
                 <Grid container spacing={2}>
@@ -85,7 +115,7 @@ const Filter: React.FC = () => {
                   <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
                       <Input
-                        name="student-code" 
+                        name="student-code"
                         placeholder="Student Code"
                         value={formData["student-code"]}
                         onChange={handleChange}
@@ -94,12 +124,25 @@ const Filter: React.FC = () => {
                   </Grid>
                   <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
-                      <Input
+                      <Select
                         name="ojt-semester"
-                        placeholder="OJT Semester"
                         value={formData["ojt-semester"]}
                         onChange={handleChange}
-                      />
+                        displayEmpty
+                        variant="standard"
+                      >
+                        <MenuItem value="" disabled>
+                          <em>OJT Semester</em>
+                        </MenuItem>
+                        {filterOjt?.data.map((semester) => (
+                          <MenuItem
+                            key={semester.semester}
+                            value={semester.semester}
+                          >
+                            {semester.semester}
+                          </MenuItem>
+                        ))}
+                      </Select>
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} sm={3}>
@@ -132,30 +175,34 @@ const Filter: React.FC = () => {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      startIcon={<Search />}
-                      className="search-btn"
-                    >
-                      Search
-                    </Button>
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <Button
-                      type="button"
-                      onClick={handleReset}
-                      className="clean-btn"
-                    >
-                      Clean Filter
-                    </Button>
+                  <Grid item xs={12} sm={3} container spacing={2}>
+                    <Grid item xs={6}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        startIcon={<Search />}
+                        className="search-btn"
+                        fullWidth
+                      >
+                        Search
+                      </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Button
+                        type="button"
+                        onClick={handleReset}
+                        className="clean-btn"
+                        fullWidth
+                      >
+                        Clean Filter
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Grid>
               </FormControl>
             </form>
-          </CardContent>
-        </Card>
+          </AccordionDetails>
+        </Accordion>
       </LocalizationProvider>
       <InternTable
         isFilter={isFilter}
