@@ -237,8 +237,8 @@ const TimeTable: React.FC = () => {
                     <StyledTableCell>Giờ đến (lịch)</StyledTableCell>
                     <StyledTableCell>Giờ về (lịch)</StyledTableCell>
                     <StyledTableCell>Ngày lên văn phòng</StyledTableCell>
-                    <StyledTableCell>Trạng thái điểm danh</StyledTableCell>
-                    <StyledTableCell>Chỉnh sửa thái điểm danh</StyledTableCell>
+                    {/* <StyledTableCell>Trạng thái điểm danh</StyledTableCell>
+                    <StyledTableCell>Chỉnh sửa thái điểm danh</StyledTableCell> */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -258,7 +258,7 @@ const TimeTable: React.FC = () => {
                         <StyledTableCell>
                           {dayjs(intern["office-time"]).format("DD/MM/YYYY")}
                         </StyledTableCell>
-                        <StyledTableCell>{intern.statusIntern}</StyledTableCell>
+                        {/* <StyledTableCell>{intern.statusIntern}</StyledTableCell>
                         <StyledTableCell>
                           {intern.statusIntern === "not-yet" && (
                             <Select
@@ -295,7 +295,7 @@ const TimeTable: React.FC = () => {
                                 Cannot edit
                               </Typography>
                             )}
-                        </StyledTableCell>
+                        </StyledTableCell> */}
                       </StyledTableRow>
                     ))
                   ) : (
