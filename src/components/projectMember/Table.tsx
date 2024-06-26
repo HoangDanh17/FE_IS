@@ -139,7 +139,7 @@ function TableProjectMember({
       <TablePagination
         rowsPerPageOptions={[5, 10]}
         component="div"
-       // count={cardMem?.paging.items || 0}
+        count={cardMem?.paging.items || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

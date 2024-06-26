@@ -1,5 +1,4 @@
 import FilterProjectMember from "@/components/projectMember/Filter";
-import TableProjectMember from "@/components/projectMember/Table";
 const projectMember = () => {
     return (
         <div>
