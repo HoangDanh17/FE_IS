@@ -22,7 +22,7 @@ import MuiAccordionSummary, {
 } from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import SearchIcon from "@mui/icons-material/Search";
-import ListTable from "@/components/pm/mainLayout/ListTable";
+import ListTable from "@/components/manager/mainLayout/ListTable";
 import { TaskFilterType } from "@/schemaValidations/task.schema";
 
 const Accordion = styled((props: AccordionProps) => (

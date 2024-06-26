@@ -12,7 +12,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import DetailTaskModal from "@/components/pm/mainLayout/DetailTaskModal";
+import DetailTaskModal from "@/components/manager/mainLayout/DetailTaskModal";
 import { useAppContext } from "@/app/app-provider";
 import {
   TaskFilterType,
@@ -21,8 +21,7 @@ import {
 } from "@/schemaValidations/task.schema";
 import { useEffect, useState } from "react";
 import taskApiRequest from "@/apiRequests/task";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Chip } from "@mui/material";
+import { Button, Chip, DialogActions } from "@mui/material";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -193,7 +192,8 @@ export default function ListTable({
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-      <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
+
+      <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth style={{top:-20,bottom:-20}}>
         <DialogTitle>Chi tiết công việc</DialogTitle>
         <DialogContent>
           {selectedRow && (
@@ -202,11 +202,11 @@ export default function ListTable({
             </>
           )}
         </DialogContent>
-        {/* <DialogActions>
+        <DialogActions>
           <Button onClick={handleClose} color="primary">
             Đóng
           </Button>
-        </DialogActions> */}
+        </DialogActions>
       </Dialog>
     </TableContainer>
   );
