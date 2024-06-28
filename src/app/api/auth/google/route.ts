@@ -10,18 +10,18 @@ export async function GET(request: Request) {
   }
   try {
     console.log("code", code);
-    const result = await fetch(
-      "http://localhost:8080/api/v1/auth/login-google",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: code }),
-      }
-    );
-    const data = await result.json();
-    console.log("Response data:", data);
+    // const result = await fetch(
+    //   "http://localhost:8080/api/v1/auth/login-google",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ code: code }),
+    //   }
+    // );
+    // const data = await result.json();
+    // console.log("Response data:", data);
     // Redirect to login page
     return NextResponse.redirect(new URL("/login", request.url));
   } catch (error) {
