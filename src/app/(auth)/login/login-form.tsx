@@ -18,13 +18,15 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { loginGoogle } from "../../actions";
 import Link from "next/link";
 
 const getOauthGoogleUrl = () => {
   const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
   const options = {
-    redirect_uri: "http://localhost:3000/api/auth/google",
-    client_id: "442561086123-85mg2vqqdsk64quqar83ev6k6iskj55h.apps.googleusercontent.com",
+    redirect_uri: "http://localhost:3000/api/auth/get-token",
+    client_id:
+      "355025418368-g5m47fbiaunli0rcru5j23s36klrmd76.apps.googleusercontent.com",
     access_type: "offline",
     response_type: "code",
     prompt: "consent",
@@ -32,6 +34,7 @@ const getOauthGoogleUrl = () => {
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/userinfo.email",
     ].join(" "),
+    state: "nextbean-center",
   };
   const qs = new URLSearchParams(options);
   return `${rootUrl}?${qs.toString()}`;
@@ -201,7 +204,19 @@ const LoginForm = () => {
                     justifyContent="center"
                     mt={2}
                   >
-                    <Link className="google-sign-in-button" href={oauthURL}>Login with Google</Link>
+                    <form action={loginGoogle}>
+                      <Button
+                        className="google-sign-in-button"
+                        value="google"
+                        type="submit"
+                        name="action"
+                      >
+                        Login with Google
+                      </Button>
+                    </form>
+                    <Link className="google-sign-in-button" href={oauthURL}>
+                      Login with Google
+                    </Link>
                   </Stack>
                 </Box>
               </Stack>
