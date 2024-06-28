@@ -220,7 +220,7 @@ const InternTable = ({
         className="add-btn"
         startIcon={<AddIcon />}
         onClick={handleOpenAddModal}
-        style={{ marginRight: "10px" }}
+        style={{float:"right" }}
       >
         Tạo thực tập
       </Button>

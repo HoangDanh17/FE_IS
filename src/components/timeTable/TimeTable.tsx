@@ -181,7 +181,7 @@ const TimeTable: React.FC = () => {
                       }}
                     />
                     <Typography variant="body2" color="text.secondary">
-                      Chờ duyệt: {day["total-waiting"]}
+                      Đang chờ: {day["total-waiting"]}
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
@@ -195,7 +195,7 @@ const TimeTable: React.FC = () => {
                       }}
                     />
                     <Typography variant="body2" color="text.secondary">
-                      Hủy: {day["total-denied"]}
+                      Từ chối: {day["total-denied"]}
                     </Typography>
                   </Box>
                 </CardContent>

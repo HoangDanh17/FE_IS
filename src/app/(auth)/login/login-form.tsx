@@ -1,20 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
-import {
-  Box,
-  Button,
-  Card,
-  Grid,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Card, Grid, Stack, Typography } from "@mui/material";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { handleErrorApi } from "@/lib/utils";
 import authApiRequest from "@/apiRequests/auth";
-import Link from "next/link";
 import { useAppContext } from "@/app/app-provider";
 import { toast } from "@/components/ui/use-toast";
 import {
@@ -27,9 +18,28 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
+
+const getOauthGoogleUrl = () => {
+  const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+  const options = {
+    redirect_uri: "http://localhost:3000/api/auth/google",
+    client_id: "442561086123-85mg2vqqdsk64quqar83ev6k6iskj55h.apps.googleusercontent.com",
+    access_type: "offline",
+    response_type: "code",
+    prompt: "consent",
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+    ].join(" "),
+  };
+  const qs = new URLSearchParams(options);
+  return `${rootUrl}?${qs.toString()}`;
+};
 
 const LoginForm = () => {
   const router = useRouter();
+  const oauthURL = getOauthGoogleUrl();
   const [loading, setLoading] = useState(false);
   const { setUser } = useAppContext();
   const form = useForm<LoginBodyType>({
@@ -189,19 +199,9 @@ const LoginForm = () => {
                     direction="row"
                     spacing={1}
                     justifyContent="center"
-                    mt={3}
+                    mt={2}
                   >
-                    <Typography
-                      component={Link}
-                      href="/register"
-                      fontWeight="500"
-                      sx={{
-                        textDecoration: "none",
-                        color: "primary.main",
-                      }}
-                    >
-                      Tạo tài khoản
-                    </Typography>
+                    <Link className="google-sign-in-button" href={oauthURL}>Login with Google</Link>
                   </Stack>
                 </Box>
               </Stack>

@@ -115,6 +115,7 @@ const Filter: React.FC = () => {
                     <Grid item xs={6}>
                       <Button
                         type="button"
+                        variant="outlined"
                         onClick={handleReset}
                         className="clean-btn"
                         fullWidth
