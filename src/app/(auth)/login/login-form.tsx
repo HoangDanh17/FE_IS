@@ -25,7 +25,6 @@ const getOauthGoogleUrl = () => {
   const options = {
     redirect_uri: "http://localhost:3000/api/auth/google",
     client_id: "442561086123-85mg2vqqdsk64quqar83ev6k6iskj55h.apps.googleusercontent.com",
-    client_secrect:"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",
     access_type: "offline",
     response_type: "code",
     prompt: "consent",
