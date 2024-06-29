@@ -1,6 +1,6 @@
 import "./globals.css";
 import AppProvider from "@/app/app-provider";
-import { SessionProvider } from "next-auth/react";
+// import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/toaster";
 
 export default function RootLayout({
@@ -12,9 +12,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Toaster />
-        <SessionProvider>
+        {/* <SessionProvider> */}
           <AppProvider>{children}</AppProvider>
-        </SessionProvider>
+        {/* </SessionProvider> */}
       </body>
     </html>
   );

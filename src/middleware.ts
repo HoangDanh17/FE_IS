@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const privatePaths = ["/homePage", "/listCard"];
+const privatePaths = ["/homepage", "/listCard"];
 const authPaths = ["/login", "/register"];
 
 export function middleware(req: NextRequest) {
@@ -12,6 +12,7 @@ export function middleware(req: NextRequest) {
   }
   // Đăng nhập rồi thì không cho vào login/register nữa
   if (authPaths.some((path) => pathname.startsWith(path)) && sessionToken) {
+    console.log("Da vao middleware")
     return NextResponse.redirect(new URL("/homePage", req.url));
   }
 

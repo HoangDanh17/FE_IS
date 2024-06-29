@@ -23,8 +23,8 @@ import Link from "next/link";
 const getOauthGoogleUrl = () => {
   const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
   const options = {
-    redirect_uri: "http://localhost:3000/api/auth/google",
-    client_id: "442561086123-85mg2vqqdsk64quqar83ev6k6iskj55h.apps.googleusercontent.com",
+    redirect_uri: "http://localhost:3000/login",
+    client_id: "41208747093-hg3j3jjso6v4fo5jbcambc20orbigm0n.apps.googleusercontent.com",
     access_type: "offline",
     response_type: "code",
     prompt: "consent",
@@ -34,10 +34,15 @@ const getOauthGoogleUrl = () => {
     ].join(" "),
   };
   const qs = new URLSearchParams(options);
+  const url = `${rootUrl}?${qs.toString()}`
+  console.log("gg-url: ", url)
   return `${rootUrl}?${qs.toString()}`;
 };
 
+
+
 const LoginForm = () => {
+
   const router = useRouter();
   const oauthURL = getOauthGoogleUrl();
   const [loading, setLoading] = useState(false);
@@ -49,6 +54,64 @@ const LoginForm = () => {
       password: "",
     },
   });
+
+  useEffect(() => {
+    const handleGoogleLogin = async (code: string) => {
+      try {
+
+        // const result = await authApiRequest.loginByGoogle(body);
+        const result = await fetch("http://localhost:8080/api/v1/auth/login-google", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ code: code }),
+        });
+        const data = await result.json();
+        if (data.data.account_info.role === "admin") {
+          await authApiRequest.auth({
+            sessionToken: data.data.token,
+          });
+          toast({
+            title: `Chào mừng đăng nhập ${data.data.account_info["user-name"]}`,
+            duration: 2000,
+            variant: "info",
+          });
+          setUser(data.data.account_info);
+          router.push("/homePage");
+        } else if (data.data.account_info.role === "user") {
+          toast({
+            title: `Thực tập sinh vui lòng sử dụng app`,
+            duration: 2000,
+            variant: "destructive",
+          });
+        } else {
+          await authApiRequest.auth({
+            sessionToken: data.data.token,
+          });
+          toast({
+            title: `Chào mừng đăng nhập ${data.data.account_info["user-name"]}`,
+            duration: 2000,
+            variant: "info",
+          });
+          setUser(data.data.account_info);
+          router.push("listCard");
+        }
+      } catch (error: any) {
+        handleErrorApi({
+          error,
+          setError: form.setError,
+        });
+      }
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    console.log("code", code);
+    if (code) {
+      handleGoogleLogin(code);
+    }
+  }, []);
 
   async function onSubmit(values: LoginBodyType) {
     if (loading) return;

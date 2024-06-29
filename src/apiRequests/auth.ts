@@ -11,8 +11,8 @@ import { MessageResType } from "@/schemaValidations/common.schema";
 const authApiRequest = {
   login: (body: LoginBodyType) =>
     http.post<LoginResType>("/api/v1/login", body),
-  loginByGoogle:(body:{code :string})=>{
-    http.post<LoginResType>("api/v1/auth/login-google",body)
+  loginByGoogle:(body:{code :string|null})=>{
+    http.post<LoginResType>("/api/v1/auth/login-google",body)
   },
   register: (body: RegisterBodyType) =>
     http.post<RegisterResType>("/auth/register", body),
