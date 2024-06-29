@@ -28,6 +28,9 @@ import {
 import internApiRequest from "@/apiRequests/intern";
 import { TermListResType } from "@/schemaValidations/term.schema";
 import termApiRequest from "@/apiRequests/term";
+import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
+import { storage } from "../../app/firebase";
+import Image from "next/image";
 
 const EditModal = ({
   row,
@@ -57,6 +60,36 @@ const EditModal = ({
     address: "",
     gender: "",
   });
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const imageRef = ref(storage, `avatars/${file.name + Date.now()}`);
+
+    try {
+      setLoading(true);
+      const snapshot = await uploadBytes(imageRef, file);
+      const url = await getDownloadURL(snapshot.ref);
+      setFormData((prev) => ({ ...prev, avatar: url }));
+      toast({
+        title: "Avatar uploaded successfully",
+        duration: 2000,
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast({
+        title: "Failed to upload avatar",
+        duration: 2000,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [filterOjt, setFilterOjt] = useState<TermListResType>();
 
@@ -404,6 +437,36 @@ const EditModal = ({
                     }}
                   />
                 </FormControl>
+              </Grid>
+              <Grid item xs={4}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: "none" }}
+                  id="avatar-upload"
+                />
+                <label htmlFor="avatar-upload">
+                  <Button
+                    component="span"
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}
+                  >
+                    {loading ? "Uploading..." : "Upload Avatar"}
+                  </Button>
+                </label>
+                {formData.avatar && formData.avatar.startsWith("http") && (
+                  <Box mt={2}>
+                    <Image
+                      src={formData.avatar}
+                      alt="avatar"
+                      width={150}
+                      height={150}
+                      style={{ borderRadius: "50%", objectFit: "cover" }}
+                    />
+                  </Box>
+                )}
               </Grid>
             </Grid>
           </FormControl>

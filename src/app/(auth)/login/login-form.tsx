@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { loginGoogle } from "../../actions";
 import Link from "next/link";
 
 const getOauthGoogleUrl = () => {
@@ -32,6 +33,7 @@ const getOauthGoogleUrl = () => {
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/userinfo.email",
     ].join(" "),
+    state: "nextbean-center",
   };
   const qs = new URLSearchParams(options);
   const url = `${rootUrl}?${qs.toString()}`
@@ -264,7 +266,19 @@ const LoginForm = () => {
                     justifyContent="center"
                     mt={2}
                   >
-                    <Link className="google-sign-in-button" href={oauthURL}>Login with Google</Link>
+                    <form action={loginGoogle}>
+                      <Button
+                        className="google-sign-in-button"
+                        value="google"
+                        type="submit"
+                        name="action"
+                      >
+                        Login with Google
+                      </Button>
+                    </form>
+                    <Link className="google-sign-in-button" href={oauthURL}>
+                      Login with Google
+                    </Link>
                   </Stack>
                 </Box>
               </Stack>
