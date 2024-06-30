@@ -18,14 +18,14 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { loginGoogle } from "../../actions";
 import Link from "next/link";
 
 const getOauthGoogleUrl = () => {
   const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
   const options = {
     redirect_uri: "http://localhost:3000/login",
-    client_id: "41208747093-hg3j3jjso6v4fo5jbcambc20orbigm0n.apps.googleusercontent.com",
+    client_id:
+      "41208747093-hg3j3jjso6v4fo5jbcambc20orbigm0n.apps.googleusercontent.com",
     access_type: "offline",
     response_type: "code",
     prompt: "consent",
@@ -36,15 +36,12 @@ const getOauthGoogleUrl = () => {
     state: "nextbean-center",
   };
   const qs = new URLSearchParams(options);
-  const url = `${rootUrl}?${qs.toString()}`
-  console.log("gg-url: ", url)
+  const url = `${rootUrl}?${qs.toString()}`;
+  console.log("gg-url: ", url);
   return `${rootUrl}?${qs.toString()}`;
 };
 
-
-
 const LoginForm = () => {
-
   const router = useRouter();
   const oauthURL = getOauthGoogleUrl();
   const [loading, setLoading] = useState(false);
@@ -60,15 +57,17 @@ const LoginForm = () => {
   useEffect(() => {
     const handleGoogleLogin = async (code: string) => {
       try {
-
         // const result = await authApiRequest.loginByGoogle(body);
-        const result = await fetch("http://localhost:8080/api/v1/auth/login-google", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ code: code }),
-        });
+        const result = await fetch(
+          "http://localhost:8080/api/v1/auth/login-google",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ code: code }),
+          }
+        );
         const data = await result.json();
         if (data.data.account_info.role === "admin") {
           await authApiRequest.auth({
@@ -266,16 +265,6 @@ const LoginForm = () => {
                     justifyContent="center"
                     mt={2}
                   >
-                    <form action={loginGoogle}>
-                      <Button
-                        className="google-sign-in-button"
-                        value="google"
-                        type="submit"
-                        name="action"
-                      >
-                        Login with Google
-                      </Button>
-                    </form>
                     <Link className="google-sign-in-button" href={oauthURL}>
                       Login with Google
                     </Link>
