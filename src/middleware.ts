@@ -12,7 +12,6 @@ export function middleware(req: NextRequest) {
   }
   // Đăng nhập rồi thì không cho vào login/register nữa
   if (authPaths.some((path) => pathname.startsWith(path)) && sessionToken) {
-    console.log("Da vao middleware")
     return NextResponse.redirect(new URL("/homePage", req.url));
   }
 
