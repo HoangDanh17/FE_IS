@@ -113,10 +113,7 @@ const FilterTable = () => {
         <Grid container spacing={1}>
           <Grid item xs={24}>
             <Accordion defaultExpanded>
-              <AccordionSummary
-                aria-controls="panel1d-content"
-                id="panel1d-header"
-              >
+              <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
                 <Typography>Tìm kiếm thông tin</Typography>
               </AccordionSummary>
               <AccordionDetails>
@@ -215,12 +212,10 @@ const FilterTable = () => {
                       </Button>
                       <Button
                         onClick={handleReset}
-                        startIcon={<CleaningServicesIcon />}
                         style={{
                           width: "40%",
                           marginTop: 4,
                         }}
-                        color="error"
                       >
                         Hủy tìm kiếm
                       </Button>

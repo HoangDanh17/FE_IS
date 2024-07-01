@@ -8,13 +8,16 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { TablePagination, Radio, Button, CircularProgress } from '@mui/material';
+import { TablePagination, Radio, Button, CircularProgress, Modal } from '@mui/material';
 import "@/styles/accountManagement/DataTable.css";
-import AccountInfolModal from './AccountInfolModal';
 import { AccountListResType, AccountType } from '@/schemaValidations/accountManagement/account.schema';
 import accountApiRequest from '@/apiRequests/accountManagement/account';
 import dayjs from 'dayjs';
 import ButtonGroupAccount from "@/components/accountManagement/ButtonGroup";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditModalAccount from './EditModal';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -61,10 +64,11 @@ function TableAccount({
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [selectedValue, setSelectedValue] = React.useState<RowData>();
+  const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
 
-  // handle detail modal
-  const [openModal, setOpenModal] = React.useState<boolean>(false);
-  const [accountDetail, setAccountDetail] = React.useState<AccountType | null>(null);
+
+  // handle edit
+  const [openEditModal, setOpenEditModal] = React.useState(false);
 
   const [refreshKey, setRefreshKey] = React.useState(0);
   const triggerRefresh = () => {
@@ -82,19 +86,42 @@ function TableAccount({
     setPage(0);
   };
 
-  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>, row: RowData) => {
+  // const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>, row: RowData) => {
+  //   setSelectedValue(row);
+  //   console.log("co len: ", row)
+  // };
+
+  // const handleDeselectAll = () => {
+  //   setSelectedValue(undefined);
+  // };
+
+  const handleOpenEditModal = (row: RowData) => {
     setSelectedValue(row);
-    console.log("co len: ", row)
+    setOpenEditModal(true);
   };
 
-  const handleDeselectAll = () => {
-    setSelectedValue(undefined);
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+    triggerRefresh();
   };
 
-  const handleViewDetail = (row: AccountType) => {
-    setAccountDetail(row);
-    setOpenModal(true);
+  // handle delete
+  const handleOpenDeleteModal = (row: RowData) => {
+    setSelectedValue(row);
+    setOpenDeleteModal(true);
   };
+
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+    triggerRefresh();
+  };
+
+  // handle close for all
+  const closeButNotRefresh = () => {
+    setOpenEditModal(false)
+    setOpenDeleteModal(false);
+  }
+
 
   React.useEffect(() => {
     setLoading(true);
@@ -121,43 +148,43 @@ function TableAccount({
         ) : (
           <Table sx={{ minWidth: 640 }} aria-label="customized table">
             <TableHead>
-
               <TableRow>
-                <StyledTableCell sx={{ width: 70 }} align='center'>
-                  <Radio
-                    onClick={handleDeselectAll}
-                    className="radio-buttons"
-                    color='secondary'
-                  />
-                </StyledTableCell>
-
+                <StyledTableCell>ID</StyledTableCell>
                 <StyledTableCell>Tên Người Dùng</StyledTableCell>
                 <StyledTableCell>Email</StyledTableCell>
                 <StyledTableCell>Role</StyledTableCell>
                 <StyledTableCell>Ngày tạo</StyledTableCell>
-                <StyledTableCell>Xem chi tiết</StyledTableCell>
+                <StyledTableCell align="center">Hành động</StyledTableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
               {data?.data.map((account, index) => (
                 <StyledTableRow key={index}>
-
-                  <div className="radio-cell" style={{ margin: "3px 0 0 14px" }}>
-                    <Radio
-                      checked={selectedValue?.id === account.id}
-                      onChange={(event) => handleRadioChange(event, account)}
-                      value={account.id.toString()}
-                      className="radio-buttons"
-                    />
-                  </div>
+                  <StyledTableCell>{index + 1}</StyledTableCell>
                   <StyledTableCell>{account['user-name']}</StyledTableCell>
                   <StyledTableCell>{account.email}</StyledTableCell>
                   <StyledTableCell>{account.role}</StyledTableCell>
                   <StyledTableCell>{dayjs(account['created-at']).format("DD/MM/YYYY")}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    <Button
+                      style={{ marginRight: "10px" }}
+                      variant="contained"
+                      color="warning"
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={() => handleOpenEditModal(account)}>
+                      Cập nhật
+                    </Button>
 
-                  <StyledTableCell>
-                    <Button size='small' onClick={() => handleViewDetail(account)}>Click</Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      size="small"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => handleOpenDeleteModal(account)}>
+                      Xóa
+                    </Button>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}
@@ -176,11 +203,23 @@ function TableAccount({
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="custom-row custom-pagination"
       />
+      <ButtonGroupAccount triggerRefresh={triggerRefresh} />
 
-      <AccountInfolModal open={openModal} handleClose={() => setOpenModal(false)} selectedRow={accountDetail} />
+      {/* Modal Edit */}
+      <Modal
+        open={openEditModal}
+        onClose={closeButNotRefresh}
+      >
+        <EditModalAccount onClose={handleCloseEditModal} row={selectedValue} />
+      </Modal>
 
-      <ButtonGroupAccount row={selectedValue} triggerRefresh={triggerRefresh} />
-
+      {/* Modal Confirm Delete */}
+      <Modal
+        open={openDeleteModal}
+        onClose={closeButNotRefresh}
+      >
+        <ConfirmDeleteModal onClose={handleCloseDeleteModal} row={selectedValue} />
+      </Modal>
     </div>
   );
 }

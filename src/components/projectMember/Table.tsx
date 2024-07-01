@@ -95,8 +95,13 @@ function TableProjectMember({
     setConfirmOpen(false);
   };
 
+  // Log cardMem to see its structure
+  
+
+  const paginatedData = cardMem?.data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  console.log("cardmem: ", cardMem)
   return (
-    <Box sx={{ width: '115.5%' }}>
+    <Box sx={{ width: '135%' }}>
       {/* <Typography variant='h4'>Thành viên dự án</Typography> */}
       {/* <ScrollArea className="h-[350px] rounded-md border p-4 mt-3"> */}
       <TableContainer sx={{ width: '100%', overflowX: 'auto' }} component={Paper}>
@@ -113,7 +118,7 @@ function TableProjectMember({
           </TableHead>
 
           <TableBody>
-            {cardMem?.data.map((member) => (
+            {paginatedData?.map((member) => (
               <StyledRow key={member.id}>
                 <CenteredAvatarCell>
                   <Avatar
@@ -139,7 +144,7 @@ function TableProjectMember({
       <TablePagination
         rowsPerPageOptions={[5, 10]}
         component="div"
-        count={cardMem?.paging.items || 0}
+        count={cardMem?.paging?.items || 0}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

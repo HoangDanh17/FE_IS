@@ -75,7 +75,11 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                     <FormControl fullWidth>
                       <Input
                         name="user-name"
+<<<<<<< HEAD
                         placeholder="Tên người dùng"
+=======
+                        placeholder="Tên thàn viên"
+>>>>>>> dev
                         value={formData["user-name"]}
                         onChange={handleChange}
                       />
@@ -95,7 +99,11 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                     <FormControl fullWidth>
                       <Input
                         name="student-code"
+<<<<<<< HEAD
                         placeholder="Mã sinh viên"
+=======
+                        placeholder="Mã số sinh viên"
+>>>>>>> dev
                         value={formData["student-code"]}
                         onChange={handleChange}
                       />
@@ -103,6 +111,32 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                   </Grid>
                   <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
+<<<<<<< HEAD
+=======
+                      <Select
+                        name="ojt-semester"
+                        value={formData["ojt-semester"]}
+                        onChange={handleChange}
+                        displayEmpty
+                        variant="standard"
+                      >
+                        <MenuItem value="" disabled>
+                          <em>Kỳ thực tập</em>
+                        </MenuItem>
+                        {filterOjt?.data.map((semester) => (
+                          <MenuItem
+                            key={semester.semester}
+                            value={semester.semester}
+                          >
+                            {semester.semester}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <FormControl fullWidth>
+>>>>>>> dev
                       <Input
                         name="gender"
                         placeholder="Giới tính"
@@ -111,7 +145,7 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  {/* <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
                       <Input
                         name="phone-number"
@@ -120,8 +154,8 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                         onChange={handleChange}
                       />
                     </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
+                  </Grid> */}
+                  {/* <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
                       <Input
                         name="address"
@@ -130,8 +164,8 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                         onChange={handleChange}
                       />
                     </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={3} container spacing={2}>
+                  </Grid> */}
+                  <Grid container item xs={12} sm={12} md={4} lg={4} spacing={1}>
                     <Grid item xs={6}>
                       <Button
                         type="submit"
@@ -140,7 +174,7 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                         className="search-btn"
                         fullWidth
                       >
-                        Search
+                        Tìm kiếm
                       </Button>
                     </Grid>
                     <Grid item xs={6}>
@@ -150,7 +184,7 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                         className="clean-btn"
                         fullWidth
                       >
-                        Clean Filter
+                        Hủy Filter
                       </Button>
                     </Grid>
                   </Grid>

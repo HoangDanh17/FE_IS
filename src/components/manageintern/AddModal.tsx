@@ -373,6 +373,28 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, id }) => {
               />
             </Grid>
             <Grid item xs={4}>
+<<<<<<< HEAD
+=======
+              <Select
+                name="ojt-id"
+                value={formData["ojt-id"]}
+                onChange={handleOjtIdChange}
+                displayEmpty
+                style={{ width: "100%" }}
+                size="small"
+              >
+                <MenuItem value="" disabled>
+                  <em>Kỳ thực tập</em>
+                </MenuItem>
+                {filterOjt?.data.map((semester) => (
+                  <MenuItem key={semester.id} value={semester.id}>
+                    {semester.semester}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+            <Grid item xs={4}>
+>>>>>>> dev
               <FormControl fullWidth error={Boolean(errors.gender)}>
                 <InputLabel id="gender-label" shrink>
                   Giới tính
@@ -453,7 +475,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, id }) => {
                   color="primary"
                   disabled={loading}
                 >
-                  {loading ? "Uploading..." : "Upload Avatar"}
+                  {loading ? "Đang tải..." : "Tải ảnh lên"}
                 </Button>
               </label>
               {formData.avatar && (
@@ -482,7 +504,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, id }) => {
               startIcon={<AddIcon />}
               disabled={loading}
             >
-              {loading ? "Adding..." : "Add"}
+              {loading ? "Adding..." : "Tạo"}
             </Button>
           </Box>
         </FormControl>

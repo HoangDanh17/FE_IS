@@ -230,7 +230,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
               onClick={handleAdd}
               disabled={loading}
             >
-              {loading ? "Loading..." : "Add"}
+              {loading ? "Loading..." : "Tạo"}
             </Button>
           </Box>
         </FormControl>

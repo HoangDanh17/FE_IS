@@ -301,7 +301,7 @@ const DetailIntern = ({
                   startIcon={<EditIcon></EditIcon>}
                   style={{ width: "100%", marginTop: 20 }}
                 >
-                  Sửa thông tin
+                  Cập nhật
                 </Button>
               </Grid>
               <Grid item>

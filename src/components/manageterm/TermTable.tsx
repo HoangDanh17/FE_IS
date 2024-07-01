@@ -20,6 +20,8 @@ import {
   Modal,
   Box,
   Typography,
+  Card,
+  CardContent
 } from "@mui/material";
 import AddModal from "./AddModal2";
 import termApiRequest from "@/apiRequests/term";
@@ -129,6 +131,13 @@ const TermTable = ({
     handleCloseDeleteModal();
   };
 
+  // handle close for all
+  const closeButNotRefresh = () => {
+    setOpenAddModal(false);
+    setOpenEditModal(false)
+    setOpenDeleteModal(false);
+  }
+
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
@@ -205,7 +214,11 @@ const TermTable = ({
                       startIcon={<DeleteIcon />}
                       onClick={() => handleOpenDeleteModal(account)}
                     >
+<<<<<<< HEAD
                       Xóa
+=======
+                      Xóa 
+>>>>>>> dev
                     </Button>
                   </StyledTableCell>
                 </StyledTableRow>
@@ -226,21 +239,24 @@ const TermTable = ({
         className="custom-row custom-pagination bg-white mb-4"
       />
 
-      <Button
-        variant="contained"
-        className="add-btn"
-        startIcon={<AddIcon />}
-        onClick={handleOpenAddModal}
-        style={{float:"right" }}
-      >
-        Tạo kỳ mới
-      </Button>
+      <Card >
+        <CardContent style={{ height: "68px" }}>
+          <Button
+            variant="contained"
+            className="add-btn"
+            startIcon={<AddIcon />}
+            onClick={handleOpenAddModal}
+          >
+            Tạo kỳ mới
+          </Button>
+        </CardContent>
+      </Card>
 
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openAddModal}
-        onClose={handleCloseAddModal}
+        onClose={closeButNotRefresh}
       >
         <AddModal onClose={handleCloseAddModal} />
       </Modal>
@@ -249,12 +265,12 @@ const TermTable = ({
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openEditModal}
-        onClose={handleCloseEditModal}
+        onClose={closeButNotRefresh}
       >
         <EditModal row={selectedRowData} onClose={handleCloseEditModal} />
       </Modal>
 
-      <Modal open={openDeleteModal} onClose={handleCloseDeleteModal}>
+      <Modal open={openDeleteModal} onClose={closeButNotRefresh}>
         <Box
           sx={{
             position: "absolute",
@@ -269,10 +285,10 @@ const TermTable = ({
           }}
         >
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Confirm Deletion
+            Xác nhận xóa
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Are you sure you want to delete this row?
+          Bạn có chắc chắn muốn xóa Kỳ: {selectedRowData?.semester}?
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
             <Button
@@ -281,10 +297,10 @@ const TermTable = ({
               onClick={handleDelete}
               sx={{ mr: 1 }}
             >
-              Delete
+              Xóa
             </Button>
-            <Button variant="contained" onClick={handleCloseDeleteModal}>
-              Cancel
+            <Button variant="outlined" onClick={handleCloseDeleteModal}>
+              Hủy
             </Button>
           </Box>
         </Box>
