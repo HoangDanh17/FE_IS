@@ -20,14 +20,14 @@ import {
   Modal,
   Box,
   Typography,
-  Radio,
+  Card,
+  CardContent
 } from "@mui/material";
 import AddModal from "./AddModal2";
 import termApiRequest from "@/apiRequests/term";
 import { TermListResType } from "@/schemaValidations/term.schema";
 import dayjs from "dayjs";
 import { toast } from "../ui/use-toast";
-import { useRouter } from "next/navigation";
 
 export interface RowData2 {
   id: string;
@@ -75,7 +75,6 @@ const TermTable = ({
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [selectedValue, setSelectedValue] = useState<RowData2 | null>(null);
 
   const [data, setData] = useState<TermListResType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,45 +92,29 @@ const TermTable = ({
     setPage(0);
   };
 
-  const handleRadioChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    row: RowData2
-  ) => {
-    setSelectedValue(row);
-    setSelectedRowData(row);
-    console.log("Selected row: ", row);
-  };
-
-  const handleDeselectAll = () => {
-    setSelectedValue(null);
-    setSelectedRowData(null);
-  };
-
   const handleOpenAddModal = () => setOpenAddModal(true);
   const handleCloseAddModal = () => {
     setOpenAddModal(false);
-    setSelectedValue(null);
     setSelectedRowData(null);
     setRefreshKey((prevKey) => prevKey + 1);
   };
 
-  const handleOpenEditModal = () => {
-    if (selectedRowData) {
-      console.log(selectedRowData);
-    }
+  const handleOpenEditModal = (row: RowData2) => {
+    setSelectedRowData(row);
     setOpenEditModal(true);
   };
   const handleCloseEditModal = () => {
     setOpenEditModal(false);
-    setSelectedValue(null);
     setSelectedRowData(null);
     setRefreshKey((prevKey) => prevKey + 1);
   };
 
-  const handleOpenDeleteModal = () => setOpenDeleteModal(true);
+  const handleOpenDeleteModal = (row: RowData2) => {
+    setSelectedRowData(row);
+    setOpenDeleteModal(true);
+  };
   const handleCloseDeleteModal = () => {
     setOpenDeleteModal(false);
-    setSelectedValue(null);
     setSelectedRowData(null);
   };
 
@@ -147,6 +130,13 @@ const TermTable = ({
     });
     handleCloseDeleteModal();
   };
+
+  // handle close for all
+  const closeButNotRefresh = () => {
+    setOpenAddModal(false);
+    setOpenEditModal(false)
+    setOpenDeleteModal(false);
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -185,35 +175,18 @@ const TermTable = ({
           <Table sx={{ minWidth: 640 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell sx={{ width: 70 }} align="center">
-                  <Radio
-                    onClick={handleDeselectAll}
-                    className="radio-buttons"
-                    color="secondary"
-                  />
-                </StyledTableCell>
                 <StyledTableCell>ID</StyledTableCell>
-                <StyledTableCell>Semester</StyledTableCell>
-                <StyledTableCell>University</StyledTableCell>
-                <StyledTableCell>Start Date</StyledTableCell>
-                <StyledTableCell>End Date</StyledTableCell>
+                <StyledTableCell>Kỳ</StyledTableCell>
+                <StyledTableCell>Đại học</StyledTableCell>
+                <StyledTableCell>Ngày bắt đầu</StyledTableCell>
+                <StyledTableCell>Ngày kết thúc</StyledTableCell>
+                <StyledTableCell align="center">Hành động</StyledTableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
               {data?.data.map((account, index) => (
                 <StyledTableRow key={index}>
-                  <div
-                    className="radio-cell"
-                    style={{ margin: "3px 0 0 14px" }}
-                  >
-                    <Radio
-                      checked={selectedValue?.id === account.id}
-                      onChange={(event) => handleRadioChange(event, account)}
-                      value={account.id.toString()}
-                      className="radio-buttons"
-                    />
-                  </div>
                   <StyledTableCell>{account.id}</StyledTableCell>
                   <StyledTableCell>{account.semester}</StyledTableCell>
                   <StyledTableCell>{account.university}</StyledTableCell>
@@ -222,6 +195,27 @@ const TermTable = ({
                   </StyledTableCell>
                   <StyledTableCell>
                     {dayjs(account["end-at"]).format("DD/MM/YYYY")}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    <Button
+                      style={{ marginRight: "10px" }}
+                      variant="contained"
+                      color="warning"
+                      size="small"
+                      startIcon={<EditIcon />}
+                      onClick={() => handleOpenEditModal(account)}
+                    >
+                      Cập nhật
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      size="small"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => handleOpenDeleteModal(account)}
+                    >
+                      Xóa 
+                    </Button>
                   </StyledTableCell>
                 </StyledTableRow>
               ))}
@@ -241,43 +235,24 @@ const TermTable = ({
         className="custom-row custom-pagination bg-white mb-4"
       />
 
-      <Button
-        variant="contained"
-        className="add-btn"
-        startIcon={<AddIcon />}
-        onClick={handleOpenAddModal}
-        style={{ marginRight: "10px" }}
-      >
-        Tạo kỳ mới
-      </Button>
-      <Button
-        style={{ marginRight: "10px" }}
-        variant="contained"
-        className="edit-btn"
-        color="warning"
-        startIcon={<EditIcon />}
-        onClick={handleOpenEditModal}
-        disabled={!selectedRowData}
-      >
-        Sửa kỳ
-      </Button>
-      <Button
-        style={{ marginRight: "10px" }}
-        variant="contained"
-        color="error"
-        className="delete-btn"
-        startIcon={<DeleteIcon />}
-        onClick={handleOpenDeleteModal}
-        disabled={!selectedRowData}
-      >
-        Xóa kỳ
-      </Button>
+      <Card >
+        <CardContent style={{ height: "68px" }}>
+          <Button
+            variant="contained"
+            className="add-btn"
+            startIcon={<AddIcon />}
+            onClick={handleOpenAddModal}
+          >
+            Tạo kỳ mới
+          </Button>
+        </CardContent>
+      </Card>
 
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openAddModal}
-        onClose={handleCloseAddModal}
+        onClose={closeButNotRefresh}
       >
         <AddModal onClose={handleCloseAddModal} />
       </Modal>
@@ -286,12 +261,12 @@ const TermTable = ({
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openEditModal}
-        onClose={handleCloseEditModal}
+        onClose={closeButNotRefresh}
       >
         <EditModal row={selectedRowData} onClose={handleCloseEditModal} />
       </Modal>
 
-      <Modal open={openDeleteModal} onClose={handleCloseDeleteModal}>
+      <Modal open={openDeleteModal} onClose={closeButNotRefresh}>
         <Box
           sx={{
             position: "absolute",
@@ -306,10 +281,10 @@ const TermTable = ({
           }}
         >
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Confirm Deletion
+            Xác nhận xóa
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Are you sure you want to delete this row?
+          Bạn có chắc chắn muốn xóa Kỳ: {selectedRowData?.semester}?
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
             <Button
@@ -318,10 +293,10 @@ const TermTable = ({
               onClick={handleDelete}
               sx={{ mr: 1 }}
             >
-              Delete
+              Xóa
             </Button>
-            <Button variant="contained" onClick={handleCloseDeleteModal}>
-              Cancel
+            <Button variant="outlined" onClick={handleCloseDeleteModal}>
+              Hủy
             </Button>
           </Box>
         </Box>

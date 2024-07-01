@@ -66,8 +66,8 @@ const request = async <Response>(
     body instanceof FormData
       ? {}
       : {
-          "Content-Type": "application/json",
-        };
+        "Content-Type": "application/json",
+      };
   if (isClient()) {
     const sessionToken = localStorage.getItem("sessionToken");
     if (sessionToken) {
@@ -152,10 +152,10 @@ const request = async <Response>(
 
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isClient()) {
-    if (["api/v1/login"].some((item) => item === normalizePath(url))) {
-      const { token, expiresAt } = (payload as LoginResType).data;
+    if (["api/v1/login", "api/v1/auth/login-google"].some((item) => item === normalizePath(url))) {
+      const { token } = (payload as LoginResType).data;
       localStorage.setItem("sessionToken", token);
-      localStorage.setItem("sessionTokenExpiresAt", expiresAt);
+      // localStorage.setItem("sessionTokenExpiresAt", expiresAt);
     } else if ("auth/logout" === normalizePath(url)) {
       localStorage.removeItem("sessionToken");
       localStorage.removeItem("sessionTokenExpiresAt");

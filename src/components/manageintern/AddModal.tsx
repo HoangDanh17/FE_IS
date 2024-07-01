@@ -24,6 +24,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { SelectChangeEvent } from "@mui/material";
 import { TermListResType } from "@/schemaValidations/term.schema";
 import termApiRequest from "@/apiRequests/term";
+import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
+import { storage } from "../../app/firebase";
+import Image from "next/image";
+
 interface AddModalProps {
   onClose: () => void;
 }
@@ -54,6 +58,9 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
   });
 
   const [filterOjt, setFilterOjt] = useState<TermListResType>();
+  const [imageUpload, setImageUpload] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const imagesListRef = ref(storage, "images/");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,6 +73,36 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
     };
     fetchData();
   }, []);
+
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const imageRef = ref(storage, `avatars/${file.name + Date.now()}`);
+
+    try {
+      setLoading(true);
+      const snapshot = await uploadBytes(imageRef, file);
+      const url = await getDownloadURL(snapshot.ref);
+      setFormData((prev) => ({ ...prev, avatar: url }));
+      toast({
+        title: "Avatar uploaded successfully",
+        duration: 2000,
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast({
+        title: "Failed to upload avatar",
+        duration: 2000,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -176,10 +213,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
     });
   };
 
-  const [loading, setLoading] = useState(false);
-
   async function handleAdd() {
-    // Validate all fields before submitting
     let valid = true;
     const newErrors = { ...errors };
 
@@ -254,7 +288,6 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
         ? dayjs(formData["date-of-birth"]).format("YYYY-MM-DD")
         : "",
     };
-    console.log("Form Data:", formattedData);
 
     try {
       const { payload } = await internApiRequest.createIntern(formattedData);
@@ -263,12 +296,9 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
         duration: 2000,
         variant: "success",
       });
-      console.log(payload);
       onClose();
     } catch (error: any) {
       const errorRes = { error };
-      const errorMessage =
-        errorRes.error.payload.message || "Đã xảy ra lỗi, vui lòng thử lại";
       if (errorRes.error.payload.log.includes("duplicate data")) {
         const duplicates = errorRes.error.payload.log
           .match(/\[(.*?)\]/)[1]
@@ -369,7 +399,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 size="small"
               >
                 <MenuItem value="" disabled>
-                  <em>OJT Semester</em>
+                  <em>Kỳ thực tập</em>
                 </MenuItem>
                 {filterOjt?.data.map((semester) => (
                   <MenuItem key={semester.id} value={semester.id}>
@@ -444,6 +474,36 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 }}
               />
             </Grid>
+            <Grid item xs={12} className="flex">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                style={{ display: "none" }}
+                id="avatar-upload"
+              />
+              <label htmlFor="avatar-upload">
+                <Button
+                  component="span"
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                >
+                  {loading ? "Đang tải..." : "Tải ảnh lên"}
+                </Button>
+              </label>
+              {formData.avatar && (
+                <Box marginLeft={4} >
+                  <Image
+                    src={formData.avatar}
+                    alt="avatar"
+                    width={120}
+                    height={150}
+                    style={{ borderRadius: "100%", objectFit: "cover" }}
+                  />
+                </Box>
+              )}
+            </Grid>
           </Grid>
           <Box
             display="flex"
@@ -458,7 +518,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
               startIcon={<AddIcon />}
               disabled={loading}
             >
-              {loading ? "Adding..." : "Add"}
+              {loading ? "Adding..." : "Tạo"}
             </Button>
           </Box>
         </FormControl>

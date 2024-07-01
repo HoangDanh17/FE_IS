@@ -15,6 +15,7 @@ import internApiRequest from "@/apiRequests/intern";
 import EditModal from "@/components/manageintern/EditModal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import AddSkillIntern from "@/components/manageintern/AddSkillIntern";
+import Image from "next/image";
 
 const Div = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -32,6 +33,15 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
+
+const AvatarContainer = styled("div")({
+  position: "relative",
+  width: "100px",
+  height: "100px",
+  marginBottom: "16px",
+  borderRadius: "100%",
+  overflow: "hidden",
+});
 
 const DetailIntern = ({
   row,
@@ -104,6 +114,25 @@ const DetailIntern = ({
           <Grid item xs={12} sm={8}>
             <ScrollArea className="h-[420px] w-[540px]">
               <Grid container spacing={3}>
+                <Grid item xs={12} className="flex justify-center">
+                  <AvatarContainer>
+                    <div className="absolute inset-0 bg-gray-200 rounded-full ">
+                      <Image
+                        src={
+                          detailIntern?.data.avatar
+                            ? detailIntern.data.avatar.startsWith("http")
+                              ? detailIntern.data.avatar
+                              : "/images/avatar.jpg"
+                            : "/images/avatar.jpg"
+                        }
+                        alt="Intern Avatar"
+                        layout="fill"
+                        objectFit="cover" priority
+                        className="rounded-full"
+                      />
+                    </div>
+                  </AvatarContainer>
+                </Grid>
                 <Grid item xs={12} className="flex">
                   <Grid container spacing={1}>
                     <Grid item xs={4}>
@@ -272,7 +301,7 @@ const DetailIntern = ({
                   startIcon={<EditIcon></EditIcon>}
                   style={{ width: "100%", marginTop: 20 }}
                 >
-                  Sửa thông tin
+                  Cập nhật
                 </Button>
               </Grid>
               <Grid item>

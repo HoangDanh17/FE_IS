@@ -41,7 +41,7 @@ const FilterTimeTable = ({
           {selectedDayName}, {selectedDay ? selectedDay.format("DD/MM/YYYY") : ""}
         </Typography>
         <FormControl margin="normal" style={{ minWidth: 200 }}>
-          <InputLabel id="status-label">Status</InputLabel>
+          <InputLabel id="status-label">Trạng thái</InputLabel>
           <Select
             labelId="status-label"
             id="status"
@@ -49,13 +49,13 @@ const FilterTimeTable = ({
             name="status"
             value={status}
             onChange={handleStatusChange}
-            label="Status"
+            label="Trạng thái"
             defaultValue=""
           >
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="processing">Processing</MenuItem>
-            <MenuItem value="denied">Denied</MenuItem>
-            <MenuItem value="approved">Approved</MenuItem>
+            <MenuItem value="all">Tất cả</MenuItem>
+            <MenuItem value="processing">Đang đợi</MenuItem>
+            <MenuItem value="denied">Từ chối</MenuItem>
+            <MenuItem value="approved">Đã duyệt</MenuItem>
           </Select>
         </FormControl>
       </Box>

@@ -27,16 +27,15 @@ export type RegisterBodyType = z.TypeOf<typeof RegisterBody>;
 
 export const RegisterRes = z.object({
   data: z.object({
-    token: z.string(),
-    expiresAt: z.string(),
     account_info: z.object({
       id: z.number(),
       "user-name": z.string(),
       email: z.string(),
       role: z.string(),
     }),
+    token: z.string(),
   }),
-  message: z.string(),
+  status: z.number(),
 });
 
 export type RegisterResType = z.TypeOf<typeof RegisterRes>;

@@ -3,20 +3,10 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 const Menuitems = [
   {
-    navlabel: true,
-    subheader: "Home",
-  },
-  {
     id: 1,
     title: "Dashboard",
     icon: DashboardIcon,
     href: "/homePage/dashboard",
-  },
-  {
-    id: 2,
-    title: "Quản lí tài khoản",
-    icon: DashboardIcon,
-    href: "/homePage/accountManagement",
   },
   {
     navlabel: true,
@@ -55,6 +45,16 @@ const Menuitems = [
     title: "Lịch làm việc",
     icon: AssignmentIcon,
     href: "/homePage/timeTable",
+  },
+  {
+    navlabel: true,
+    subheader: "Quản lí tài khoản",
+  },
+  {
+    id: 2,
+    title: "Quản lí tài khoản",
+    icon: DashboardIcon,
+    href: "/homePage/accountManagement",
   },
   // {
   //   navlabel: true,
@@ -130,4 +130,4 @@ const MenuitemsPm = [
   },
 ];
 
-export { Menuitems, MenuitemsManager,MenuitemsPm };
+export { Menuitems, MenuitemsManager, MenuitemsPm };

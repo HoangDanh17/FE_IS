@@ -14,7 +14,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Radio,
   styled,
   tableCellClasses,
   Button,
@@ -24,6 +23,9 @@ import {
   Tooltip,
   Fade,
   Backdrop,
+  Avatar,
+  Card,
+  CardContent
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -62,6 +64,13 @@ const styleCard = {
   boxShadow: 24,
   p: 4,
 };
+
+const CenteredAvatarCell = styled(TableCell)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+}));
+
 export interface FormFilterData {
   "user-name": string;
   email: string;
@@ -102,7 +111,7 @@ const InternTable = ({
 
   // Detail Card
   const [openCardModal, setOpenCardModal] = useState(false);
-  
+
   const handleDoubleClick = (row: any) => {
     setSelectedRowData(row);
     setOpenCardModal(true);
@@ -128,6 +137,12 @@ const InternTable = ({
     },
     []
   );
+
+    // handle close for all
+    const closeButNotRefresh = () => {
+      setOpenAddModal(false);
+      setOpenCardModal(false);
+    }
 
   useEffect(() => {
     setLoading(true);
@@ -167,13 +182,11 @@ const InternTable = ({
             <TableHead>
               <TableRow>
                 <StyledTableCell align="center">#</StyledTableCell>
+                <StyledTableCell>Hình ảnh</StyledTableCell>
                 <StyledTableCell>Họ và Tên</StyledTableCell>
                 <StyledTableCell>Email</StyledTableCell>
                 <StyledTableCell>Mã số sinh viên</StyledTableCell>
-                <StyledTableCell>Kì OJT</StyledTableCell>
                 <StyledTableCell>Giới tính</StyledTableCell>
-                <StyledTableCell>Số điện thoại</StyledTableCell>
-                <StyledTableCell>Địa chỉ</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -186,16 +199,18 @@ const InternTable = ({
                     <StyledTableCell align="center" component="th" scope="row">
                       {index + 1}
                     </StyledTableCell>
+                    <StyledTableCell>
+                      <Avatar
+                        //alt={`Avatar of ${row.internID}`}
+                        src={account.avatar}
+                        sx={{ width: 45, height: 45 }}
+                      />
+                    </StyledTableCell>
                     <StyledTableCell>{account["user-name"]}</StyledTableCell>
                     <StyledTableCell>{account.email}</StyledTableCell>
                     <StyledTableCell>{account["student-code"]}</StyledTableCell>
-                    <StyledTableCell>{account["ojt-semester"]}</StyledTableCell>
                     <StyledTableCell>
                       {account.gender !== "male" ? "Nữ" : "Nam"}
-                    </StyledTableCell>
-                    <StyledTableCell>{account["phone-number"]}</StyledTableCell>
-                    <StyledTableCell className="truncate max-w-[180px]">
-                      {account.address}
                     </StyledTableCell>
                   </StyledTableRow>
                 </Tooltip>
@@ -215,28 +230,36 @@ const InternTable = ({
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="custom-row custom-pagination mb-4 bg-white"
       />
-      <Button
-        variant="contained"
-        className="add-btn"
-        startIcon={<AddIcon />}
-        onClick={handleOpenAddModal}
-        style={{ marginRight: "10px" }}
-      >
-        Tạo thực tập
-      </Button>
+
+      <Card >
+        <CardContent style={{ height: "68px" }}>
+          <Button
+            variant="contained"
+            className="add-btn"
+            startIcon={<AddIcon />}
+            onClick={handleOpenAddModal}
+          >
+            Tạo thực tập
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Modal add  */}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openAddModal}
-        onClose={handleCloseAddModal}
+        onClose={closeButNotRefresh}
       >
         <AddModal onClose={handleCloseAddModal} />
       </Modal>
+
+      {/* Modal detail intern */}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={openCardModal}
-        onClose={handleCloseCardModal}
+        onClose={closeButNotRefresh}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
         slotProps={{

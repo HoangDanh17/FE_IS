@@ -1,6 +1,6 @@
 import LoginForm from "@/app/(auth)/login/login-form";
 
-const loginPage = () => {
+const loginPage = async () => {
   return (
     <div>
       <LoginForm></LoginForm>

@@ -203,14 +203,14 @@ const FilterProjectMember = () => {
                                 </Grid>
 
                                 <Grid container item xs={12} sm={12} md={4} lg={4} spacing={1}>
-                                    <Grid item>
-                                        <Button className='clean-btn' onClick={handleReset}>
-                                            Xóa Filter
-                                        </Button>
-                                    </Grid>
-                                    <Grid item>
+                                    <Grid item xs={6}>
                                         <Button type="submit" variant="contained" startIcon={<Search />} className='search-btn'>
                                             Search
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Button className='clean-btn' onClick={handleReset}>
+                                            Xóa Filter
                                         </Button>
                                     </Grid>
                                 </Grid>

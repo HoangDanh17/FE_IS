@@ -84,7 +84,7 @@ const Filter: React.FC = () => {
                     <FormControl fullWidth>
                       <Input
                         name="university"
-                        placeholder="University"
+                        placeholder="Trường Đại học"
                         value={formData.university}
                         onChange={handleChange}
                       />
@@ -94,7 +94,7 @@ const Filter: React.FC = () => {
                     <FormControl fullWidth>
                       <Input
                         name="semester"
-                        placeholder="Semester"
+                        placeholder="Kỳ"
                         value={formData.semester}
                         onChange={handleChange}
                       />
@@ -109,17 +109,18 @@ const Filter: React.FC = () => {
                         className="search-btn"
                         fullWidth
                       >
-                        Search
+                        Tìm kiếm
                       </Button>
                     </Grid>
                     <Grid item xs={6}>
                       <Button
                         type="button"
+                        variant="outlined"
                         onClick={handleReset}
                         className="clean-btn"
                         fullWidth
                       >
-                        Clean Filter
+                        Hủy Filter
                       </Button>
                     </Grid>
                   </Grid>

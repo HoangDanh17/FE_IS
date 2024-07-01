@@ -5,12 +5,7 @@ import {
   ListItemText,
   Typography,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Button,
-  SelectChangeEvent,
   Divider,
 } from "@mui/material";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -18,6 +13,8 @@ import dayjs, { Dayjs } from "dayjs";
 import timetableApiRequest from "@/apiRequests/timetable";
 import { TimeTableResType } from "@/schemaValidations/timetable.schema";
 import { toast } from "@/components/ui/use-toast";
+import CheckIcon from "@mui/icons-material/Check";
+import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
 
 interface TimeTableItem {
   intern_name: string;
@@ -32,7 +29,7 @@ const ListTimeTable = ({
   selectedDay,
 }: {
   status: string;
-  selectedDay: Dayjs | null| undefined;
+  selectedDay: Dayjs | null | undefined;
 }) => {
   const [dataModal, setDataModal] = useState<TimeTableResType | undefined>();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -47,16 +44,6 @@ const ListTimeTable = ({
         };
         const { payload } = await timetableApiRequest.getTimeTable(body);
         setDataModal(payload);
-
-        // Initialize selectedStatus based on fetched data
-        const initialSelectedStatus = payload.data.reduce(
-          (acc: any, item: any, index: number) => {
-            acc[index] = item.status;
-            return acc;
-          },
-          {}
-        );
-        setSelectedStatus(initialSelectedStatus);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -64,22 +51,12 @@ const ListTimeTable = ({
     fetchData();
   }, [status, selectedDay, refreshKey]);
 
-  const [selectedStatus, setSelectedStatus] = useState<{
-    [key: number]: string;
-  }>({});
-
-  const handleStatusChange = (index: number, value: string) => {
-    setSelectedStatus((prevState) => ({
-      ...prevState,
-      [index]: value,
-    }));
-  };
-
   const [loading, setLoading] = useState<boolean>(false);
-  async function handleSubmit(id: string, index: number) {
+
+  async function handleSubmit(id: string, newStatus: string) {
     setLoading(true);
 
-    const body = { status: selectedStatus[index] };
+    const body = { status: newStatus };
     try {
       const result = await timetableApiRequest.approveTimeTable(id, body);
       toast({
@@ -129,42 +106,43 @@ const ListTimeTable = ({
                         alignItems="center"
                         width="50%"
                       >
-                        <Typography component="span" style={{ marginLeft: 16 }}>
-                          Status: {item.status}
+                        <Typography
+                          component="span"
+                          style={{
+                            marginLeft: 16,
+                            // color: getStatusColor(item.status),
+                          }}
+                        >
+                          Status:{" "}
+                          {item.status === "processing"
+                            ? <Typography component="span" style={{ color: '#FFCF81' }}>Đang đợi</Typography>
+                            : item.status === "approved"
+                            ? <Typography component="span" style={{ color: 'green' }}>Đã duyệt</Typography>
+                            : <Typography component="span" style={{ color: 'red' }}>Từ chối</Typography>
+                          }
                         </Typography>
                         <Box ml={2} display="flex" alignItems="center">
-                          <FormControl
-                            size="small"
-                            variant="outlined"
-                            style={{ marginRight: 8, minWidth: 150 }}
-                          >
-                            <InputLabel id={`status-select-label-${index}`}>
-                              Change Status
-                            </InputLabel>
-                            <Select
-                              labelId={`status-select-label-${index}`}
-                              id={`status-select-${index}`}
-                              value={selectedStatus[index] || ""}
-                              onChange={(e: SelectChangeEvent<string>) =>
-                                handleStatusChange(
-                                  index,
-                                  e.target.value as string
-                                )
-                              }
-                              label="Change Status"
-                            >
-                              <MenuItem value="processing">Processing</MenuItem>
-                              <MenuItem value="denied">Denied</MenuItem>
-                              <MenuItem value="approved">Approved</MenuItem>
-                            </Select>
-                          </FormControl>
+                        
                           <Button
                             variant="contained"
-                            color="primary"
+                            color="success"
                             size="small"
-                            onClick={() => handleSubmit(item.id, index)}
+                            startIcon={<CheckIcon />}
+                            onClick={() => handleSubmit(item.id, "approved")}
+                            disabled={loading}
+                            style={{ marginRight: 8 }}
                           >
-                            Submit
+                            Duyệt đơn
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="error"
+                            size="small"
+                            startIcon={<DoNotDisturbOnIcon />}
+                            onClick={() => handleSubmit(item.id, "denied")}
+                            disabled={loading}
+                          >
+                            Từ chối
                           </Button>
                         </Box>
                       </Box>
