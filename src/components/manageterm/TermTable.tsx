@@ -196,7 +196,7 @@ const TermTable = ({
                       startIcon={<EditIcon />}
                       onClick={() => handleOpenEditModal(account)}
                     >
-                      Sửa kỳ
+                      Cập nhật
                     </Button>
                     <Button
                       variant="contained"
@@ -205,7 +205,7 @@ const TermTable = ({
                       startIcon={<DeleteIcon />}
                       onClick={() => handleOpenDeleteModal(account)}
                     >
-                      Xóa kỳ
+                      Xóa
                     </Button>
                   </StyledTableCell>
                 </StyledTableRow>

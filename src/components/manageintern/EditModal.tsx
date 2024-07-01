@@ -91,34 +91,12 @@ const EditModal = ({
     }
   };
 
-  const [filterOjt, setFilterOjt] = useState<TermListResType>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { payload } = await termApiRequest.getListTerm(null, null, null);
-        setFilterOjt(payload);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
-
   const [submitError, setSubmitError] = useState<string>("");
 
   const handleDateChange = (name: string, date: Dayjs | null) => {
     setFormData({
       ...formData,
       [name]: date ? date.toISOString() : "",
-    });
-  };
-
-  const handleOjtIdChange = (e: SelectChangeEvent<number>) => {
-    const value = e.target.value as number;
-    setFormData({
-      ...formData,
-      "ojt-id": value,
     });
   };
 
@@ -309,7 +287,7 @@ const EditModal = ({
               <Grid item xs={4}>
                 <FormControl fullWidth error={Boolean(errors["user-name"])}>
                   <TextField
-                    label="Username"
+                    label="Tên người dùng"
                     size="small"
                     value={formData["user-name"]}
                     onChange={handleChange("user-name")}
@@ -340,28 +318,6 @@ const EditModal = ({
                     error={Boolean(errors["student-code"])}
                     helperText={errors["student-code"]}
                   />
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={4}>
-                <FormControl fullWidth>
-                  <Select
-                    name="ojt-id"
-                    value={formData["ojt-id"]}
-                    onChange={handleOjtIdChange}
-                    displayEmpty
-                    style={{ width: "100%" }}
-                    size="small"
-                  >
-                    <MenuItem value="" disabled>
-                      <em>OJT Semester</em>
-                    </MenuItem>
-                    {filterOjt?.data.map((semester) => (
-                      <MenuItem key={semester.id} value={semester.id}>
-                        {semester.semester}
-                      </MenuItem>
-                    ))}
-                  </Select>
                 </FormControl>
               </Grid>
 

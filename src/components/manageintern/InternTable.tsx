@@ -73,10 +73,14 @@ export interface FormFilterData {
 }
 
 const InternTable = ({
+  id,
+  name,
   isFilter,
   dataFilter,
   handleReset,
 }: {
+  id: number;
+  name: string;
   isFilter: boolean;
   dataFilter: FormFilterData | null;
   handleReset: () => void;
@@ -84,10 +88,9 @@ const InternTable = ({
   const [data, setData] = useState<InternListResType | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [page, setPage] = useState(0);
-  const [selectedRowData, setSelectedRowData] =
-    useState<any>(null);
+  const [selectedRowData, setSelectedRowData] = useState<any>(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -102,7 +105,7 @@ const InternTable = ({
 
   // Detail Card
   const [openCardModal, setOpenCardModal] = useState(false);
-  
+
   const handleDoubleClick = (row: any) => {
     setSelectedRowData(row);
     setOpenCardModal(true);
@@ -128,7 +131,7 @@ const InternTable = ({
     },
     []
   );
-
+console.log(name);
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
@@ -136,7 +139,7 @@ const InternTable = ({
         const { payload } = await internApiRequest.getListIntern(
           page + 1,
           rowsPerPage,
-          isFilter ? dataFilter : {}
+          isFilter ? dataFilter : { "ojt-semester": name }
         );
         setData(payload);
       } catch (error) {
@@ -220,7 +223,7 @@ const InternTable = ({
         className="add-btn"
         startIcon={<AddIcon />}
         onClick={handleOpenAddModal}
-        style={{float:"right" }}
+        style={{ float: "right" }}
       >
         Tạo thực tập
       </Button>
@@ -230,7 +233,7 @@ const InternTable = ({
         open={openAddModal}
         onClose={handleCloseAddModal}
       >
-        <AddModal onClose={handleCloseAddModal} />
+        <AddModal onClose={handleCloseAddModal} id={id} />
       </Modal>
       <Modal
         aria-labelledby="transition-modal-title"

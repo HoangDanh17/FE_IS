@@ -13,13 +13,15 @@ import {
 const internApiRequest = {
   getListIntern: (page: number, psize: number, body: InternFilterType | null) =>
     http.get<InternListResType>(
-      `/api/v1/interns?page=${page}&psize=${psize}
-      ${body?.["user-name"] ? `&username=${body["user-name"]}` : ""}
-      ${body?.email ? `&email=${body.email}` : ""}
-      ${body?.["student-code"] ? `&student-code=${body["student-code"]}` : ""}
-      ${body?.["ojt-semester"] ? `&ojt-semester=${body["ojt-semester"]}` : ""}
-      ${body?.gender ? `&gender=${body.gender}` : ""}
-      ${body?.address ? `&username=${body.address}` : ""}`
+      `/api/v1/interns?page=${page}&psize=${psize}${
+        body?.["user-name"] ? `&username=${body["user-name"]}` : ""
+      }${body?.email ? `&email=${body.email}` : ""}${
+        body?.["student-code"] ? `&student-code=${body["student-code"]}` : ""
+      }${
+        body?.["ojt-semester"] ? `&ojt-semester=${body["ojt-semester"]}` : ""
+      }${body?.gender ? `&gender=${body.gender}` : ""}${
+        body?.address ? `&username=${body.address}` : ""
+      }`
     ),
   getListInternById: (id: string) =>
     http.get<InternByIdResType>(`/api/v1/interns/${id}`),

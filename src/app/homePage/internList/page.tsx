@@ -1,10 +1,10 @@
-import Filter from "@/components/manageintern/FilterIntern";
+import ListTerm from "@/components/manageintern/LayoutInten/ListTerm";
 
 const manageIntern = () => {
   return (
     <div>
       <div className="filter">
-        <Filter />
+        <ListTerm />
       </div>
     </div>
   );

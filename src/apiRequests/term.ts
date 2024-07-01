@@ -9,19 +9,13 @@ import {
 } from "@/schemaValidations/term.schema";
 
 const termApiRequest = {
-  getListTerm: (
-    page: number | null,
-    psize: number | null,
-    body: TermFilterType | null
-  ) =>
+  getListTerm: (page: number, psize: number, body: TermFilterType | null) =>
     http.get<TermListResType>(
-      `/api/v1/ojts?
-      ${page !== null ? `&page=${page}` : ""}
-      ${psize !== null ? `&psize=${psize}` : ""}
-      ${body?.id ? `&id=${body.id}` : ""}
-      ${body?.university ? `&university=${body.university}` : ""}
-      ${body?.semester ? `&semester=${body.semester}` : ""}    
-      `
+      `/api/v1/ojts?${page !== null ? `page=${page}&` : ""}${
+        psize !== null ? `psize=${psize}&` : ""
+      }${body?.id ? `id=${body.id}&` : ""}${
+        body?.university ? `university=${body.university}&` : ""
+      }${body?.semester ? `semester=${body.semester}&` : ""}`.slice(0, -1)
     ),
   createTerm: (body: CreateTermType) =>
     http.post<CreateTermResType>("/api/v1/ojts", body),

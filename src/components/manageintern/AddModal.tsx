@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   TextField,
@@ -10,7 +10,6 @@ import {
   MenuItem,
   FormHelperText,
   InputLabel,
-  Input,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -22,24 +21,23 @@ import internApiRequest from "@/apiRequests/intern";
 import { CreateInternType } from "@/schemaValidations/intern.schema";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { SelectChangeEvent } from "@mui/material";
-import { TermListResType } from "@/schemaValidations/term.schema";
-import termApiRequest from "@/apiRequests/term";
-import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../app/firebase";
 import Image from "next/image";
 
 interface AddModalProps {
   onClose: () => void;
+  id: number;
 }
 
-const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
+const AddModal: React.FC<AddModalProps> = ({ onClose, id }) => {
   const [formData, setFormData] = useState<CreateInternType>({
     address: "",
     avatar: "",
     "date-of-birth": "",
     email: "",
     gender: "male",
-    "ojt-id": 1,
+    "ojt-id": id,
     password: "",
     "phone-number": "",
     "student-code": "",
@@ -57,22 +55,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
     address: "",
   });
 
-  const [filterOjt, setFilterOjt] = useState<TermListResType>();
-  const [imageUpload, setImageUpload] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const imagesListRef = ref(storage, "images/");
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { payload } = await termApiRequest.getListTerm(null, null, null);
-        setFilterOjt(payload);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -343,7 +326,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
             <Grid item xs={4}>
               <TextField
                 fullWidth
-                label="Tên đăng nhập"
+                label="Tên người dùng"
                 name="user-name"
                 size="small"
                 value={formData["user-name"]}
@@ -388,25 +371,6 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 error={Boolean(errors["student-code"])}
                 helperText={errors["student-code"]}
               />
-            </Grid>
-            <Grid item xs={4}>
-              <Select
-                name="ojt-id"
-                value={formData["ojt-id"]}
-                onChange={handleOjtIdChange}
-                displayEmpty
-                style={{ width: "100%" }}
-                size="small"
-              >
-                <MenuItem value="" disabled>
-                  <em>OJT Semester</em>
-                </MenuItem>
-                {filterOjt?.data.map((semester) => (
-                  <MenuItem key={semester.id} value={semester.id}>
-                    {semester.semester}
-                  </MenuItem>
-                ))}
-              </Select>
             </Grid>
             <Grid item xs={4}>
               <FormControl fullWidth error={Boolean(errors.gender)}>
@@ -493,7 +457,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 </Button>
               </label>
               {formData.avatar && (
-                <Box marginLeft={4} >
+                <Box marginLeft={4}>
                   <Image
                     src={formData.avatar}
                     alt="avatar"

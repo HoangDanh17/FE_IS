@@ -19,9 +19,12 @@ import {
   Paper,
   TableBody,
   styled,
-  Select,
-  MenuItem,
   tableCellClasses,
+  Tooltip,
+  Modal,
+  Backdrop,
+  Fade,
+  Chip,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -30,21 +33,23 @@ import FilterTimeTable from "@/components/timeTable/FilterTimeTable";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   TimeTableResType,
-  TimeTableType,
   WeekResType,
 } from "@/schemaValidations/timetable.schema";
 import timetableApiRequest from "@/apiRequests/timetable";
+import DetailTimeTable from "@/components/timeTable/DetailTimeTable";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
+    textAlign: "center",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
     whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
+    textAlign: "center",
   },
 }));
 
@@ -52,17 +57,27 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
   },
 }));
 
-const TimeTable: React.FC = () => {
+const styleCard = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 500,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+};
+
+const TimeTable = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Dayjs | null>();
   const [selectedDayName, setSelectedDayName] = useState<string>("");
-  const [filterDate, setFilterDate] = useState<Dayjs | null>(null); // Thêm state mới cho DatePicker lọc
+  const [filterDate, setFilterDate] = useState<Dayjs | null>(null);
   const [data, setData] = useState<TimeTableResType | undefined>();
   const [dataWeek, setDataWeek] = useState<WeekResType>();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -88,10 +103,6 @@ const TimeTable: React.FC = () => {
     timetableApiRequest.getTimeTable(body).then((payload) => {
       setData(payload.payload);
     });
-    console.log(
-      "Ngày được chọn từ DatePicker lọc:",
-      newValue ? newValue.format("DD/MM/YYYY") : null
-    );
   };
 
   const handleCardClick = (date: string | Date | null, day: string) => {
@@ -108,13 +119,17 @@ const TimeTable: React.FC = () => {
     setFilterDate(null);
   };
 
-  const handleStatusChange = (
-    event: React.ChangeEvent<{ value: unknown }>,
-    internId: string
-  ) => {
-    const { value } = event.target;
-    // Logic to update status or handle submission
-    console.log(`Intern ID ${internId} status updated to: ${value}`);
+  const [openCardModal, setOpenCardModal] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<any>(null);
+
+  const handleDoubleClick = (row: object) => {
+    setSelectedCard(row);
+    setOpenCardModal(true);
+  };
+
+  const handleCloseCardModal = () => {
+    setOpenCardModal(false);
+    setRefreshKey((prevKey) => prevKey + 1);
   };
 
   return (
@@ -231,72 +246,33 @@ const TimeTable: React.FC = () => {
                     <StyledTableCell>#</StyledTableCell>
                     <StyledTableCell>Tên thực tập</StyledTableCell>
                     <StyledTableCell>Mã thực tập sinh</StyledTableCell>
-                    <StyledTableCell>Trạng thái</StyledTableCell>
-                    <StyledTableCell>Giờ đến (thực tế)</StyledTableCell>
-                    <StyledTableCell>Giờ về (thực tế)</StyledTableCell>
-                    <StyledTableCell>Giờ đến (lịch)</StyledTableCell>
-                    <StyledTableCell>Giờ về (lịch)</StyledTableCell>
-                    <StyledTableCell>Ngày lên văn phòng</StyledTableCell>
-                    {/* <StyledTableCell>Trạng thái điểm danh</StyledTableCell>
-                    <StyledTableCell>Chỉnh sửa thái điểm danh</StyledTableCell> */}
+                    <StyledTableCell>Trạng thái duyệt</StyledTableCell>
+                    <StyledTableCell>Trạng thái điểm danh</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {data && data.data.length > 0 ? (
                     data.data.map((intern, index) => (
-                      <StyledTableRow key={intern.id}>
-                        <StyledTableCell>{index + 1}</StyledTableCell>
-                        <StyledTableCell>{intern.intern_name}</StyledTableCell>
-                        <StyledTableCell>
-                          {intern["student-code"]}
-                        </StyledTableCell>
-                        <StyledTableCell>{intern.status}</StyledTableCell>
-                        <StyledTableCell>{intern["act-start"]}</StyledTableCell>
-                        <StyledTableCell>{intern["act-end"]}</StyledTableCell>
-                        <StyledTableCell>{intern["est-start"]}</StyledTableCell>
-                        <StyledTableCell>{intern["est-end"]}</StyledTableCell>
-                        <StyledTableCell>
-                          {dayjs(intern["office-time"]).format("DD/MM/YYYY")}
-                        </StyledTableCell>
-                        {/* <StyledTableCell>{intern.statusIntern}</StyledTableCell>
-                        <StyledTableCell>
-                          {intern.statusIntern === "not-yet" && (
-                            <Select
-                              value={intern.attendanceStatus}
-                              onChange={(event) =>
-                                handleStatusChange(event, intern.id)
-                              }
-                              style={{ minWidth: 120 }}
-                            >
-                              <MenuItem value="absent">Absent</MenuItem>
-                              <MenuItem value="not-yet">Not Yet</MenuItem>
-                            </Select>
-                          )}
-                          {intern.statusIntern === "wait-for_admin" && (
-                            <Select
-                              value={intern.attendanceStatus}
-                              onChange={(event) =>
-                                handleStatusChange(event, intern.id)
-                              }
-                              style={{ minWidth: 120 }}
-                            >
-                              <MenuItem value="absent">Absent</MenuItem>
-                              <MenuItem value="admin-approve">
-                                Admin Approve
-                              </MenuItem>
-                            </Select>
-                          )}
-                          {intern.statusIntern !== "not-yet" &&
-                            intern.statusIntern !== "wait-for_admin" && (
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                Cannot edit
-                              </Typography>
-                            )}
-                        </StyledTableCell> */}
-                      </StyledTableRow>
+                      <Tooltip
+                        key={index}
+                        title="Ấn 2 lần để xem chi tiết"
+                        arrow
+                      >
+                        <StyledTableRow
+                          key={intern.id}
+                          onDoubleClick={() => handleDoubleClick(intern)}
+                        >
+                          <StyledTableCell>{index + 1}</StyledTableCell>
+                          <StyledTableCell>
+                            {intern.intern_name}
+                          </StyledTableCell>
+                          <StyledTableCell>
+                            {intern["student-code"]}
+                          </StyledTableCell>
+                          <StyledTableCell>{intern.status}</StyledTableCell>
+                          <StyledTableCell>Đang chờ</StyledTableCell>
+                        </StyledTableRow>
+                      </Tooltip>
                     ))
                   ) : (
                     <StyledTableRow>
@@ -325,6 +301,36 @@ const TimeTable: React.FC = () => {
             ></FilterTimeTable>
           </DialogContent>
         </Dialog>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          open={openCardModal}
+          onClose={handleCloseCardModal}
+          closeAfterTransition
+          slots={{ backdrop: Backdrop }}
+          slotProps={{
+            backdrop: {
+              timeout: 500,
+            },
+          }}
+        >
+          <Fade in={openCardModal}>
+            <Box sx={styleCard}>
+              <Typography
+                id="transition-modal-title"
+                variant="h6"
+                component="h2"
+              >
+                Chi tiết lịch làm việc &#160; - &#160;&#160;
+                <Chip label="present" color="success"></Chip>
+              </Typography>
+              <DetailTimeTable
+                row={selectedCard}
+                handleCloseCard={handleCloseCardModal}
+              ></DetailTimeTable>
+            </Box>
+          </Fade>
+        </Modal>
       </Container>
     </LocalizationProvider>
   );

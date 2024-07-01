@@ -2,16 +2,11 @@
 
 import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import {
-  Card,
   Input,
   Button,
   FormControl,
   Grid,
-  CardContent,
-  Select,
-  MenuItem,
   SelectChangeEvent,
-  CardHeader,
   Typography,
   Accordion,
   AccordionSummary,
@@ -21,15 +16,13 @@ import { Search } from "@mui/icons-material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import InternTable, { FormFilterData } from "./InternTable";
-import termApiRequest from "@/apiRequests/term";
-import { TermListResType } from "@/schemaValidations/term.schema";
 
-const Filter = () => {
+const FilterIntern = ({ id, name }: { id: number; name: string }) => {
   const [formData, setFormData] = useState<FormFilterData>({
     "user-name": "",
     email: "",
     "student-code": "",
-    "ojt-semester": "",
+    "ojt-semester": name,
     gender: "",
     "phone-number": "",
     address: "",
@@ -42,20 +35,6 @@ const Filter = () => {
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  const [filterOjt, setFilterOjt] = useState<TermListResType>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { payload } = await termApiRequest.getListTerm(null, null, null);
-        setFilterOjt(payload);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
 
   const [isFilter, setIsFilter] = useState<boolean>(false);
   const [dataFilter, setDataFilter] = useState<FormFilterData | null>(null);
@@ -72,7 +51,7 @@ const Filter = () => {
       "user-name": "",
       email: "",
       "student-code": "",
-      "ojt-semester": "",
+      "ojt-semester": name,
       gender: "",
       "phone-number": "",
       address: "",
@@ -96,7 +75,7 @@ const Filter = () => {
                     <FormControl fullWidth>
                       <Input
                         name="user-name"
-                        placeholder="Username"
+                        placeholder="Tên người dùng"
                         value={formData["user-name"]}
                         onChange={handleChange}
                       />
@@ -107,7 +86,7 @@ const Filter = () => {
                       <Input
                         name="email"
                         placeholder="Email"
-                        value={formData.email}
+                        value={formData.email.trim()}
                         onChange={handleChange}
                       />
                     </FormControl>
@@ -116,7 +95,7 @@ const Filter = () => {
                     <FormControl fullWidth>
                       <Input
                         name="student-code"
-                        placeholder="Student Code"
+                        placeholder="Mã sinh viên"
                         value={formData["student-code"]}
                         onChange={handleChange}
                       />
@@ -124,32 +103,9 @@ const Filter = () => {
                   </Grid>
                   <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
-                      <Select
-                        name="ojt-semester"
-                        value={formData["ojt-semester"]}
-                        onChange={handleChange}
-                        displayEmpty
-                        variant="standard"
-                      >
-                        <MenuItem value="" disabled>
-                          <em>OJT Semester</em>
-                        </MenuItem>
-                        {filterOjt?.data.map((semester) => (
-                          <MenuItem
-                            key={semester.semester}
-                            value={semester.semester}
-                          >
-                            {semester.semester}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <FormControl fullWidth>
                       <Input
                         name="gender"
-                        placeholder="Gender"
+                        placeholder="Giới tính"
                         value={formData.gender}
                         onChange={handleChange}
                       />
@@ -159,7 +115,7 @@ const Filter = () => {
                     <FormControl fullWidth>
                       <Input
                         name="phone-number"
-                        placeholder="Phone Number"
+                        placeholder="Số điện thoại"
                         value={formData["phone-number"]}
                         onChange={handleChange}
                       />
@@ -169,7 +125,7 @@ const Filter = () => {
                     <FormControl fullWidth>
                       <Input
                         name="address"
-                        placeholder="Address"
+                        placeholder="Địa chỉ"
                         value={formData.address}
                         onChange={handleChange}
                       />
@@ -205,6 +161,8 @@ const Filter = () => {
         </Accordion>
       </LocalizationProvider>
       <InternTable
+        id={id}
+        name={name}
         isFilter={isFilter}
         dataFilter={dataFilter}
         handleReset={handleReset}
@@ -213,4 +171,4 @@ const Filter = () => {
   );
 };
 
-export default Filter;
+export default FilterIntern;
