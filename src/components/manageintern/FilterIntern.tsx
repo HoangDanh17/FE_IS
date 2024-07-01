@@ -75,11 +75,7 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                     <FormControl fullWidth>
                       <Input
                         name="user-name"
-<<<<<<< HEAD
                         placeholder="Tên người dùng"
-=======
-                        placeholder="Tên thàn viên"
->>>>>>> dev
                         value={formData["user-name"]}
                         onChange={handleChange}
                       />
@@ -99,11 +95,7 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                     <FormControl fullWidth>
                       <Input
                         name="student-code"
-<<<<<<< HEAD
-                        placeholder="Mã sinh viên"
-=======
                         placeholder="Mã số sinh viên"
->>>>>>> dev
                         value={formData["student-code"]}
                         onChange={handleChange}
                       />
@@ -111,32 +103,6 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                   </Grid>
                   <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
-<<<<<<< HEAD
-=======
-                      <Select
-                        name="ojt-semester"
-                        value={formData["ojt-semester"]}
-                        onChange={handleChange}
-                        displayEmpty
-                        variant="standard"
-                      >
-                        <MenuItem value="" disabled>
-                          <em>Kỳ thực tập</em>
-                        </MenuItem>
-                        {filterOjt?.data.map((semester) => (
-                          <MenuItem
-                            key={semester.semester}
-                            value={semester.semester}
-                          >
-                            {semester.semester}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
-                    <FormControl fullWidth>
->>>>>>> dev
                       <Input
                         name="gender"
                         placeholder="Giới tính"

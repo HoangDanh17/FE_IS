@@ -214,11 +214,7 @@ const TermTable = ({
                       startIcon={<DeleteIcon />}
                       onClick={() => handleOpenDeleteModal(account)}
                     >
-<<<<<<< HEAD
-                      Xóa
-=======
                       Xóa 
->>>>>>> dev
                     </Button>
                   </StyledTableCell>
                 </StyledTableRow>

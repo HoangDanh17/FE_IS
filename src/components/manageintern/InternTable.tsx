@@ -140,17 +140,13 @@ const InternTable = ({
     },
     []
   );
-<<<<<<< HEAD
-console.log(name);
-=======
 
-    // handle close for all
-    const closeButNotRefresh = () => {
-      setOpenAddModal(false);
-      setOpenCardModal(false);
-    }
+  // handle close for all
+  const closeButNotRefresh = () => {
+    setOpenAddModal(false);
+    setOpenCardModal(false);
+  }
 
->>>>>>> dev
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
@@ -237,17 +233,6 @@ console.log(name);
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="custom-row custom-pagination mb-4 bg-white"
       />
-<<<<<<< HEAD
-      <Button
-        variant="contained"
-        className="add-btn"
-        startIcon={<AddIcon />}
-        onClick={handleOpenAddModal}
-        style={{ float: "right" }}
-      >
-        Tạo thực tập
-      </Button>
-=======
 
       <Card >
         <CardContent style={{ height: "68px" }}>
@@ -263,7 +248,6 @@ console.log(name);
       </Card>
 
       {/* Modal add  */}
->>>>>>> dev
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
