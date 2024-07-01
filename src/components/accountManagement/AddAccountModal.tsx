@@ -134,7 +134,7 @@ const AddModalAccount: React.FC<AddModalProps> = ({ onClose }) => {
                         className="cancel-btn"
                         onClick={onClose}
                     >
-                        Cancel
+                        Hủy
                     </Button>
 
                     <Button
@@ -142,7 +142,7 @@ const AddModalAccount: React.FC<AddModalProps> = ({ onClose }) => {
                         color="primary"
                         type='submit'
                     >
-                        Add
+                        Tạo
                     </Button>
                 </Box>
             </form>

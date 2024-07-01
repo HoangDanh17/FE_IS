@@ -14,7 +14,6 @@ interface EditModalAccountProps {
 
 const EditModalAccount: React.FC<EditModalAccountProps> = ({ onClose, row }) => {
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
 
     const [formData, setFormData] = useState<UpdateAccountType>({
         id: row?.id ?? '',
@@ -50,7 +49,7 @@ const EditModalAccount: React.FC<EditModalAccountProps> = ({ onClose, row }) => 
 
         } catch (error: any) {
             toast({
-                title: `${error}`,
+                title: `${error.message}`,
                 duration: 2000,
                 variant: "destructive",
             });
@@ -117,19 +116,18 @@ const EditModalAccount: React.FC<EditModalAccountProps> = ({ onClose, row }) => 
 
                     <Box display="flex" justifyContent="flex-end">
                         <Button
-                            color="primary"
-                            className="cancel-btn"
-                            onClick={onClose}
-                        >
-                            Cancel
-                        </Button>
-
-                        <Button
                             variant="contained"
                             color="primary"
                             onClick={handleSubmit}
                         >
-                            Sửa
+                            Cập nhật
+                        </Button>
+                        <Button
+                            color="primary"
+                            className="cancel-btn"
+                            onClick={onClose}
+                        >
+                            Hủy
                         </Button>
                     </Box>
                 </form>

@@ -144,14 +144,14 @@ const FilterAccount = () => {
                                 </Grid>
 
                                 <Grid container item xs={12} sm={12} md={4} lg={4} spacing={1}>
-                                    <Grid item>
-                                        <Button className='clean-btn' onClick={handleReset}>
-                                            Xóa Filter
+                                    <Grid item xs={6}>
+                                        <Button type="submit" variant="contained" startIcon={<Search />} fullWidth className='search-btn'>
+                                            Tìm kiếm
                                         </Button>
                                     </Grid>
-                                    <Grid item>
-                                        <Button type="submit" variant="contained" startIcon={<Search />} className='search-btn'>
-                                            Search
+                                    <Grid item xs={6}>
+                                        <Button fullWidth className='clean-btn' onClick={handleReset}>
+                                            Hủy Filter
                                         </Button>
                                     </Grid>
                                 </Grid>

@@ -96,7 +96,7 @@ const Filter = () => {
                     <FormControl fullWidth>
                       <Input
                         name="user-name"
-                        placeholder="Username"
+                        placeholder="Tên thàn viên"
                         value={formData["user-name"]}
                         onChange={handleChange}
                       />
@@ -116,7 +116,7 @@ const Filter = () => {
                     <FormControl fullWidth>
                       <Input
                         name="student-code"
-                        placeholder="Student Code"
+                        placeholder="Mã số sinh viên"
                         value={formData["student-code"]}
                         onChange={handleChange}
                       />
@@ -132,7 +132,7 @@ const Filter = () => {
                         variant="standard"
                       >
                         <MenuItem value="" disabled>
-                          <em>OJT Semester</em>
+                          <em>Kỳ thực tập</em>
                         </MenuItem>
                         {filterOjt?.data.map((semester) => (
                           <MenuItem
@@ -149,13 +149,13 @@ const Filter = () => {
                     <FormControl fullWidth>
                       <Input
                         name="gender"
-                        placeholder="Gender"
+                        placeholder="Giới tính"
                         value={formData.gender}
                         onChange={handleChange}
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={3}>
+                  {/* <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
                       <Input
                         name="phone-number"
@@ -164,8 +164,8 @@ const Filter = () => {
                         onChange={handleChange}
                       />
                     </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={3}>
+                  </Grid> */}
+                  {/* <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
                       <Input
                         name="address"
@@ -174,8 +174,8 @@ const Filter = () => {
                         onChange={handleChange}
                       />
                     </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={3} container spacing={2}>
+                  </Grid> */}
+                  <Grid container item xs={12} sm={12} md={4} lg={4} spacing={1}>
                     <Grid item xs={6}>
                       <Button
                         type="submit"
@@ -184,7 +184,7 @@ const Filter = () => {
                         className="search-btn"
                         fullWidth
                       >
-                        Search
+                        Tìm kiếm
                       </Button>
                     </Grid>
                     <Grid item xs={6}>
@@ -194,7 +194,7 @@ const Filter = () => {
                         className="clean-btn"
                         fullWidth
                       >
-                        Clean Filter
+                        Hủy Filter
                       </Button>
                     </Grid>
                   </Grid>

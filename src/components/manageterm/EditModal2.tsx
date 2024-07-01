@@ -196,7 +196,7 @@ const EditModal = ({
 
             <Box display="flex" justifyContent="flex-end">
               <Button variant="contained" color="primary" onClick={handleAdd} disabled={loading}>
-                {loading ? "Loading..." : "Edit"}
+                {loading ? "Loading..." : "Cập nhật"}
               </Button>
             </Box>
           </FormControl>

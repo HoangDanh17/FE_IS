@@ -55,7 +55,7 @@ const ConfirmDeleteModal: React.FC<DeleteModalAccountProps> = ({ onClose, row })
         }}
     >
         <Typography id="modal-modal-title" variant="h6" component="h2">
-            Confirm Delete
+            Xác nhận xóa
         </Typography>
         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Bạn có chắc chắn muốn xóa account: {row?.['user-name']}?

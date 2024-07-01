@@ -399,7 +399,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                 size="small"
               >
                 <MenuItem value="" disabled>
-                  <em>OJT Semester</em>
+                  <em>Kỳ thực tập</em>
                 </MenuItem>
                 {filterOjt?.data.map((semester) => (
                   <MenuItem key={semester.id} value={semester.id}>
@@ -489,7 +489,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
                   color="primary"
                   disabled={loading}
                 >
-                  {loading ? "Uploading..." : "Upload Avatar"}
+                  {loading ? "Đang tải..." : "Tải ảnh lên"}
                 </Button>
               </label>
               {formData.avatar && (
@@ -518,7 +518,7 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
               startIcon={<AddIcon />}
               disabled={loading}
             >
-              {loading ? "Adding..." : "Add"}
+              {loading ? "Adding..." : "Tạo"}
             </Button>
           </Box>
         </FormControl>
