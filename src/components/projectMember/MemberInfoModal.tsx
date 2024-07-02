@@ -64,10 +64,10 @@ const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, se
                                         <Typography variant="h6">Hình ảnh </Typography>
                                         <AvatarGroup>
                                             {/* {listImage?.data.map((image, index) => ( */}
-                                            <Tooltip title="tam">
+                                            <Tooltip title={selectedMember['user-name']}>
                                                 <Avatar
                                                     //alt={image['user-name']}
-                                                    src="/images/avatar.jpg"
+                                                    src={selectedMember.avatar}
                                                 />
                                             </Tooltip>
                                             {/* ))} */}
@@ -77,7 +77,6 @@ const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, se
                             </Grid>
                         </Grid>
 
-
                         <Box display="flex" justifyContent="flex-end">
                             <Button
                                 variant='contained'
@@ -85,7 +84,7 @@ const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, se
                                 color="error"
                                 startIcon={<DeleteIcon />}
                             >
-                                Xóa
+                                Dừng hoạt động
                             </Button>
                         </Box>
                     </FormControl>

@@ -25,6 +25,9 @@ const termApiRequest = {
   },
   deleteTerm: (body: string) =>
     http.delete<CreateTermResType>(`/api/v1/ojts/${body}`),
+
+  getTerm: () => http.get<TermListResType>(`/api/v1/ojts`),
+
 };
 
 export default termApiRequest;

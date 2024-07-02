@@ -1,18 +1,10 @@
-import FilterProjectMember from "@/components/projectMember/Filter";
+import ListCardProject from "@/components/projectMember/ListCardProject";
 const projectMember = () => {
     return (
         <div>
             <div className="filter">
-                <FilterProjectMember />
+                <ListCardProject />
             </div>
-
-            {/* <div className="table" style={{ marginTop: "10px" }}>
-                <TableProjectMember />
-            </div> */}
-
-            {/* <div>
-                <ButtonGroupMemberProject />
-            </div> */}
 
         </div>
     );
