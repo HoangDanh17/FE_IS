@@ -15,8 +15,8 @@ const ConfirmDeleteModal: React.FC<DeleteModalAccountProps> = ({ onClose, row })
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-     //handle delete
-     const handleDelete = async () => {
+    //handle delete
+    const handleDelete = async () => {
         if (row) {
             try {
                 setLoading(true);
@@ -27,7 +27,7 @@ const ConfirmDeleteModal: React.FC<DeleteModalAccountProps> = ({ onClose, row })
                     variant: "success",
                 });
 
-               // router.refresh();
+                // router.refresh();
             } catch (error: any) {
                 toast({
                     title: `${error}`,
@@ -40,44 +40,44 @@ const ConfirmDeleteModal: React.FC<DeleteModalAccountProps> = ({ onClose, row })
             }
         }
     };
-    
+
     return (
         <Box
-        sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-        }}
-    >
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-            Xác nhận xóa
-        </Typography>
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Bạn có chắc chắn muốn xóa account: {row?.['user-name']}?
-        </Typography>
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-            <Button
-                variant="contained"
-                color='error'
-                onClick={handleDelete}
-                disabled={loading}
-                sx={{ mr: 1 }}
-            >
-                {loading ? "Deleting..." : "Xóa"}
-            </Button>
-            <Button
-                variant="outlined"
-                onClick={onClose}
-            >
-                Hủy
-            </Button>
+            sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 400,
+                bgcolor: 'background.paper',
+                boxShadow: 24,
+                p: 4,
+            }}
+        >
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+                Xác nhận xóa
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                Bạn có chắc chắn muốn xóa account: {row?.['user-name']}?
+            </Typography>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                <Button
+                    variant="contained"
+                    color='error'
+                    onClick={handleDelete}
+                    disabled={loading}
+                    sx={{ mr: 1 }}
+                >
+                    {loading ? "Deleting..." : "Xóa"}
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={onClose}
+                >
+                    Hủy
+                </Button>
+            </Box>
         </Box>
-    </Box>
     )
 }
 export default ConfirmDeleteModal;

@@ -28,6 +28,6 @@ const projectMemberApiRequest = {
         ),
 
     deleteMemberInProject: (projectID: string, memberID: string) =>
-        http.delete(`/api/v1/accounts/${projectID}`)
+        http.delete(`/api/v1/projects/${projectID}/${memberID}`)
 };
 export default projectMemberApiRequest;

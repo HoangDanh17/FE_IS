@@ -1,12 +1,13 @@
-'use client'
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { Table, TableBody, TableContainer, TableHead, TableRow, Paper, Avatar, TablePagination, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import MemberInfoModal from './MemberInfoModal';
-import "@/styles/accountManagement/DataTable.css";
 import { ProjectMemberListResType, ProjectMemberType } from '@/schemaValidations/projectMember/projectMember.schema';
+import "@/styles/accountManagement/DataTable.css";
+import projectMemberApiRequest from '@/apiRequests/projectMember/projectMember';
+import { toast } from "@/components/ui/use-toast";
 
 const StyledCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -31,6 +32,7 @@ const StyledRow = styled(TableRow)(({ theme }) => ({
     backgroundColor: theme.palette.action.hover,
   },
 }));
+
 export interface FormFilter {
   "user-name": string,
   "student-code": string,
@@ -38,27 +40,25 @@ export interface FormFilter {
   university: string,
 }
 
+
 function TableProjectMember({
   isFilter,
   dataFilter,
-  cardMem
+  cardMem,
+  selectedProjectId
 }: {
   isFilter: boolean;
   dataFilter: FormFilter | null;
   cardMem: ProjectMemberListResType | null;
+  selectedProjectId: string;
 }) {
-  const [selectedMember, setSelectedMember] = React.useState<ProjectMemberType | null>(null);
-  const [open, setOpen] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
-
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  // confirm Delete
-  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [selectedMember, setSelectedMember] = useState<ProjectMemberType | null>(null);
+  const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleChangePage = (event: unknown, newPage: number) => {
-    setLoading(true);
     setPage(newPage);
   };
 
@@ -77,42 +77,54 @@ function TableProjectMember({
     setSelectedMember(null);
   };
 
+  // Open confirm modal
   const handleDelete = (member: ProjectMemberListResType["data"][0]) => {
-    //setSelectedMember({ status: 204, data: [member] });
     setConfirmOpen(true);
+    setSelectedMember(member);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (selectedMember) {
-      setConfirmOpen(false);
-      handleClose();
+      try {
+        await projectMemberApiRequest.deleteMemberInProject(selectedProjectId, selectedMember.id);
+        toast({
+          title: `Deleted member ${selectedMember['user-name']} successfully!`,
+          duration: 2000,
+          variant: "success",
+        });
+      } catch (error: any) {
+        toast({
+          title: `Failed to delete member: ${error.message}`,
+          duration: 2000,
+          variant: "destructive",
+        });
+      } finally {
+        setOpen(false)
+        setConfirmOpen(false);
+        setSelectedMember(null);
+      }
     }
   };
 
   const cancelDelete = () => {
-    setOpen(false);
+    setOpen(false)
     setSelectedMember(null);
     setConfirmOpen(false);
   };
 
-  // Log cardMem to see its structure
-  
-
   const paginatedData = cardMem?.data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-  console.log("cardmem: ", cardMem)
+
   return (
-    <Box sx={{ width: '135%' }}>
-      {/* <Typography variant='h4'>Thành viên dự án</Typography> */}
-      {/* <ScrollArea className="h-[350px] rounded-md border p-4 mt-3"> */}
-      <TableContainer sx={{ width: '100%', overflowX: 'auto' }} component={Paper}>
+    <Box sx={{ width: '100%' }}>
+      <TableContainer component={Paper}>
         <Table sx={{ minWidth: 640 }} aria-label="customized table">
           <TableHead>
             <TableRow>
               <StyledCell>Avatar</StyledCell>
               <StyledCell>Tên Thành Viên</StyledCell>
               <StyledCell>Mã số sinh viên</StyledCell>
-              <StyledCell>Kỳ thực tập</StyledCell>
-              <StyledCell>Kỹ năng công nghệ</StyledCell>
+              {/* <StyledCell>Kỳ thực tập</StyledCell>
+              <StyledCell>Kỹ năng công nghệ</StyledCell> */}
               <StyledCell>Hành động</StyledCell>
             </TableRow>
           </TableHead>
@@ -123,14 +135,14 @@ function TableProjectMember({
                 <CenteredAvatarCell>
                   <Avatar
                     //alt={`Avatar of ${row.internID}`}
-                    //src={row.avatarUrl}
+                    src={member.avatar}
                     sx={{ width: 45, height: 45 }}
                   />
                 </CenteredAvatarCell>
                 <StyledCell>{member['user-name']}</StyledCell>
                 <StyledCell>{member['student-code']}</StyledCell>
-                <StyledCell>{member['ojt-semester-university']}</StyledCell>
-                <StyledCell>{member.technical_skills}</StyledCell>
+                {/* <StyledCell>{member['ojt-semester-university']}</StyledCell>
+                <StyledCell>{member.technical_skills}</StyledCell> */}
 
                 <StyledCell>
                   <Button size='small' onClick={() => handleClickOpen(member)}>Click</Button>
@@ -151,9 +163,7 @@ function TableProjectMember({
         onRowsPerPageChange={handleChangeRowsPerPage}
         className="custom-row custom-pagination"
       />
-      {/* </ScrollArea> */}
 
-      {/* Thông tin từng trong card */}
       <MemberInfoModal
         open={open}
         handleClose={handleClose}
@@ -161,7 +171,6 @@ function TableProjectMember({
         handleDelete={handleDelete}
       />
 
-      {/* Xác nhận xóa */}
       <Dialog
         open={confirmOpen}
         onClose={cancelDelete}

@@ -1,6 +1,6 @@
 import z from "zod";
 
-// Define the individual project schema
+// Define the individual schema
 export const TermSchema = z.object({
   id: z.string(),
   semester: z.string(),
