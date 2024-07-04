@@ -9,7 +9,7 @@ import TableProjectMember, { FormFilter } from './Table';
 import projectMemberApiRequest from '@/apiRequests/projectMember/projectMember';
 import ButtonAdd from './Button';
 interface FilterProjectMemberProps {
-    selectedProjectId: string | null;
+    selectedProjectId: string;
 }
 
 const FilterProjectMember: React.FC<FilterProjectMemberProps> = ({ selectedProjectId }) => {
@@ -144,6 +144,7 @@ const FilterProjectMember: React.FC<FilterProjectMemberProps> = ({ selectedProje
                     cardMem={members}
                     isFilter={isFilter}
                     dataFilter={dataFilter}
+                    selectedProjectId={selectedProjectId}
                 />
 
                 {/* ButtonAdd Component */}

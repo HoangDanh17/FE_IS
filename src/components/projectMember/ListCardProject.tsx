@@ -1,34 +1,17 @@
 'use client'
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { Input, Button, FormControl, Grid, InputLabel, MenuItem, Typography, Autocomplete, Card, CardContent, CardHeader, Skeleton } from '@mui/material';
-import { Search } from '@mui/icons-material';
-import AddIcon from '@mui/icons-material/Add';
-import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
+import React, { useState, useEffect } from 'react';
+import { Button, Grid, Typography, Card, CardContent, CardHeader, Skeleton } from '@mui/material';
 import "@/styles/projectMember/Filter.css"
-import AddMemberModal from './AddMemberModal';
-import projectMemberApiRequest from '@/apiRequests/projectMember/projectMember';
-import { RowData } from '../projectList/DetailCard';
 import projectApiRequest from '@/apiRequests/project';
-import { ProjectMemberListResType } from '@/schemaValidations/projectMember/projectMember.schema';
-import { FormFilterData } from './AddMemberModal';
-import TableProjectMember from './Table';
 import { usePathname, useRouter } from "next/navigation";
 
 type Project = {
     id: string;
     name: string;
 };
-interface ProjectProps {
-    row: RowData;
-}
 
 const ListCardProject = () => {
-    const [modalOpen, setModalOpen] = useState(false);
     const [project, setProject] = useState<Project[]>([]);
-    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
     const [limit, setLimit] = useState(12);
     const [loading, setLoading] = useState(false);
     const router = useRouter();

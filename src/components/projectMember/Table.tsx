@@ -6,6 +6,8 @@ import { Table, TableBody, TableContainer, TableHead, TableRow, Paper, Avatar, T
 import MemberInfoModal from './MemberInfoModal';
 import { ProjectMemberListResType, ProjectMemberType } from '@/schemaValidations/projectMember/projectMember.schema';
 import "@/styles/accountManagement/DataTable.css";
+import projectMemberApiRequest from '@/apiRequests/projectMember/projectMember';
+import { toast } from "@/components/ui/use-toast";
 
 const StyledCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -38,14 +40,17 @@ export interface FormFilter {
   university: string,
 }
 
+
 function TableProjectMember({
   isFilter,
   dataFilter,
-  cardMem
+  cardMem,
+  selectedProjectId
 }: {
   isFilter: boolean;
   dataFilter: FormFilter | null;
   cardMem: ProjectMemberListResType | null;
+  selectedProjectId: string;
 }) {
   const [selectedMember, setSelectedMember] = useState<ProjectMemberType | null>(null);
   const [open, setOpen] = useState(false);
@@ -72,19 +77,37 @@ function TableProjectMember({
     setSelectedMember(null);
   };
 
+  // Open confirm modal
   const handleDelete = (member: ProjectMemberListResType["data"][0]) => {
     setConfirmOpen(true);
+    setSelectedMember(member);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (selectedMember) {
-      setConfirmOpen(false);
-      handleClose();
+      try {
+        await projectMemberApiRequest.deleteMemberInProject(selectedProjectId, selectedMember.id);
+        toast({
+          title: `Deleted member ${selectedMember['user-name']} successfully!`,
+          duration: 2000,
+          variant: "success",
+        });
+      } catch (error: any) {
+        toast({
+          title: `Failed to delete member: ${error.message}`,
+          duration: 2000,
+          variant: "destructive",
+        });
+      } finally {
+        setOpen(false)
+        setConfirmOpen(false);
+        setSelectedMember(null);
+      }
     }
   };
 
   const cancelDelete = () => {
-    setOpen(false);
+    setOpen(false)
     setSelectedMember(null);
     setConfirmOpen(false);
   };
