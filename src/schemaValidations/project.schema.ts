@@ -5,8 +5,8 @@ export const ProjectSchema = z.object({
   id: z.string(),
   name: z.string(),
   status: z.string(),
-  "start-date": z.string(),
-  duration: z.string(),
+  "est-start-time": z.string(),
+  "est-completion-time": z.string(),
 });
 
 // Define the pagination schema
@@ -21,9 +21,12 @@ export const ProjectPageSchema = z.object({
 export const ProjectFilterSchema = z.object({
   name: z.string().optional(),
   status: z.string().optional(),
-  "order-by": z.string().optional(),
-  "start-date-from": z.string().optional(),
-  "start-date-to": z.string().optional(),
+  "est-start-time-from": z
+    .union([z.string().nullable(), z.date().nullable()])
+    .optional(),
+  "est-start-time-to": z
+    .union([z.string().nullable(), z.date().nullable()])
+    .optional(),
 });
 
 // Define the full response schema
@@ -36,27 +39,27 @@ export const ProjectListRes = z.object({
 
 export const CreateProject = z.object({
   description: z.string(),
-  duration: z.string(),
   name: z.string(),
-  "start-at": z.union([z.string().nullable(), z.date().nullable()]),
+  "est-start-time": z.union([z.string().nullable(), z.date().nullable()]),
+  "est-completion-time": z.union([z.string().nullable(), z.date().nullable()]),
 });
 
 export const UpdateProject = z.object({
-  status: z.string(),
   id: z.string(),
   description: z.string(),
-  duration: z.string(),
+  "est-completion-time": z.union([z.string().nullable(), z.date().nullable()]),
+  "est-start-time": z.union([z.string().nullable(), z.date().nullable()]),
   name: z.string(),
-  "start-at": z.union([z.string().nullable(), z.date().nullable()]),
+  status: z.string(),
 });
 
 export const UpdateProjectForApi = z.object({
-  status: z.string(),
   id: z.string(),
   description: z.string(),
-  duration: z.string(),
+  "est-completion-time": z.union([z.string().nullable(), z.date().nullable()]),
+  "est-start-time": z.union([z.string().nullable(), z.date().nullable()]),
   name: z.string(),
-  "start-date": z.union([z.string().nullable(), z.date().nullable()]),
+  status: z.string(),
 });
 
 export const CreateProjectRes = z.object({

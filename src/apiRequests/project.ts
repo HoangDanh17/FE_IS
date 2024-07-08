@@ -24,12 +24,12 @@ const projectApiRequest = {
       `/api/v1/projects?page=${page}&psize=${psize}${
         body?.name ? `&name=${body.name}` : ""
       }${body?.status ? `&status=${body.status}` : ""}${
-        body?.["start-date-from"]
-          ? `&start-date-from=${body?.["start-date-from"]}`
+        body?.["est-start-time-from"]
+          ? `&est-start-time-from=${body?.["est-start-time-from"]}`
           : ""
       }${
-        body?.["start-date-to"]
-          ? `&start-date-to=${body?.["start-date-to"]}`
+        body?.["est-start-time-to"]
+          ? `&est-start-time-to=${body?.["est-start-time-to"]}`
           : ""
       }`
     ),

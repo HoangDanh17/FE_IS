@@ -67,7 +67,7 @@ const styleCard = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 500,
+  width: 600,
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
@@ -130,6 +130,32 @@ const TimeTable = () => {
   const handleCloseCardModal = () => {
     setOpenCardModal(false);
     setRefreshKey((prevKey) => prevKey + 1);
+  };
+
+  const getStatusChipColor = (status: string) => {
+    switch (status) {
+      case "not-yet":
+        return { backgroundColor: "#bab8b5", color: "white" }; // Màu hồng pastel đậm hơn
+      case "present":
+        return { backgroundColor: "green", color: "white" }; // Màu xanh lá pastel đậm hơn
+      case "absent":
+        return { backgroundColor: "red", color: "white" }; // Màu cam pastel đậm hơn
+      default:
+        return { backgroundColor: "#D3D3D3", color: "white" }; // Màu xám
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "not-yet":
+        return "Đang chờ";
+      case "present":
+        return "Đã điểm danh";
+      case "absent":
+        return "Vắng mặt";
+      default:
+        return "Không xác định";
+    }
   };
 
   return (
@@ -269,8 +295,54 @@ const TimeTable = () => {
                           <StyledTableCell>
                             {intern["student-code"]}
                           </StyledTableCell>
-                          <StyledTableCell>{intern.status}</StyledTableCell>
-                          <StyledTableCell>Đang chờ</StyledTableCell>
+                          <StyledTableCell>
+                            {intern.verified === "processing" ? (
+                              <Typography
+                                component="span"
+                                style={{ color: "#bab8b5" }}
+                              >
+                                Đang đợi
+                              </Typography>
+                            ) : intern.verified === "approved" ? (
+                              <Typography
+                                component="span"
+                                style={{ color: "green" }}
+                              >
+                                Đã duyệt
+                              </Typography>
+                            ) : (
+                              <Typography
+                                component="span"
+                                style={{ color: "red" }}
+                              >
+                                Từ chối
+                              </Typography>
+                            )}
+                          </StyledTableCell>
+                          <StyledTableCell>
+                            {intern["status-attendance"] === "not-yet" ? (
+                              <Typography
+                                component="span"
+                                style={{ color: "#bab8b5" }}
+                              >
+                                Đang đợi
+                              </Typography>
+                            ) : intern["status-attendance"] === "present" ? (
+                              <Typography
+                                component="span"
+                                style={{ color: "green" }}
+                              >
+                                Đã điểm danh
+                              </Typography>
+                            ) : (
+                              <Typography
+                                component="span"
+                                style={{ color: "red" }}
+                              >
+                                Vắng mặt
+                              </Typography>
+                            )}
+                          </StyledTableCell>
                         </StyledTableRow>
                       </Tooltip>
                     ))
@@ -322,7 +394,11 @@ const TimeTable = () => {
                 component="h2"
               >
                 Chi tiết lịch làm việc &#160; - &#160;&#160;
-                <Chip label="present" color="success"></Chip>
+                <Chip
+                  size="small"
+                  label={getStatusLabel(selectedCard?.["status-attendance"])}
+                  sx={getStatusChipColor(selectedCard?.["status-attendance"])}
+                ></Chip>
               </Typography>
               <DetailTimeTable
                 row={selectedCard}

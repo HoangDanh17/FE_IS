@@ -11,7 +11,7 @@ const timetableApiRequest = {
     http.get<TimeTableResType>(
       `/api/v1/timetables?${
         body?.["intern-name"] ? `&intern-name=${body["intern-name"]}` : ""
-      }${body?.status ? `&status=${body.status}` : ""}${
+      }${body?.verified ? `&verified=${body.verified}` : ""}${
         body?.["office-time-from"]
           ? `&office-time-from=${body["office-time-from"]}`
           : ""
@@ -21,7 +21,7 @@ const timetableApiRequest = {
           : ""
       }`
     ),
-  approveTimeTable: (id: string, body: { status: string }) =>
+  approveTimeTable: (id: string, body: { verified: string }) =>
     http.post<CreateResType>(`/api/v1/timetables/${id}/approve`, body),
   getCurrentWeek: () => http.get<WeekResType>(`/api/v1/timetables/weekly`),
 };

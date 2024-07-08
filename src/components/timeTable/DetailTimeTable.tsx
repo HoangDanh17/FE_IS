@@ -1,7 +1,10 @@
 import { TimeTableType } from "@/schemaValidations/timetable.schema";
-import React from "react";
+import React, { useState } from "react";
 import { Grid, Typography, Box, Button } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import timetableApiRequest from "@/apiRequests/timetable";
+import { toast } from "@/components/ui/use-toast";
+
 const DetailTimeTable = ({
   row,
   handleCloseCard,
@@ -9,7 +12,6 @@ const DetailTimeTable = ({
   row: TimeTableType;
   handleCloseCard: () => void;
 }) => {
-
   const renderStatus = (status: string) => {
     switch (status) {
       case "not-yet":
@@ -30,7 +32,7 @@ const DetailTimeTable = ({
             - Vắng mặt
           </Typography>
         );
-      case "wait-for-admin":
+      case "admin-check":
         return (
           <Box display="flex" alignItems="center">
             <Typography
@@ -39,14 +41,14 @@ const DetailTimeTable = ({
                 color: "#EEC759",
                 fontWeight: "bold",
                 marginRight: "8px",
-              }} // Pastel vàng
+              }}
             >
               - Chờ admin duyệt
             </Typography>
             <Button
               variant="outlined"
               size="small"
-              startIcon={<ThumbUpIcon></ThumbUpIcon>}
+              startIcon={<ThumbUpIcon />}
               onClick={() => console.log("admin-approve")}
               style={{ borderColor: "#77DD77", color: "#77DD77" }} // Pastel xanh lá cây
             >
@@ -68,10 +70,39 @@ const DetailTimeTable = ({
     }
   };
 
+  const renderTime = (time: string) => {
+    return time ? time : "đang đợi";
+  };
+
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(id: string, newStatus: string) {
+    setLoading(true);
+
+    const body = { verified: newStatus };
+    try {
+      const result = await timetableApiRequest.approveTimeTable(id, body);
+      toast({
+        title: `${result.payload.message}`,
+        duration: 2000,
+        variant: "success",
+      });
+      handleCloseCard();
+    } catch (error: any) {
+      toast({
+        title: `${error}`,
+        duration: 2000,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <Box>
       <Grid container direction="column" spacing={2} style={{ marginTop: 10 }}>
-      <Grid item>
+        <Grid item>
           <Grid container height="30px">
             <Grid item xs={4}>
               <Typography variant="subtitle1" fontWeight="bold">
@@ -79,7 +110,9 @@ const DetailTimeTable = ({
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="body1">01/07/2024</Typography>
+              <Typography variant="body1">
+                {renderTime(row["office-time"])}
+              </Typography>
             </Grid>
           </Grid>
         </Grid>
@@ -91,7 +124,9 @@ const DetailTimeTable = ({
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="body1">1:00</Typography>
+              <Typography variant="body1">
+                {renderTime(row["est-start-time"])}
+              </Typography>
             </Grid>
           </Grid>
         </Grid>
@@ -105,9 +140,9 @@ const DetailTimeTable = ({
             <Grid item xs={6}>
               <Box display="flex" alignItems="center">
                 <Typography variant="body1" style={{ marginRight: "8px" }}>
-                  12:49:00
+                  {renderTime(row["act-clockin"])}
                 </Typography>
-                {renderStatus("admin-approve")}
+                {renderStatus(row["clockin-validated"])}
               </Box>
             </Grid>
           </Grid>
@@ -120,7 +155,9 @@ const DetailTimeTable = ({
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="body1">4:00</Typography>
+              <Typography variant="body1">
+                {renderTime(row["est-end-time"])}
+              </Typography>
             </Grid>
           </Grid>
         </Grid>
@@ -134,17 +171,22 @@ const DetailTimeTable = ({
             <Grid item xs={6}>
               <Box display="flex" alignItems="center">
                 <Typography variant="body1" style={{ marginRight: "8px" }}>
-                  4:00
+                  {renderTime(row["act-clockout"])}
                 </Typography>
-                {renderStatus("absent")}
+                {renderStatus(row["clockout-validated"])}
               </Box>
             </Grid>
           </Grid>
         </Grid>
       </Grid>
       <Box display="flex" justifyContent="flex-end" mt={2}>
-        <Button variant="contained" color="error">
-          Absent
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() => handleSubmit(row.id, "absent")}
+          disabled={loading}
+        >
+          {loading ? "..." : "Vắng mặt"}
         </Button>
       </Box>
     </Box>

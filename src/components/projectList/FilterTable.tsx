@@ -15,7 +15,6 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
-import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import MuiAccordion, { AccordionProps } from "@mui/material/Accordion";
 import MuiAccordionSummary, {
   AccordionSummaryProps,
@@ -58,9 +57,9 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 }));
 
 const statusLabels: { [key: string]: string } = {
-  not_start: "Chưa bắt đầu",
-  doing: "Đang thực hiện",
-  done: "Hoàn thành",
+  not_started: "Chưa bắt đầu",
+  in_progress: "Đang thực hiện",
+  completed: "Hoàn thành",
   cancel: "Hủy bỏ",
 };
 
@@ -68,8 +67,8 @@ const FilterTable = () => {
   const [formData, setFormData] = useState<FormFilterData>({
     name: "",
     status: "",
-    "start-date-from": "",
-    "start-date-to": "",
+    "est-start-time-from": "",
+    "est-start-time-to": "",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -100,8 +99,8 @@ const FilterTable = () => {
     setFormData({
       name: "",
       status: "",
-      "start-date-from": "",
-      "start-date-to": "",
+      "est-start-time-from": "",
+      "est-start-time-to": "",
     });
     setIsFilter(false);
     setDataFilter(null);
@@ -113,7 +112,10 @@ const FilterTable = () => {
         <Grid container spacing={1}>
           <Grid item xs={24}>
             <Accordion defaultExpanded>
-              <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
+              <AccordionSummary
+                aria-controls="panel1d-content"
+                id="panel1d-header"
+              >
                 <Typography>Tìm kiếm thông tin</Typography>
               </AccordionSummary>
               <AccordionDetails>
@@ -133,14 +135,14 @@ const FilterTable = () => {
                     </Grid>
                     <Grid item xs={3}>
                       <DatePicker
-                        label="Ngày bắt đầu từ"
+                        label="Ngày dự kiến bắt đầu"
                         value={
-                          formData["start-date-from"]
-                            ? dayjs(formData["start-date-from"])
+                          formData["est-start-time-from"]
+                            ? dayjs(formData["est-start-time-from"])
                             : null
                         }
                         onChange={(date) =>
-                          handleDateChange("start-date-from", date)
+                          handleDateChange("est-start-time-from", date)
                         }
                         slotProps={{
                           textField: {
@@ -156,14 +158,14 @@ const FilterTable = () => {
                     </Grid>
                     <Grid item xs={3}>
                       <DatePicker
-                        label="Ngày bắt đầu đến"
+                        label="Ngày dự kiến kết thúc"
                         value={
-                          formData["start-date-to"]
-                            ? dayjs(formData["start-date-to"])
+                          formData["est-start-time-to"]
+                            ? dayjs(formData["est-start-time-to"])
                             : null
                         }
                         onChange={(date) =>
-                          handleDateChange("start-date-to", date)
+                          handleDateChange("est-start-time-to", date)
                         }
                         slotProps={{
                           textField: {
@@ -194,9 +196,9 @@ const FilterTable = () => {
                         <MenuItem disabled value="">
                           <em>Chọn trạng thái</em>
                         </MenuItem>
-                        <MenuItem value="not_start">Chưa bắt đầu</MenuItem>
-                        <MenuItem value="doing">Đang thực hiện</MenuItem>
-                        <MenuItem value="done">Hoàn thành</MenuItem>
+                        <MenuItem value="not_started">Chưa bắt đầu</MenuItem>
+                        <MenuItem value="in_progress">Đang diễn ra</MenuItem>
+                        <MenuItem value="completed">Đã kết thúc</MenuItem>
                         <MenuItem value="cancel">Hủy bỏ</MenuItem>
                       </Select>
                     </Grid>
@@ -212,6 +214,7 @@ const FilterTable = () => {
                       </Button>
                       <Button
                         onClick={handleReset}
+                        variant="outlined"
                         style={{
                           width: "40%",
                           marginTop: 4,

@@ -21,7 +21,8 @@ import {
   Box,
   Typography,
   Card,
-  CardContent
+  CardContent,
+  Chip,
 } from "@mui/material";
 import AddModal from "./AddModal2";
 import termApiRequest from "@/apiRequests/term";
@@ -35,12 +36,14 @@ export interface RowData2 {
   university: string;
   "start-at": string;
   "end-at": string;
+  status:string;
 }
 
 export interface RowData {
   id: string;
   semester: string;
   university: string;
+  status:string;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -134,9 +137,9 @@ const TermTable = ({
   // handle close for all
   const closeButNotRefresh = () => {
     setOpenAddModal(false);
-    setOpenEditModal(false)
+    setOpenEditModal(false);
     setOpenDeleteModal(false);
-  }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -156,6 +159,33 @@ const TermTable = ({
     };
     fetchData();
   }, [isFilter, page, rowsPerPage, dataFilter, refreshKey]);
+
+  const getStatusChipColor = (status: string) => {
+    switch (status) {
+      case "not_started":
+        return { backgroundColor: "#FFB6C1", color: "white" }; // Màu hồng pastel đậm hơn
+      case "in_progress":
+        return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
+      case "completed":
+        return { backgroundColor: "#90EE90", color: "white" }; // Màu xanh lá pastel đậm hơn
+      default:
+        return { backgroundColor: "#D3D3D3", color: "white" }; // Màu xám
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "not_started":
+        return "Chưa bắt đầu";
+      case "in_progress":
+        return "Đang diễn ra";
+      case "completed":
+        return "Đã kết thúc";
+      default:
+        return "Không xác định";
+    }
+  };
+
 
   return (
     <div style={{ maxHeight: 762, width: "100%", marginTop: "10px" }}>
@@ -180,6 +210,7 @@ const TermTable = ({
                 <StyledTableCell>Đại học</StyledTableCell>
                 <StyledTableCell>Ngày bắt đầu</StyledTableCell>
                 <StyledTableCell>Ngày kết thúc</StyledTableCell>
+                <StyledTableCell align="center">Trạng thái</StyledTableCell>
                 <StyledTableCell align="center">Hành động</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -196,6 +227,13 @@ const TermTable = ({
                   <StyledTableCell>
                     {dayjs(account["end-at"]).format("DD/MM/YYYY")}
                   </StyledTableCell>
+                  <StyledTableCell align="center" >
+                      <Chip
+                        size="small"
+                        label={getStatusLabel(account.status)}
+                        sx={getStatusChipColor(account.status)}
+                      ></Chip>
+                    </StyledTableCell>
                   <StyledTableCell align="center">
                     <Button
                       style={{ marginRight: "10px" }}
@@ -214,7 +252,7 @@ const TermTable = ({
                       startIcon={<DeleteIcon />}
                       onClick={() => handleOpenDeleteModal(account)}
                     >
-                      Xóa 
+                      Xóa
                     </Button>
                   </StyledTableCell>
                 </StyledTableRow>
@@ -235,7 +273,7 @@ const TermTable = ({
         className="custom-row custom-pagination bg-white mb-4"
       />
 
-      <Card >
+      <Card>
         <CardContent style={{ height: "68px" }}>
           <Button
             variant="contained"
@@ -284,7 +322,7 @@ const TermTable = ({
             Xác nhận xóa
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Bạn có chắc chắn muốn xóa Kỳ: {selectedRowData?.semester}?
+            Bạn có chắc chắn muốn xóa Kỳ: {selectedRowData?.semester}?
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
             <Button

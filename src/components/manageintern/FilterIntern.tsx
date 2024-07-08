@@ -149,6 +149,7 @@ const FilterIntern = ({ id, name }: { id: number; name: string }) => {
                         onClick={handleReset}
                         className="clean-btn"
                         fullWidth
+                        variant="outlined"
                       >
                         Hủy Filter
                       </Button>

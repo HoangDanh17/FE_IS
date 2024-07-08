@@ -16,14 +16,6 @@ import { toast } from "@/components/ui/use-toast";
 import CheckIcon from "@mui/icons-material/Check";
 import DoNotDisturbOnIcon from "@mui/icons-material/DoNotDisturbOn";
 
-interface TimeTableItem {
-  intern_name: string;
-  student_code: string;
-  est_start: string;
-  est_end: string;
-  status: string;
-}
-
 const ListTimeTable = ({
   status,
   selectedDay,
@@ -38,7 +30,7 @@ const ListTimeTable = ({
     const fetchData = async () => {
       try {
         const body = {
-          status: status === "all" ? "" : status,
+          verified: status === "all" ? "" : status,
           "office-time-from": dayjs(selectedDay).format("YYYY-MM-DD"),
           "office-time-to": dayjs(selectedDay).format("YYYY-MM-DD"),
         };
@@ -56,7 +48,7 @@ const ListTimeTable = ({
   async function handleSubmit(id: string, newStatus: string) {
     setLoading(true);
 
-    const body = { status: newStatus };
+    const body = { verified: newStatus };
     try {
       const result = await timetableApiRequest.approveTimeTable(id, body);
       toast({
@@ -93,11 +85,24 @@ const ListTimeTable = ({
                     >
                       <div className="flex flex-col">
                         <Typography component="span" variant="body1">
-                          Tên thực tập: {item.intern_name} -{" "}
-                          {item["student-code"]}
+                          Tên thực tập:
+                          <Typography
+                            component="span"
+                            variant="body1"
+                            style={{ fontWeight: "bold" }}
+                          >
+                            {item.intern_name} - {item["student-code"]}
+                          </Typography>
                         </Typography>
                         <Typography component="span">
-                          Thời gian: {item["est-start"]} - {item["est-end"]}
+                          Thời gian:
+                          <Typography
+                            component="span"
+                            variant="body1"
+                            style={{ fontWeight: "bold" }}
+                          >
+                            {item["est-start-time"]} - {item["est-end-time"]}
+                          </Typography>
                         </Typography>
                       </div>
                       <Box
@@ -110,19 +115,33 @@ const ListTimeTable = ({
                           component="span"
                           style={{
                             marginLeft: 16,
-                            // color: getStatusColor(item.status),
                           }}
                         >
                           Status:{" "}
-                          {item.status === "processing"
-                            ? <Typography component="span" style={{ color: '#FFCF81' }}>Đang đợi</Typography>
-                            : item.status === "approved"
-                            ? <Typography component="span" style={{ color: 'green' }}>Đã duyệt</Typography>
-                            : <Typography component="span" style={{ color: 'red' }}>Từ chối</Typography>
-                          }
+                          {item.verified === "processing" ? (
+                            <Typography
+                              component="span"
+                              style={{ color: "#bab8b5" }}
+                            >
+                              Đang đợi
+                            </Typography>
+                          ) : item.verified === "approved" ? (
+                            <Typography
+                              component="span"
+                              style={{ color: "green" }}
+                            >
+                              Đã duyệt
+                            </Typography>
+                          ) : (
+                            <Typography
+                              component="span"
+                              style={{ color: "red" }}
+                            >
+                              Từ chối
+                            </Typography>
+                          )}
                         </Typography>
                         <Box ml={2} display="flex" alignItems="center">
-                        
                           <Button
                             variant="contained"
                             color="success"
