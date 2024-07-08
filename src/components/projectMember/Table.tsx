@@ -41,7 +41,6 @@ export interface FormFilter {
   university: string,
 }
 
-
 function TableProjectMember({
   isFilter,
   dataFilter,
