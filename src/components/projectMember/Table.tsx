@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import { Table, TableBody, TableContainer, TableHead, TableRow, Paper, Avatar, TablePagination, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import { Table, TableBody, TableContainer, TableHead, TableRow, Paper, Avatar, TablePagination, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Chip } from '@mui/material';
 import MemberInfoModal from './MemberInfoModal';
 import { ProjectMemberListResType, ProjectMemberType } from '@/schemaValidations/projectMember/projectMember.schema';
 import "@/styles/accountManagement/DataTable.css";
 import projectMemberApiRequest from '@/apiRequests/projectMember/projectMember';
 import { toast } from "@/components/ui/use-toast";
+import { useAppContext } from "@/app/app-provider";
 
 const StyledCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -57,6 +58,8 @@ function TableProjectMember({
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const { project } = useAppContext()
+  console.log("21332123: ", project);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -94,7 +97,7 @@ function TableProjectMember({
         });
       } catch (error: any) {
         toast({
-          title: `Failed to delete member: ${error.message}`,
+          title: `${error.message}`,
           duration: 2000,
           variant: "destructive",
         });
@@ -123,6 +126,7 @@ function TableProjectMember({
               <StyledCell>Avatar</StyledCell>
               <StyledCell>Tên Thành Viên</StyledCell>
               <StyledCell>Mã số sinh viên</StyledCell>
+              <StyledCell>Trạng thái</StyledCell>
               {/* <StyledCell>Kỳ thực tập</StyledCell>
               <StyledCell>Kỹ năng công nghệ</StyledCell> */}
               <StyledCell>Hành động</StyledCell>
@@ -141,6 +145,7 @@ function TableProjectMember({
                 </CenteredAvatarCell>
                 <StyledCell>{member['user-name']}</StyledCell>
                 <StyledCell>{member['student-code']}</StyledCell>
+                <StyledCell><Chip label={member.status} color="success" /></StyledCell>
                 {/* <StyledCell>{member['ojt-semester-university']}</StyledCell>
                 <StyledCell>{member.technical_skills}</StyledCell> */}
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button, Typography, FormControl, Grid, TextField, Box, Avatar, AvatarGroup, Tooltip } from '@mui/material';
+import { Modal, Button, Typography, FormControl, Grid, TextField, Box, Avatar, AvatarGroup, Tooltip, Chip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import '@/styles/projectMember/InfoModal.css';
@@ -54,6 +54,14 @@ const MemberInfoModal: React.FC<MemberInfoModalProps> = ({ open, handleClose, se
                                 <FormControl fullWidth>
                                     <Typography variant="subtitle1">
                                         Kỹ năng công nghệ: <Typography component="span" variant="subtitle1" fontWeight="bold"> {selectedMember.technical_skills}</Typography>
+                                    </Typography>
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <FormControl fullWidth>
+                                    <Typography variant="subtitle1">
+                                        Trạng thái: <Typography component="span" variant="subtitle1" fontWeight="bold"> <Chip label={selectedMember.status} color="success"/></Typography>
                                     </Typography>
                                 </FormControl>
                             </Grid>
