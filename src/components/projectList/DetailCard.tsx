@@ -46,10 +46,10 @@ const style = {
 export interface RowData {
   id: string;
   name: string;
-  "start-date": Date;
-  duration: string;
   status: string;
   description: string;
+  "est-start-time": Date;
+  "est-completion-time": Date;
 }
 
 const DetailCard = ({
@@ -82,11 +82,11 @@ const DetailCard = ({
 
   const getStatusChipColor = (status: string) => {
     switch (status) {
-      case "not_start":
+      case "not_started":
         return { backgroundColor: "#FFB6C1", color: "white" }; // Màu hồng pastel đậm hơn
-      case "doing":
+      case "in_progress":
         return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
-      case "done":
+      case "completed":
         return { backgroundColor: "#90EE90", color: "white" }; // Màu xanh lá pastel đậm hơn
       case "cancel":
         return { backgroundColor: "#FFA07A", color: "white" }; // Màu cam pastel đậm hơn
@@ -97,11 +97,11 @@ const DetailCard = ({
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "not_start":
+      case "not_started":
         return "Chưa bắt đầu";
-      case "doing":
+      case "in_progress":
         return "Đang thực hiện";
-      case "done":
+      case "completed":
         return "Hoàn thành";
       case "cancel":
         return "Hủy bỏ";
@@ -109,6 +109,7 @@ const DetailCard = ({
         return "Không xác định";
     }
   };
+  
   // add PM
 
   const [openAddPMModal, setOpenAddPMModal] = useState(false);
@@ -141,7 +142,12 @@ const DetailCard = ({
             sx={getStatusChipColor(row.status)}
           ></Chip>
         </Typography>
-        <Typography id="transition-modal-title" variant="h4" component="h2" className="mr-8">
+        <Typography
+          id="transition-modal-title"
+          variant="h4"
+          component="h2"
+          className="mr-8"
+        >
           Hành động
         </Typography>
       </div>
@@ -152,10 +158,10 @@ const DetailCard = ({
               <Grid container spacing={3}>
                 <Grid item xs={12} className="flex">
                   <Grid container spacing={1}>
-                    <Grid item xs={4}>
+                    <Grid item xs={5}>
                       <Typography variant="h5">Tên dự án:</Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                       <Typography
                         variant="h6"
                         className="mt-1"
@@ -168,42 +174,48 @@ const DetailCard = ({
                 </Grid>
                 <Grid item xs={12} className="flex">
                   <Grid container spacing={1}>
-                    <Grid item xs={4}>
-                      <Typography variant="h5">Ngày bắt đầu:</Typography>
+                    <Grid item xs={5}>
+                      <Typography variant="h5">
+                        Ngày dự kiến bắt đầu:
+                      </Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                       <Typography
                         variant="h6"
                         className="mt-1"
                         color="GrayText"
                       >
-                        &#160;{dayjs(row["start-date"]).format("DD/MM/YYYY")}
+                        &#160;
+                        {dayjs(row["est-start-time"]).format("DD/MM/YYYY")}
                       </Typography>
                     </Grid>
                   </Grid>
                 </Grid>
                 <Grid item xs={12} className="flex">
                   <Grid container spacing={1}>
-                    <Grid item xs={4}>
-                      <Typography variant="h5">Thời gian dự kiến: </Typography>
+                    <Grid item xs={5}>
+                      <Typography variant="h5">
+                        Ngày dự kiến kết thúc:
+                      </Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                       <Typography
                         variant="h6"
                         className="mt-1"
                         color="GrayText"
                       >
-                        &#160;{row.duration}
+                        &#160;
+                        {dayjs(row["est-completion-time"]).format("DD/MM/YYYY")}
                       </Typography>
                     </Grid>
                   </Grid>
                 </Grid>
                 <Grid item xs={12} className="flex">
                   <Grid container spacing={1}>
-                    <Grid item xs={4}>
+                    <Grid item xs={5}>
                       <Typography variant="h5">Thông tin mô tả: </Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                       <Typography
                         variant="h6"
                         className="mt-1"
@@ -217,12 +229,12 @@ const DetailCard = ({
                 </Grid>
                 <Grid item xs={12} className="flex">
                   <Grid container spacing={1}>
-                    <Grid item xs={4}>
+                    <Grid item xs={5}>
                       <Typography variant="h5" className="mt-1">
                         Quản lí dự án:{" "}
                       </Typography>
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid item xs={7}>
                       <div className="flex break-words max-w-[350px]">
                         {listMemberInProject?.data.length !== 0 ? (
                           <AvatarGroup>
@@ -263,7 +275,7 @@ const DetailCard = ({
                     startIcon={<EditIcon></EditIcon>}
                     style={{ width: "100%", marginTop: 20 }}
                   >
-                    Sửa dự án
+                    Cập nhật
                   </Button>
                 </Grid>
 

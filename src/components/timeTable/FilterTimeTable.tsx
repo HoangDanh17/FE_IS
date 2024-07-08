@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 import ListTimeTable from "@/components/timeTable/ListTimeTable";
 
 const FilterTimeTable = ({
@@ -36,17 +36,23 @@ const FilterTimeTable = ({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
         <Typography component="span" variant="h5">
-          {selectedDayName}, {selectedDay ? selectedDay.format("DD/MM/YYYY") : ""}
+          {selectedDayName},{" "}
+          {selectedDay ? selectedDay.format("DD/MM/YYYY") : ""}
         </Typography>
         <FormControl margin="normal" style={{ minWidth: 200 }}>
-          <InputLabel id="status-label">Trạng thái</InputLabel>
+          <InputLabel id="verified-label">Trạng thái</InputLabel>
           <Select
-            labelId="status-label"
-            id="status"
+            labelId="verified-label"
+            id="verified"
             size="small"
-            name="status"
+            name="verified"
             value={status}
             onChange={handleStatusChange}
             label="Trạng thái"

@@ -43,7 +43,7 @@ const styleCard = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 800,
+  width: 900,
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
@@ -75,8 +75,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 export interface FormFilterData {
   name: string;
   status: string;
-  "start-date-from": string;
-  "start-date-to": string;
+  "est-start-time-from": string;
+  "est-start-time-to": string;
 }
 
 export default function ProjectListTable({
@@ -142,14 +142,14 @@ export default function ProjectListTable({
     handleReset();
     triggerRefresh();
   };
-  
+
   const getStatusChipColor = (status: string) => {
     switch (status) {
-      case "not_start":
+      case "not_started":
         return { backgroundColor: "#FFB6C1", color: "white" }; // Màu hồng pastel đậm hơn
-      case "doing":
+      case "in_progress":
         return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
-      case "done":
+      case "completed":
         return { backgroundColor: "#90EE90", color: "white" }; // Màu xanh lá pastel đậm hơn
       case "cancel":
         return { backgroundColor: "#FFA07A", color: "white" }; // Màu cam pastel đậm hơn
@@ -160,11 +160,11 @@ export default function ProjectListTable({
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case "not_start":
+      case "not_started":
         return "Chưa bắt đầu";
-      case "doing":
+      case "in_progress":
         return "Đang thực hiện";
-      case "done":
+      case "completed":
         return "Hoàn thành";
       case "cancel":
         return "Hủy bỏ";
@@ -216,9 +216,11 @@ export default function ProjectListTable({
               <TableRow>
                 <StyledTableCell align="center">#</StyledTableCell>
                 <StyledTableCell>Tên dự án</StyledTableCell>
-                <StyledTableCell align="center">Ngày tạo dự án</StyledTableCell>
                 <StyledTableCell align="center">
-                  Thời gian dự kiến
+                  Ngày dự kiến bắt đầu
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  Ngày dự kiến kết thúc
                 </StyledTableCell>
                 <StyledTableCell align="center">Trạng thái</StyledTableCell>
               </TableRow>
@@ -232,10 +234,10 @@ export default function ProjectListTable({
                     </StyledTableCell>
                     <StyledTableCell align="left">{row.name}</StyledTableCell>
                     <StyledTableCell align="center">
-                      {dayjs(row["start-date"]).format("DD/MM/YYYY")}
+                      {dayjs(row["est-start-time"]).format("DD/MM/YYYY")}
                     </StyledTableCell>
                     <StyledTableCell align="center">
-                      {row.duration}
+                      {dayjs(row["est-completion-time"]).format("DD/MM/YYYY")}
                     </StyledTableCell>
                     <StyledTableCell align="center">
                       <Chip

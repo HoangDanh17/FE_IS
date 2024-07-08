@@ -1,6 +1,7 @@
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+
 const Menuitems = [
   {
     id: 1,
@@ -89,7 +90,7 @@ const MenuitemsManager = [
     id: 1,
     title: "Chi tiết dự án",
     icon: AssignmentIcon,
-    href: "/homePage/projectList",
+    href: "/homePage/projectDetail",
   },
   {
     id: 2,
@@ -114,7 +115,7 @@ const MenuitemsPm = [
     id: 1,
     title: "Chi tiết dự án",
     icon: AssignmentIcon,
-    href: "/homePage/projectList",
+    href: "/homePage/projectDetail",
   },
   {
     id: 2,

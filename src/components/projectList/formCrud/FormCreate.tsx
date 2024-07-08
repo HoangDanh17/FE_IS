@@ -14,7 +14,6 @@ import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useRouter } from "next/navigation";
-import { toast } from "@/components/ui/use-toast";
 import projectApiRequest from "@/apiRequests/project";
 import { CreateProjectType } from "@/schemaValidations/project.schema";
 
@@ -26,10 +25,12 @@ const Div = styled("div")(({ theme }) => ({
 const FormCreate = ({ handleClose }: { handleClose: () => void }) => {
   const [formData, setFormData] = useState<CreateProjectType>({
     description: "",
-    duration: "",
     name: "",
-    "start-at": new Date(),
+    "est-start-time": new Date(),
+    "est-completion-time": new Date(),
   });
+
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,40 +39,57 @@ const FormCreate = ({ handleClose }: { handleClose: () => void }) => {
   const handleDateChange = (date: Dayjs | null) => {
     setFormData({
       ...formData,
-      "start-at": date ? date.toDate() : null,
+      "est-start-time": date ? date.toDate() : null,
+    });
+  };
+
+  const handleDateChange2 = (date: Dayjs | null) => {
+    setFormData({
+      ...formData,
+      "est-completion-time": date ? date.toDate() : null,
     });
   };
 
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: FormEvent) {
     if (loading) return;
     setLoading(true);
     e.preventDefault();
+
+    // Validate that the end date is after the start date
+    if (
+      formData["est-completion-time"] &&
+      formData["est-start-time"] &&
+      dayjs(formData["est-completion-time"]).isBefore(
+        dayjs(formData["est-start-time"])
+      )
+    ) {
+      setErrorMessage(
+        "Ngày dự kiến kết thúc phải lớn hơn ngày dự kiến bắt đầu"
+      );
+      setLoading(false);
+      return;
+    }
+
     const formattedData = {
       ...formData,
-      "start-at": formData["start-at"]
-        ? dayjs(formData["start-at"]).format("YYYY-MM-DD")
+      "est-start-time": formData["est-start-time"]
+        ? dayjs(formData["est-start-time"]).format("YYYY-MM-DD")
+        : null,
+      "est-completion-time": formData["est-completion-time"]
+        ? dayjs(formData["est-completion-time"]).format("YYYY-MM-DD")
         : null,
     };
 
     try {
       const result = await projectApiRequest.createProject(formattedData);
-      toast({
-        title: `${result.payload.message}`,
-        duration: 2000,
-        variant: "success",
-      });
+      handleClose();
     } catch (error: any) {
-      toast({
-        title: `${error}`,
-        duration: 2000,
-        variant: "destructive",
-      });
+      const errorRes = { error };
+      setErrorMessage(errorRes.error.payload.log);
     } finally {
       setLoading(false);
-      handleClose();
     }
   }
 
@@ -115,29 +133,30 @@ const FormCreate = ({ handleClose }: { handleClose: () => void }) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h6">Thời gian dự kiến</Typography>
-                <TextField
-                  name="duration"
-                  value={formData.duration}
-                  onChange={handleChange}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  placeholder="Nhập thời hạn"
-                  style={{ marginTop: 2 }}
-                  size="small"
-                />
-              </Grid>
-              <Grid item xs={12}>
                 <Typography variant="h6" style={{ marginBottom: 4 }}>
-                  Ngày bắt đầu
+                  Ngày dự kiến bắt đầu
                 </Typography>
                 <DatePicker
-                  value={dayjs(formData["start-at"])}
+                  value={dayjs(formData["est-start-time"])}
                   onChange={(newValue) => handleDateChange(newValue)}
                   slotProps={{ textField: { fullWidth: true, size: "small" } }}
                 />
               </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6" style={{ marginBottom: 4 }}>
+                  Ngày dự kiến kết thúc
+                </Typography>
+                <DatePicker
+                  value={dayjs(formData["est-completion-time"])}
+                  onChange={(newValue) => handleDateChange2(newValue)}
+                  slotProps={{ textField: { fullWidth: true, size: "small" } }}
+                />
+              </Grid>
+              {errorMessage && (
+                <Grid item xs={12}>
+                  <Typography color="error">{errorMessage}</Typography>
+                </Grid>
+              )}
               <Grid item xs={12}>
                 <Button
                   type="submit"

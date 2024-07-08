@@ -5,11 +5,14 @@ export const TimeTableSchema = z.object({
   intern_name: z.string(),
   "student-code": z.string(),
   "office-time": z.string(),
-  "est-start": z.string(),
-  "est-end": z.string(),
-  "act-start": z.string(),
-  "act-end": z.string(),
-  status: z.string(),
+  verified: z.string(),
+  "est-start-time": z.string(),
+  "est-end-time": z.string(),
+  "act-clockin": z.string(),
+  "clockin-validated": z.string(),
+  "act-clockout": z.string(),
+  "clockout-validated": z.string(),
+  "status-attendance": z.string(),
 });
 
 export const TimeTablePageSchema = z.object({
@@ -20,7 +23,7 @@ export const TimeTablePageSchema = z.object({
 });
 
 export const TimeTableFilterSchema = z.object({
-  status: z.string().optional(),
+  verified: z.string().optional(),
   "intern-name": z.string().optional(),
   "office-time-from": z.string().optional(),
   "office-time-to": z.string().optional(),

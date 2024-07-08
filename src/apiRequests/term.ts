@@ -15,7 +15,9 @@ const termApiRequest = {
         psize !== null ? `psize=${psize}&` : ""
       }${body?.id ? `id=${body.id}&` : ""}${
         body?.university ? `university=${body.university}&` : ""
-      }${body?.semester ? `semester=${body.semester}&` : ""}`.slice(0, -1)
+      }${body?.status ? `status=${body.status}&` : ""}${
+        body?.semester ? `semester=${body.semester}&` : ""
+      }`.slice(0, -1)
     ),
   createTerm: (body: CreateTermType) =>
     http.post<CreateTermResType>("/api/v1/ojts", body),
@@ -27,7 +29,6 @@ const termApiRequest = {
     http.delete<CreateTermResType>(`/api/v1/ojts/${body}`),
 
   getTerm: () => http.get<TermListResType>(`/api/v1/ojts`),
-
 };
 
 export default termApiRequest;
