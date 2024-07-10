@@ -8,6 +8,7 @@ export const ProjectMemberSchema = z.object({
   avatar: z.string(),
   "ojt-semester-university": z.string(),
   "technical_skills": z.string(),
+  status: z.string()
 });
 
 // --------Mem not in project------------------//
@@ -44,6 +45,7 @@ export const MemberInProFilterSchema = z.object({
   "student-code": z.string().optional(),
   semester: z.string().optional(),
   university: z.string().optional(),
+  status: z.string().optional(),
 });
 
 // Define the pagination schema for Mem  in project

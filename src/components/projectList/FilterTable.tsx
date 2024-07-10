@@ -20,7 +20,7 @@ import MuiAccordionSummary, {
   AccordionSummaryProps,
 } from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import SearchIcon from "@mui/icons-material/Search";
+import { Search } from '@mui/icons-material';
 import ProjectListTable, {
   FormFilterData,
 } from "@/components/projectList/ProjectListTable";
@@ -202,26 +202,29 @@ const FilterTable = () => {
                         <MenuItem value="cancel">Hủy bỏ</MenuItem>
                       </Select>
                     </Grid>
-                    <Grid item xs={5} style={{ width: "100%" }}>
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        startIcon={<SearchIcon />}
-                        style={{ width: "50%", marginTop: 4, marginRight: 5 }}
-                      >
-                        Tìm kiếm
-                      </Button>
-                      <Button
-                        onClick={handleReset}
-                        variant="outlined"
-                        style={{
-                          width: "40%",
-                          marginTop: 4,
-                        }}
-                      >
-                        Hủy tìm kiếm
-                      </Button>
+                    <Grid item xs={12} sm={3} container spacing={2}>
+                      <Grid item xs={6}>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          startIcon={<Search />}
+                          className="search-btn"
+                          fullWidth
+                        >
+                          Tìm kiếm
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          type="button"
+                          variant="outlined"
+                          onClick={handleReset}
+                          className="clean-btn"
+                          fullWidth
+                        >
+                          Hủy Filter
+                        </Button>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </form>

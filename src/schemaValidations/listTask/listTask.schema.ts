@@ -2,7 +2,7 @@ import z from "zod";
 
 // Define the individual account schema
 export const ListTaskSchema = z.object({
-    taskId: z.string(),
+    id: z.string(),
     "project-id": z.string(),
     "assigned-to": z.string(),
     "assigned-name": z.string(),
@@ -58,7 +58,7 @@ export const UpdateTask = z.object({
     name: z.string(),
     description: z.string(),
     "estimated-effort": z.string(),
-    "is-approved": z.string(),
+    "is-approved": z.boolean(),
 });
 
 

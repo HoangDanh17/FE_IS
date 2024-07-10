@@ -9,7 +9,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import projectMemberApiRequest from '@/apiRequests/projectMember/projectMember';
 import { MemberNotInProListResType } from '@/schemaValidations/projectMember/projectMember.schema';
 import { toast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
 
 type Member = {
     id: string,
@@ -36,7 +35,7 @@ function AddMemberModal({
 }: {
     open: boolean;
     onClose: () => void;
-    selectedProjectId: string | null;
+    selectedProjectId: string | undefined;
     Filter: boolean;
     DataFilter: FormFilterData | null;
 
@@ -150,9 +149,10 @@ function AddMemberModal({
                 resetAndClose();
             })
             .catch((error) => {
+                const errorRes = { error };
                 toast({
-                    title: `${error}`,
-                    duration: 2000,
+                    title: `${errorRes.error.payload.message}`,
+                    duration: 4000,
                     variant: "destructive",
                 });
             });
@@ -306,7 +306,8 @@ function AddMemberModal({
                                                                 <Tooltip title="tam">
                                                                     <Avatar
                                                                         //alt={image['user-name']}
-                                                                        src="/images/avatar.jpg"
+                                                                        src={member.avatar}
+                                                                        style={{ width: 70, height: 70 }}
                                                                     />
                                                                 </Tooltip>
                                                                 {/* ))} */}

@@ -42,7 +42,7 @@ export interface FormFilter {
   university: string;
 }
 
-function TableProjectMember({
+function TableForPM({
   isFilter,
   dataFilter,
   selectedProjectId,
@@ -124,6 +124,7 @@ function TableProjectMember({
           duration: 2000,
           variant: "success",
         });
+        triggerRefresh();
       } catch (error: any) {
         const errorRes = { error };
         toast({
@@ -166,6 +167,7 @@ function TableProjectMember({
               <StyledRow key={member.id}>
                 <CenteredAvatarCell>
                   <Avatar
+                    //alt={`Avatar of ${row.internID}`}
                     src={member.avatar}
                     sx={{ width: 45, height: 45 }}
                   />
@@ -198,14 +200,6 @@ function TableProjectMember({
         className="custom-row custom-pagination"
       />
 
-      {/* ButtonAdd Component */}
-      <ButtonAdd
-        triggerRefresh={triggerRefresh}
-        selectedProjectId={selectedProjectId}
-        isFilter={isFilter}
-        dataFilter={dataFilter}
-      />
-
       <MemberInfoModal
         open={open}
         handleClose={handleClose}
@@ -234,4 +228,4 @@ function TableProjectMember({
   );
 }
 
-export default TableProjectMember;
+export default TableForPM;

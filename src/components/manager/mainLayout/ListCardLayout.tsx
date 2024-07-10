@@ -58,7 +58,7 @@ const ListCardLayout = () => {
     setLoading(true);
     const fetchData = async () => {
       try {
-        const { payload } = await projectApiRequest.getListProject(1,limit, {});
+        const { payload } = await projectApiRequest.getListProject(1, limit, {});
         setListProject(payload);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -103,41 +103,41 @@ const ListCardLayout = () => {
           <Grid container spacing={3}>
             {loading
               ? Array.from(new Array(9)).map((_, index) => (
-                  <Card key={index} className="w-[360px]">
-                    <CardHeader>
-                      <Skeleton variant="text" width="80%" height={30} />
-                      <Skeleton
-                        variant="rectangular"
-                        width="100%"
-                        height={60}
-                      />
-                    </CardHeader>
-                  </Card>
-                ))
+                <Card key={index} className="w-[360px]">
+                  <CardHeader>
+                    <Skeleton variant="text" width="80%" height={30} />
+                    <Skeleton
+                      variant="rectangular"
+                      width="100%"
+                      height={60}
+                    />
+                  </CardHeader>
+                </Card>
+              ))
               : listProject?.data.map((project, index) => (
-                  <Grid item xs={12} sm={6} md={3} key={index}>
-                    <Card
-                      onClick={() => handleCardClick(project)}
-                      className="hover:scale-105 transition-transform duration-400 ease-in-out cursor-pointer shadow-2xl rounded-2xl"
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <Card
+                    onClick={() => handleCardClick(project)}
+                    className="hover:scale-105 transition-transform duration-400 ease-in-out cursor-pointer shadow-2xl rounded-2xl"
+                  >
+                    <CardContent
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        height: "150px",
+                      }}
                     >
-                      <CardContent
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          textAlign: "center",
-                          height: "150px",
-                        }}
-                      >
-                        <Typography variant="h6">{project.name}</Typography>
-                        <Typography color="textSecondary">
-                          {dayjs(project["start-date"]).format("DD/MM/YYYY")}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
+                      <Typography variant="h6">{project.name}</Typography>
+                      <Typography color="textSecondary">
+                        {dayjs(project["est-start-time"]).format("DD/MM/YYYY")}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
           </Grid>
           {listProject?.data?.length && listProject.data.length > 12 && (
             <div className="flex justify-center">
