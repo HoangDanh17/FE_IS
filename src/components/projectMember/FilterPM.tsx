@@ -1,12 +1,14 @@
 'use client'
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import { Input, Button, Grid, Accordion, AccordionSummary, AccordionDetails, FormControl, InputLabel, MenuItem, TextField } from '@mui/material';
+import { TextField, Button, Grid, Accordion, AccordionSummary, AccordionDetails, FormControl, MenuItem, InputLabel } from '@mui/material';
 import { Search } from '@mui/icons-material';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import "@/styles/projectMember/Filter.css"
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import TableProjectMember, { FormFilter } from './Table';
+import TableForPM from './TablePM';
+import { FormFilter } from './TablePM';
 import termApiRequest from '@/apiRequests/term';
+
 interface FilterProjectMemberProps {
     selectedProjectId: string | undefined;
 }
@@ -17,7 +19,7 @@ type School = {
     semester: string;
 };
 
-const FilterProjectMember: React.FC<FilterProjectMemberProps> = ({ selectedProjectId }) => {
+const ProjectMemberPM: React.FC<FilterProjectMemberProps> = ({ selectedProjectId }) => {
     const [isFilter, setIsFilter] = useState<boolean>(false);
     const [dataFilter, setDataFilter] = useState<FormFilter | null>(null);
     const [school, setSchool] = useState<School[]>([]);
@@ -29,7 +31,7 @@ const FilterProjectMember: React.FC<FilterProjectMemberProps> = ({ selectedProje
         university: "",
     });
 
-
+    
     // Get list School when select
     useEffect(() => {
         termApiRequest.getTerm()
@@ -41,18 +43,13 @@ const FilterProjectMember: React.FC<FilterProjectMemberProps> = ({ selectedProje
             });
     }, []);
 
-
-    const handleSchoolChange = (e: SelectChangeEvent<string>) => {
-        setFormData({ ...formData, university: e.target.value });
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     }
-
+    
     const handleSemesterChange = (e: SelectChangeEvent<string>) => {
         setFormData({ ...formData, semester: e.target.value });
     }
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -70,6 +67,7 @@ const FilterProjectMember: React.FC<FilterProjectMemberProps> = ({ selectedProje
         setIsFilter(false);
         setDataFilter(null);
     };
+
 
     return (
         <div>
@@ -169,9 +167,8 @@ const FilterProjectMember: React.FC<FilterProjectMemberProps> = ({ selectedProje
                 </AccordionDetails>
             </Accordion>
 
-
             <Grid sx={{ marginTop: "10px" }}>
-                <TableProjectMember
+                <TableForPM
                     isFilter={isFilter}
                     dataFilter={dataFilter}
                     selectedProjectId={selectedProjectId}
@@ -181,4 +178,4 @@ const FilterProjectMember: React.FC<FilterProjectMemberProps> = ({ selectedProje
     );
 };
 
-export default FilterProjectMember;
+export default ProjectMemberPM;

@@ -20,9 +20,10 @@ import listTaskApiRequest from '@/apiRequests/listTask/listTask';
 import { ListTaskAllResType } from '@/schemaValidations/listTask/listTask.schema';
 import ButtonTask from './ButtonTask';
 import EditTaskModal from './UpdateTask';
+import { useAppContext } from "@/app/app-provider";
 
 export interface Task {
-  taskId: string,
+  id: string,
   "assigned-to": string,
   description: string,
   "estimated-effort": string,
@@ -54,15 +55,7 @@ function TaskList({
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  const handleOpen = (task: Task) => {
-    setSelectedTask(task);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedTask(null);
-  };
+  const { project } = useAppContext()
 
   const [refreshKey, setRefreshKey] = useState(0);
   const triggerRefresh = () => {
@@ -78,11 +71,28 @@ function TaskList({
     setPage(0);
   };
 
+  const handleOpen = (task: Task) => {
+    setSelectedTask(task);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedTask(null);
+    triggerRefresh();
+  };
+
+  // handle close for all
+  const closeNotRefresh = () => {
+    setOpen(false);
+    setSelectedTask(null);
+  }
+
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
       try {
-        const { payload } = await listTaskApiRequest.getListTask(page + 1, rowsPerPage, isFilter ? dataFilter : {});
+        const { payload } = await listTaskApiRequest.getListTask(project?.id, page + 1, rowsPerPage, isFilter ? dataFilter : {});
         setData(payload);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -111,7 +121,7 @@ function TaskList({
       </Box>
       <List>
         {data?.data.map((task) => (
-          <Accordion key={task.taskId}>
+          <Accordion key={task.id}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
 
@@ -153,15 +163,23 @@ function TaskList({
                   />
                 </ListItem>
                 <ListItem sx={{ width: 'auto' }}>
+                  <ListItemText
+                    primary="Xác nhận"
+                    secondary={task['is-approved']}
+                    secondaryTypographyProps={{ style: { fontWeight: 'bold', fontSize: 13 } }}
+                  />
+                </ListItem>
+                <ListItem sx={{ width: 'auto' }}>
                   <ListItemText primary="Actual effort" secondary={task['Actual-effort']} />
                 </ListItem>
               </Box>
-              <Button sx={{ marginRight: 1 }} variant="contained" color="primary">Assign</Button>
-              <Button variant="contained" color="secondary" onClick={() => handleOpen(task)}>Update</Button>
+              {/* <Button sx={{ marginRight: 1 }} variant="contained" color="primary">Assign</Button> */}
+              <Button variant="contained" color="warning" onClick={() => handleOpen(task)}>Cập nhật</Button>
             </AccordionDetails>
           </Accordion>
         ))}
       </List>
+
       <TablePagination
         rowsPerPageOptions={[5, 10]}
         component="div"
@@ -176,9 +194,9 @@ function TaskList({
       <ButtonTask triggerRefresh={triggerRefresh} />
 
       {/* Modal for updating task */}
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={open} onClose={closeNotRefresh}>
         <Box>
-          <EditTaskModal onClose={handleClose} task={selectedTask}/>
+          <EditTaskModal onClose={handleClose} task={selectedTask} />
         </Box>
       </Modal>
     </div>

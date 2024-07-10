@@ -22,13 +22,13 @@ const projectMemberApiRequest = {
             `
         ),
 
-    addMemberIntoProject: (id: string | null, body: { "member-id": string }) =>
+    addMemberIntoProject: (id: string | undefined, body: { "member-id": string }) =>
         http.post<ProjectMemberResType>(
             `api/v1/projects/${id}/member`,
             body
         ),
 
-    deleteMemberInProject: (projectID: string, memberID: string) =>
+    deleteMemberInProject: (projectID: string | undefined, memberID: string) =>
         http.delete<ProjectMemberResType>(
             `/api/v1/projects/${projectID}/${memberID}`
         )

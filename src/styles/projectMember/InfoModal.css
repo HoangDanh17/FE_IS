@@ -8,3 +8,11 @@
     box-shadow: 24px;
     padding: 32px;
 }
+
+.centered-avatar {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100px;
+    height: 100px; 
+}
