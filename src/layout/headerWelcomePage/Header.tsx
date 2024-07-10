@@ -1,33 +1,15 @@
-"use client";
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Typography } from "@mui/material";
 import Link from "next/link";
-import { useState } from "react";
 
 const HeaderWelcomePage = () => {
-  const [alignment, setAlignment] = useState("");
-  const handleChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string
-  ) => {
-    setAlignment(newAlignment);
-  };
-
   return (
-    <div>
-      <ToggleButtonGroup
-        color="primary"
-        value={alignment}
-        exclusive
-        onChange={handleChange}
-        aria-label="Platform"
-      >
-        <ToggleButton value="login">
-          <Link href="/login">Đăng nhập</Link>
-        </ToggleButton>
-        <ToggleButton value="register">
-          <Link href="/register">Đăng ký</Link>
-        </ToggleButton>
-      </ToggleButtonGroup>
+    <div className="flex justify-between flex-row items-center w-full p-4 bg-[#fbf8f8]/20 text-center">
+      <Typography variant="h5" className="text-white font-bold ml-6 nextBean">
+        NEXTBEAN CENTER
+      </Typography>
+      <Link href="/login" className="btn-get-started">
+        Đăng nhập
+      </Link>
     </div>
   );
 };

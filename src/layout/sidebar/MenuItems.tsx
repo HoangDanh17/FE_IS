@@ -4,6 +4,10 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 
 const Menuitems = [
   {
+    navlabel: true,
+    subheader: "Thông kê",
+  },
+  {
     id: 1,
     title: "Dashboard",
     icon: DashboardIcon,
@@ -41,12 +45,7 @@ const Menuitems = [
     icon: AssignmentIcon,
     href: "/homePage/projectMember",
   },
-  {
-    id: 7,
-    title: "Lịch làm việc",
-    icon: AssignmentIcon,
-    href: "/homePage/timeTable",
-  },
+
   {
     navlabel: true,
     subheader: "Quản lí tài khoản",
@@ -56,6 +55,16 @@ const Menuitems = [
     title: "Quản lí tài khoản",
     icon: DashboardIcon,
     href: "/homePage/accountManagement",
+  },
+  {
+    navlabel: true,
+    subheader: "Quản lí lịch",
+  },
+  {
+    id: 7,
+    title: "Lịch làm việc",
+    icon: AssignmentIcon,
+    href: "/homePage/timeTable",
   },
   // {
   //   navlabel: true,

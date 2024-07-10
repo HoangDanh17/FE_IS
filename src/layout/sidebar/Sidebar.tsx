@@ -1,6 +1,5 @@
 import { useMediaQuery, Box, Drawer } from "@mui/material";
 import SidebarItems from "./SidebarItems";
-import { Upgrade } from "./Updrade";
 import Logo from "@/layout/shared/logo/Logo";
 import { useTheme } from "@mui/material/styles";
 
@@ -50,7 +49,6 @@ const Sidebar = () => {
               {/* Sidebar Items */}
               {/* ------------------------------------------- */}
               <SidebarItems />
-              <Upgrade />
             </Box>
           </Box>
         </Drawer>
@@ -79,7 +77,6 @@ const Sidebar = () => {
       {/* Sidebar For Mobile */}
       {/* ------------------------------------------- */}
       <SidebarItems />
-      <Upgrade />
     </Drawer>
   );
 };

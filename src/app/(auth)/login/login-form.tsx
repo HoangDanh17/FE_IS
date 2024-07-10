@@ -165,7 +165,6 @@ const LoginForm = () => {
           position: "relative",
           "&:before": {
             content: '""',
-            background: "radial-gradient(#d2f1df, #d3d7fa, #bad8f4)",
             backgroundSize: "400% 400%",
             animation: "gradient 15s ease infinite",
             position: "absolute",
@@ -173,6 +172,13 @@ const LoginForm = () => {
             width: "100%",
             opacity: "0.3",
           },
+        }}
+        style={{
+          backgroundImage: "url('/images/party.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          objectFit: "cover",
         }}
       >
         <Grid
@@ -193,13 +199,14 @@ const LoginForm = () => {
           >
             <Card
               elevation={9}
-              sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "600px" }}
+              sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "600px",backgroundColor:"inherit",color:"white" }}
             >
               <Typography
                 variant="h5"
                 textAlign="center"
                 color="textSecondary"
                 mb={1}
+                style={{color:"white"}}
               >
                 NEXTBEAN CENTER
               </Typography>
@@ -262,10 +269,20 @@ const LoginForm = () => {
                   <Stack
                     direction="row"
                     spacing={1}
+                    display="flex"
                     justifyContent="center"
+                    style={{ width: "100%" }}
                     mt={2}
                   >
-                    <Link className="google-sign-in-button" href={oauthURL}>
+                    <Link
+                      className="google-sign-in-button"
+                      href={oauthURL}
+                      style={{
+                        width: "100%",
+                        alignItems: "center",
+                        textAlign: "center",
+                      }}
+                    >
                       Login with Google
                     </Link>
                   </Stack>

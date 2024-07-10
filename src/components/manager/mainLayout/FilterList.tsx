@@ -216,12 +216,11 @@ const FilterList = () => {
                       </Button>
                       <Button
                         onClick={handleReset}
-                        startIcon={<CleaningServicesIcon />}
+                        variant="outlined"
                         style={{
                           width: "45%",
                           marginTop: 4,
                         }}
-                        color="error"
                       >
                         Hủy tìm kiếm
                       </Button>

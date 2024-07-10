@@ -4,6 +4,7 @@ import { Grid, Typography, Box, Button } from "@mui/material";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import timetableApiRequest from "@/apiRequests/timetable";
 import { toast } from "@/components/ui/use-toast";
+import dayjs from "dayjs";
 
 const DetailTimeTable = ({
   row,
@@ -12,7 +13,7 @@ const DetailTimeTable = ({
   row: TimeTableType;
   handleCloseCard: () => void;
 }) => {
-  const renderStatus = (status: string) => {
+  const renderStatus = (status: string, timeType: string) => {
     switch (status) {
       case "not-yet":
         return (
@@ -49,8 +50,8 @@ const DetailTimeTable = ({
               variant="outlined"
               size="small"
               startIcon={<ThumbUpIcon />}
-              onClick={() => console.log("admin-approve")}
-              style={{ borderColor: "#77DD77", color: "#77DD77" }} // Pastel xanh lá cây
+              onClick={() => handleSubmitValidate(row.id, timeType)}
+              style={{ borderColor: "#77DD77", color: "#77DD77" }}
             >
               duyệt
             </Button>
@@ -60,7 +61,7 @@ const DetailTimeTable = ({
         return (
           <Typography
             variant="body2"
-            style={{ color: "#A1EEBD", fontWeight: "bold" }} // Pastel xám
+            style={{ color: "#A1EEBD", fontWeight: "bold" }}
           >
             - Admin đã duyệt
           </Typography>
@@ -79,9 +80,32 @@ const DetailTimeTable = ({
   async function handleSubmit(id: string, newStatus: string) {
     setLoading(true);
 
-    const body = { verified: newStatus };
+    const body = { status: newStatus };
     try {
-      const result = await timetableApiRequest.approveTimeTable(id, body);
+      const result = await timetableApiRequest.absentTimeTable(id, body);
+      toast({
+        title: `${result.payload.message}`,
+        duration: 2000,
+        variant: "success",
+      });
+      handleCloseCard();
+    } catch (error: any) {
+      toast({
+        title: `${error}`,
+        duration: 2000,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSubmitValidate(id: string, newStatus: string) {
+    setLoading(true);
+
+    const body = { "validate-field": newStatus };
+    try {
+      const result = await timetableApiRequest.adminValidateTimeTable(id, body);
       toast({
         title: `${result.payload.message}`,
         duration: 2000,
@@ -111,7 +135,7 @@ const DetailTimeTable = ({
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">
-                {renderTime(row["office-time"])}
+                {dayjs(row["office-time"]).format("DD/MM/YYYY")}
               </Typography>
             </Grid>
           </Grid>
@@ -142,7 +166,7 @@ const DetailTimeTable = ({
                 <Typography variant="body1" style={{ marginRight: "8px" }}>
                   {renderTime(row["act-clockin"])}
                 </Typography>
-                {renderStatus(row["clockin-validated"])}
+                {renderStatus(row["clockin-validated"], "clockin")}
               </Box>
             </Grid>
           </Grid>
@@ -173,22 +197,33 @@ const DetailTimeTable = ({
                 <Typography variant="body1" style={{ marginRight: "8px" }}>
                   {renderTime(row["act-clockout"])}
                 </Typography>
-                {renderStatus(row["clockout-validated"])}
+                {renderStatus(row["clockout-validated"], "clockout")}
               </Box>
             </Grid>
           </Grid>
         </Grid>
       </Grid>
-      <Box display="flex" justifyContent="flex-end" mt={2}>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={() => handleSubmit(row.id, "absent")}
-          disabled={loading}
-        >
-          {loading ? "..." : "Vắng mặt"}
-        </Button>
-      </Box>
+      {row["status-attendance"] !== "present" && (
+        <Box display="flex" justifyContent="flex-end" mt={2}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() =>
+              handleSubmit(
+                row.id,
+                row["status-attendance"] === "absent" ? "remove" : "absent"
+              )
+            }
+            disabled={loading}
+          >
+            {loading
+              ? "..."
+              : row["status-attendance"] === "absent"
+              ? "Gỡ vắng"
+              : "Vắng mặt"}
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

@@ -19,6 +19,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import projectApiRequest from "@/apiRequests/project";
+import { toast } from "@/components/ui/use-toast";
 
 const Div = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -82,7 +83,9 @@ const FormUpdate = ({
         dayjs(formData["est-start-time"])
       )
     ) {
-      setErrorMessage("Ngày dự kiến kết thúc phải lớn hơn ngày dự kiến bắt đầu");
+      setErrorMessage(
+        "Ngày dự kiến kết thúc phải lớn hơn ngày dự kiến bắt đầu"
+      );
       setLoading(false);
       return;
     }
@@ -104,10 +107,19 @@ const FormUpdate = ({
     };
 
     try {
-      const result = await projectApiRequest.updateProject(formattedData);
-      handleClose();
+      const result = await projectApiRequest
+        .updateProject(formattedData)
+        .then((response) => {
+          toast({
+            title: `${response.payload.message}`,
+            duration: 2000,
+            variant: "success",
+          });
+          handleClose();
+        });
     } catch (error: any) {
-      setErrorMessage(error.toString());
+      const errorRes = { error };
+      setErrorMessage(errorRes.error.payload.log);
     } finally {
       setLoading(false);
     }

@@ -16,6 +16,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useRouter } from "next/navigation";
 import projectApiRequest from "@/apiRequests/project";
 import { CreateProjectType } from "@/schemaValidations/project.schema";
+import { toast } from "@/components/ui/use-toast";
 
 const Div = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -83,8 +84,16 @@ const FormCreate = ({ handleClose }: { handleClose: () => void }) => {
     };
 
     try {
-      const result = await projectApiRequest.createProject(formattedData);
-      handleClose();
+      const result = await projectApiRequest
+        .createProject(formattedData)
+        .then((response) => {
+          toast({
+            title: `${response.payload.message}`,
+            duration: 2000,
+            variant: "success",
+          });
+          handleClose();
+        });
     } catch (error: any) {
       const errorRes = { error };
       setErrorMessage(errorRes.error.payload.log);

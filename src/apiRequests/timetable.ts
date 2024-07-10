@@ -24,6 +24,10 @@ const timetableApiRequest = {
   approveTimeTable: (id: string, body: { verified: string }) =>
     http.post<CreateResType>(`/api/v1/timetables/${id}/approve`, body),
   getCurrentWeek: () => http.get<WeekResType>(`/api/v1/timetables/weekly`),
+  adminValidateTimeTable: (id: string, body: { "validate-field": string }) =>
+    http.patch<CreateResType>(`/api/v1/timetables/${id}/validated`, body),
+  absentTimeTable: (id: string, body: { status: string }) =>
+    http.patch<CreateResType>(`/api/v1/timetables/${id}/absent`, body),
 };
 
 export default timetableApiRequest;

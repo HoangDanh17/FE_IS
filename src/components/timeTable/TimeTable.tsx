@@ -117,6 +117,7 @@ const TimeTable = () => {
     setDialogOpen(false);
     setRefreshKey((prevKey) => prevKey + 1);
     setFilterDate(null);
+    setData(undefined);
   };
 
   const [openCardModal, setOpenCardModal] = useState(false);
@@ -130,6 +131,8 @@ const TimeTable = () => {
   const handleCloseCardModal = () => {
     setOpenCardModal(false);
     setRefreshKey((prevKey) => prevKey + 1);
+    setFilterDate(null);
+    setData(undefined);
   };
 
   const getStatusChipColor = (status: string) => {
@@ -255,6 +258,7 @@ const TimeTable = () => {
             </Typography>
             <DatePicker
               value={filterDate}
+              format="DD/MM/YYYY"
               onChange={(newValue) => handleFilterDateChange(newValue)}
               slotProps={{
                 textField: {

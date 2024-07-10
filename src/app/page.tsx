@@ -1,9 +1,18 @@
+import Body from "@/layout/bodyWelcomePage/Body";
 import HeaderWelcomePage from "@/layout/headerWelcomePage/Header";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <HeaderWelcomePage />
+    <main
+      className="min-h-screen "
+      style={{ backgroundImage: "url('/images/party.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat",objectFit:"cover" }}
+    >
+      <header>
+        <HeaderWelcomePage />
+      </header>
+      <div>
+        <Body></Body>
+      </div>
     </main>
   );
 }

@@ -50,7 +50,7 @@ export class EntityError extends HttpError {
 let clientLogoutRequest: null | Promise<any> = null;
 export const isClient = () => typeof window !== "undefined";
 const request = async <Response>(
-  method: "GET" | "POST" | "PUT" | "DELETE",
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
   url: string,
   options?: CustomOptions | undefined
 ) => {
@@ -66,8 +66,8 @@ const request = async <Response>(
     body instanceof FormData
       ? {}
       : {
-        "Content-Type": "application/json",
-      };
+          "Content-Type": "application/json",
+        };
   if (isClient()) {
     const sessionToken = localStorage.getItem("sessionToken");
     if (sessionToken) {
@@ -152,7 +152,11 @@ const request = async <Response>(
 
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
   if (isClient()) {
-    if (["api/v1/login", "api/v1/auth/login-google"].some((item) => item === normalizePath(url))) {
+    if (
+      ["api/v1/login", "api/v1/auth/login-google"].some(
+        (item) => item === normalizePath(url)
+      )
+    ) {
       const { token } = (payload as LoginResType).data;
       localStorage.setItem("sessionToken", token);
       // localStorage.setItem("sessionTokenExpiresAt", expiresAt);
@@ -191,6 +195,13 @@ const http = {
     options?: Omit<CustomOptions, "body"> | undefined
   ) {
     return request<Response>("DELETE", url, { ...options });
+  },
+  patch<Response>(
+    url: string,
+    body: any,
+    options?: Omit<CustomOptions, "body"> | undefined
+  ) {
+    return request<Response>("PATCH", url, { ...options, body });
   },
 };
 
