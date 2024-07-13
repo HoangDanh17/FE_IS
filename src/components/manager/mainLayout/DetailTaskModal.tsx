@@ -1,8 +1,6 @@
 "use client";
-import React, { useState, ChangeEvent } from "react";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardActionArea from "@mui/material/CardActionArea";
+import React, { useState, ChangeEvent, useCallback, useMemo } from "react";
+import dayjs from "dayjs";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -14,18 +12,25 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { TaskType } from "@/schemaValidations/task.schema";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import CloseIcon from "@mui/icons-material/Close";
+import { useAppContext } from "@/app/app-provider";
 
 interface CardItem {
+  type: "card";
   title: string;
   description: string;
   progress: number;
+  timestamp: number;
 }
 
 interface Comment {
+  type: "comment";
   avatar: string;
   text: string;
   name: string;
+  timestamp: number;
 }
+
+type CombinedItem = CardItem | Comment;
 
 const getCardBackgroundColor = (progress: number) => {
   if (progress <= 25) return "#FDCF76";
@@ -35,162 +40,139 @@ const getCardBackgroundColor = (progress: number) => {
 };
 
 const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
-  const cards: CardItem[] = [
-    {
-      title: "26/06/2024",
-      description: "Báo cáo ngày 26/06/2024",
-      progress: 50,
-    },
-    {
-      title: "25/06/2024",
-      description: "Báo cáo ngày 25/06/2024",
-      progress: 70,
-    },
-    {
-      title: "24/06/2024",
-      description: "Báo cáo ngày 24/06/2024",
-      progress: 20,
-    },
-    {
-      title: "23/06/2024",
-      description: "Báo cáo ngày 23/06/2024",
-      progress: 80,
-    },
-    {
-      title: "22/06/2024",
-      description: "Báo cáo ngày 22/06/2024",
-      progress: 60,
-    },
-    {
-      title: "21/06/2024",
-      description: "Báo cáo ngày 21/06/2024",
-      progress: 90,
-    },
-    {
-      title: "20/06/2024",
-      description: "Báo cáo ngày 20/06/2024",
-      progress: 100,
-    },
-  ];
-
-  // Thêm một state mới để lưu trữ chi tiết báo cáo
-  const [reportDetails, setReportDetails] = useState<string[]>([
-    "Hôm nay tôi đã hoàn thành việc thiết kế giao diện người dùng cho trang chủ. Tôi đã sử dụng Figma để tạo wireframe và prototype. Tôi gặp một số khó khăn trong việc tối ưu hóa layout cho các thiết bị di động, nhưng đã giải quyết được bằng cách sử dụng CSS Grid.",
-    "Tôi đã bắt đầu phát triển backend API cho chức năng đăng nhập và đăng ký. Tôi đã sử dụng Node.js với Express và đã thiết lập cơ sở dữ liệu MongoDB. Tôi đã gặp một số vấn đề với việc xử lý lỗi, nhưng đã giải quyết được bằng cách sử dụng middleware.",
-    "Hôm nay tôi tập trung vào việc tối ưu hóa hiệu suất của ứng dụng. Tôi đã sử dụng công cụ profiling để xác định các bottleneck và đã thực hiện một số cải tiến, bao gồm việc thêm caching và lazy loading cho một số component.",
-    "Tôi đã làm việc trên chức năng tìm kiếm của ứng dụng. Tôi đã triển khai full-text search sử dụng Elasticsearch và đã tích hợp nó với backend API. Tôi cũng đã thêm chức năng gợi ý tìm kiếm realtime.",
-    "Hôm nay tôi đã thực hiện kiểm thử đơn vị cho các component React. Tôi đã sử dụng Jest và React Testing Library. Tôi đã viết được khoảng 50 test case và đã đạt được độ bao phủ khoảng 80%.",
-    "Tôi đã làm việc trên việc tích hợp thanh toán vào ứng dụng. Tôi đã sử dụng Stripe API và đã triển khai chức năng thanh toán một lần và thanh toán định kỳ. Tôi gặp một số khó khăn với việc xử lý webhook, nhưng đã giải quyết được.",
-    "Hôm nay là ngày cuối cùng của sprint. Tôi đã hoàn thành việc fix các bug còn lại và đã chuẩn bị cho buổi demo với khách hàng. Tôi cũng đã cập nhật tài liệu kỹ thuật và hướng dẫn sử dụng cho phiên bản mới.",
-  ]);
+  const cards: CardItem[] = useMemo(
+    () => [
+      {
+        type: "card",
+        title: "26/06/2024",
+        description: "Báo cáo ngày 26/06/2024",
+        progress: 50,
+        timestamp: 1624675200000,
+      },
+      {
+        type: "card",
+        title: "25/06/2024",
+        description: "Báo cáo ngày 25/06/2024",
+        progress: 70,
+        timestamp: 1624588800000,
+      },
+      {
+        type: "card",
+        title: "24/06/2024",
+        description: "Báo cáo ngày 24/06/2024",
+        progress: 20,
+        timestamp: 1624502400000,
+      },
+      {
+        type: "card",
+        title: "23/06/2024",
+        description: "Báo cáo ngày 23/06/2024",
+        progress: 80,
+        timestamp: 1624416000000,
+      },
+      {
+        type: "card",
+        title: "22/06/2024",
+        description: "Báo cáo ngày 22/06/2024",
+        progress: 60,
+        timestamp: 1624329600000,
+      },
+      {
+        type: "card",
+        title: "21/06/2024",
+        description: "Báo cáo ngày 21/06/2024",
+        progress: 90,
+        timestamp: 1624243200000,
+      },
+      {
+        type: "card",
+        title: "20/06/2024",
+        description: "Báo cáo ngày 20/06/2024",
+        progress: 100,
+        timestamp: 1624156800000,
+      },
+    ],
+    []
+  );
 
   const initialComments: Comment[][] = [
     [
       {
+        type: "comment",
         avatar: "/images/avatar.jpg",
         text: "Great job on this task!",
         name: "John Doe",
+        timestamp: 1624416000000,
       },
       {
+        type: "comment",
         avatar: "/images/avatar.jpg",
         text: "I agree, well done!",
         name: "Jane Smith",
+        timestamp: 1625014800000,
       },
     ],
     [
       {
+        type: "comment",
         avatar: "/images/avatar.jpg",
         text: "Can we discuss this further?",
         name: "Alice Johnson",
+        timestamp: 1625022000000,
       },
     ],
     [
       {
+        type: "comment",
         avatar: "/images/avatar.jpg",
         text: "I have some concerns about this.",
-        name: "Bob Williams",
+        name: "thanh",
+        timestamp: 1625025600000,
       },
       {
+        type: "comment",
         avatar: "/images/avatar.jpg",
         text: "Let's schedule a meeting to talk about it.",
         name: "Charlie Brown",
+        timestamp: 1625029200000,
       },
     ],
   ];
 
-  const [comments, setComments] = useState<string[]>(
-    Array(cards.length).fill("")
-  );
-  const [submittedComments, setSubmittedComments] = useState<Comment[][]>(
-    cards.map((_, index) => initialComments[index] || [])
-  );
-  const [selectedComments, setSelectedComments] = useState<Comment[]>([]);
-  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(
-    null
-  );
-  const [reportSelected, setReportSelected] = useState<boolean>(false);
-  const [selectedReportDetail, setSelectedReportDetail] = useState<string>("");
+  const { user } = useAppContext();
+  const [comment, setComment] = useState("");
+  const [submittedComments, setSubmittedComments] =
+    useState<Comment[][]>(initialComments);
 
   const handleCommentChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    if (selectedCardIndex !== null) {
-      const newComments = [...comments];
-      newComments[selectedCardIndex] = event.target.value;
-      setComments(newComments);
+    setComment(event.target.value);
+  };
+
+  const handleCommentSubmit = useCallback(() => {
+    console.log("Submitting comment:", comment);
+    if (comment.trim()) {
+      const newComment: Comment = {
+        type: "comment",
+        avatar: "/images/avatar.jpg",
+        text: comment,
+        name: user?.["user-name"] || "Me",
+        timestamp: Date.now(),
+      };
+      setSubmittedComments((prev) => {
+        const updatedComments = [...prev];
+        const lastCardIndex = updatedComments.length - 1;
+        updatedComments[lastCardIndex] = [
+          ...updatedComments[lastCardIndex],
+          newComment,
+        ];
+        return updatedComments;
+      });
+      setComment("");
+      console.log("New comments:", submittedComments);
     }
-  };
-
-  const handleCommentSubmit = () => {
-    if (selectedCardIndex !== null) {
-      const newSubmittedComments = [...submittedComments];
-      newSubmittedComments[selectedCardIndex] = [
-        ...newSubmittedComments[selectedCardIndex],
-        {
-          avatar: "/images/avatar.jpg",
-          text: comments[selectedCardIndex],
-          name: "Me",
-        },
-      ];
-      setSubmittedComments(newSubmittedComments);
-
-      const newComments = [...comments];
-      newComments[selectedCardIndex] = "";
-      setComments(newComments);
-
-      if (selectedComments === submittedComments[selectedCardIndex]) {
-        setSelectedComments(newSubmittedComments[selectedCardIndex]);
-      }
-    }
-  };
-  const handleCardClick = (index: number) => {
-    setSelectedComments(submittedComments[index]);
-    setSelectedCardIndex(index);
-    setSelectedReportDetail(reportDetails[index]);
-    setReportSelected(true);
-  };
-
-  const assignedPerson = {
-    name: "Nguyễn Văn A",
-    status: "in_progress",
-    estHour: "2 tiếng",
-    actHour: "1 tiếng 59 phút",
-  };
-
-  const getStatusProgress = (status: string) => {
-    switch (status) {
-      case "not_start":
-        return 0;
-      case "in_progress":
-        return 50;
-      case "done":
-        return 100;
-      case "cancel":
-        return 0;
-      default:
-        return 0;
-    }
-  };
+  }, [comment, user]);
 
   const getStatusChipColor = (status: string) => {
     switch (status) {
@@ -222,13 +204,32 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
     }
   };
 
-  const getCardStyle = (index: number) => ({
-    backgroundColor: getCardBackgroundColor(cards[index].progress),
-    cursor: "pointer",
-    border: selectedCardIndex === index ? "2px solid #000" : "none",
-    boxShadow:
-      selectedCardIndex === index ? "0 0 10px rgba(0,0,0,0.5)" : "none",
-  });
+  const combinedData = useMemo(() => {
+    const commentsWithCardIndex = submittedComments.flatMap((comments, index) =>
+      comments.map((comment) => ({
+        ...comment,
+        cardIndex: index,
+        type: "comment" as const,
+      }))
+    );
+    const cardsWithType = cards.map((card, index) => ({
+      ...card,
+      type: "card" as const,
+      cardIndex: index,
+    }));
+    const combinedArray: CombinedItem[] = [
+      ...cardsWithType,
+      ...commentsWithCardIndex,
+    ];
+    return combinedArray.sort((a, b) => a.timestamp - b.timestamp);
+  }, [cards, submittedComments]);
+
+  const isCardItem = (item: CombinedItem): item is CardItem => {
+    return item.type === "card";
+  };
+  const formatDateTime = (timestamp: number) => {
+    return dayjs(timestamp).format("DD/MM/YYYY HH:mm");
+  };
 
   return (
     <Box display="flex" flexDirection="row" flex={1}>
@@ -310,9 +311,11 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
               </Typography>
               <Typography variant="body1">
                 <Chip
-                  size="small"
                   label={getStatusLabel(selectedRow.status)}
-                  sx={getStatusChipColor(selectedRow.status)}
+                  style={{
+                    ...getStatusChipColor(selectedRow.status),
+                    fontWeight: "bold",
+                  }}
                 />
               </Typography>
             </Box>
@@ -322,56 +325,45 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
               justifyContent="space-between"
             >
               <Typography variant="body1" fontWeight="bold">
-                Xác nhận:
+                Người giao task:
               </Typography>
-              <Typography variant="body1" fontWeight="bold" className="flex">
+              <Tooltip title={selectedRow["assigned-name"]} arrow>
                 <Typography
-                  style={{
-                    color: selectedRow["is-approved"] ? "#00FF00" : "#FF0000",
-                  }}
+                  variant="body1"
+                  noWrap
+                  style={{ maxWidth: "150px" }}
                 >
-                  {selectedRow["is-approved"] ? (
-                    <>
-                      <DoneAllIcon style={{ color: "#00FF00" }} />
-                      &#160;{selectedRow["is-approved"]}
-                    </>
-                  ) : (
-                    <>
-                      <CloseIcon style={{ color: "#FF0000" }} />
-                      &#160;{selectedRow["is-approved"]}
-                    </>
-                  )}
+                  {selectedRow["assigned-name"]}
                 </Typography>
-              </Typography>
+              </Tooltip>
             </Box>
-            <Box>
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <Typography variant="body1" fontWeight="bold">
-                Tiến độ công việc:
+                Đã xác nhận:
               </Typography>
-              <Box display="flex" alignItems="center" mt={2}>
-                <LinearProgress
-                  variant="determinate"
-                  value={getStatusProgress(assignedPerson.status)}
-                  style={{ width: "100%", marginRight: "10px" }}
-                />
-                <Typography variant="body2" color="textSecondary">
-                  {getStatusProgress(assignedPerson.status)}%
+              <Typography display="flex" alignItems="center">
+                <Typography variant="body1">
+                  {selectedRow["is-approved"] ? "Đã xác nhận" : "Chưa xác nhận"}
                 </Typography>
-              </Box>
-              {assignedPerson.status === "cancel" && (
-                <Typography variant="body2" color="textSecondary" mt={1}>
-                  Progress reset to 0% due to task cancellation.
-                </Typography>
-              )}
+                {selectedRow["is-approved"] ? (
+                  <DoneAllIcon sx={{ color: "#00FF00", ml: 1 }} />
+                ) : (
+                  <CloseIcon sx={{ color: "#FF0000", ml: 1 }} />
+                )}
+              </Typography>
             </Box>
             <Box display="flex" flexDirection="column">
               <Typography variant="body1" fontWeight="bold">
                 Mô tả task:
               </Typography>
-              <ScrollArea className="h-[200px] pr-2">
+              <ScrollArea className="h-[145px] pr-2">
                 <Typography
                   variant="body1"
-                  noWrap
                   style={{
                     maxWidth: "1200px",
                     wordBreak: "break-word",
@@ -379,186 +371,156 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                     overflowWrap: "break-word",
                   }}
                 >
-                  {selectedRow.description}ssssssss sssss sss s s s s ss ss s s
-                  s s s s s s s s s s s ss s s s s s s s s s s s s ss ss s s s
-                  ss s s s s s ss s s s s s s s s s s s s ss s s s s s s s s s s
-                  s s s s s s ss s s s s s s s s s s s s s ss s s s s s s s s s
-                  s s s s s ss s s s s s s s s s s s s ss s s s s s s s s s s s
-                  s ss s s s s s s s s s s s s s s s ss s s s s s s s s s s s s
-                  s s s s s s s s s s s s s s s s s s s s s s s s s s s s s s ss
-                  s ss s s s s ss s s s s s s s s ss s s s s s s s s s s s s s s
-                  s s s ss s s s s s s s s s s s s s s s s ss s s s s s s s s s
-                  ss s s s s s s s s s s s s s s s s s ss s s s s s s s
+                  {selectedRow.description}
                 </Typography>
               </ScrollArea>
             </Box>
           </Stack>
         </Box>
       </Box>
+
       <Divider orientation="vertical" flexItem />
-      <Box display="flex" flexDirection="column" flex={30}>
-        <Box flexGrow={1} height="60%">
-          <Typography variant="h6" color="primary" className="ml-2">
-            Các báo cáo
+
+      <Box flex={70} ml={2} maxHeight="500px">
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Typography variant="h6" color="primary">
+            Messenger Board
           </Typography>
-          <ScrollArea className="h-[530px] p-5 rounded-md m-4 shadow-lg border">
-            {cards.length > 0 ? (
-              <Stack spacing={2}>
-                {cards.map((card, index) => (
-                  <Card
-                    key={index}
-                    sx={getCardStyle(index)}
-                    onClick={() => handleCardClick(index)}
-                    className="border rounded-lg"
-                  >
-                    <CardActionArea>
-                      <CardContent>
+          <ScrollArea style={{ height: "400px" }}>
+            <Stack spacing={2} paddingRight={2} paddingBottom={2}>
+              {combinedData.map((item, index) => (
+                <React.Fragment key={index}>
+                  {isCardItem(item) ? (
+                    <Box
+                      bgcolor={getCardBackgroundColor(item.progress)}
+                      color="white"
+                      p={2}
+                      borderRadius={2}
+                      mb={1}
+                      minHeight="80px"
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="space-between"
+                    >
+                      <Typography
+                        variant="body1"
+                        fontWeight="bold"
+                        color="textPrimary"
+                      >
+                        Report
+                      </Typography>
+                      <Typography variant="body2">
+                        {item.description}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {formatDateTime(item.timestamp)}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Box
+                      key={index}
+                      display="flex"
+                      justifyContent={
+                        item.name === user?.["user-name"]
+                          ? "flex-end"
+                          : "flex-start"
+                      }
+                      width="100%"
+                    >
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        flexDirection={
+                          item.name === user?.["user-name"]
+                            ? "row-reverse"
+                            : "row"
+                        }
+                        bgcolor={
+                          item.name === user?.["user-name"]
+                            ? "#e0f7fa"
+                            : "#f5f5f5"
+                        }
+                        p={2}
+                        borderRadius={2}
+                        mb={1}
+                        maxWidth="70%"
+                      >
+                        <Avatar src={item.avatar} alt={item.name} />
                         <Box
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="space-between"
-                          flexGrow={1}
+                          ml={item.name === user?.["user-name"] ? 0 : 2}
+                          mr={item.name === user?.["user-name"] ? 2 : 0}
                         >
-                          <Tooltip title={card.title} arrow>
-                            <Typography
-                              variant="body1"
-                              fontWeight="bold"
-                              noWrap
-                              style={{ maxWidth: "150px" }}
-                            >
-                              {card.title}
-                            </Typography>
-                          </Tooltip>
                           <Box
                             display="flex"
-                            alignItems="center"
-                            sx={{ marginLeft: "10px" }}
+                            flexDirection="column"
+                            alignItems={
+                              item.name === user?.["user-name"]
+                                ? "flex-end"
+                                : "flex-start"
+                            }
                           >
                             <Typography
                               variant="body2"
-                              style={{ fontSize: 15, fontWeight: 700 }}
+                              fontWeight="bold"
+                              color="textPrimary"
                             >
-                              {card.progress}%
+                              {item.name}
+                            </Typography>
+                            <Typography
+                              variant="body1"
+                              style={{
+                                maxWidth: '100%',
+                                wordBreak: 'break-all',
+                                overflowWrap: 'break-word',
+                                whiteSpace: 'pre-wrap',
+                              }}
+                            >
+                              {item.text}
+                            </Typography>
+                            <Typography variant="caption" color="textSecondary">
+                              {formatDateTime(item.timestamp)}
                             </Typography>
                           </Box>
                         </Box>
-                        {/* <Typography mt={2}>{card.description}</Typography> */}
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                ))}
-              </Stack>
-            ) : (
-              <Typography variant="body1">Chưa có báo cáo nào.</Typography>
-            )}
+                      </Box>
+                    </Box>
+                  )}
+                </React.Fragment>
+              ))}
+            </Stack>
           </ScrollArea>
         </Box>
-      </Box>
-      <Divider orientation="vertical" flexItem />
-      <Box display="flex" flexDirection="column" flex={40}>
-        <Typography variant="h6" color="primary" className="ml-2">
-          Chi tiết báo cáo
-        </Typography>
-        <ScrollArea className="h-[110px] w-full">
-          <Box mb={2} mx={2} marginTop="10px">
-            {reportSelected ? (
-              <Typography
-                variant="body1"
-                style={{
-                  maxWidth: "800px",
-                  wordBreak: "break-word",
-                  whiteSpace: "pre-wrap",
-                  overflowWrap: "break-word",
-                }}
-              >
-                {selectedReportDetail}
-              </Typography>
-            ) : (
-              <Typography variant="body1">
-                Chưa có chi tiết báo cáo. Vui lòng chọn một báo cáo.
-              </Typography>
-            )}
-          </Box>
-        </ScrollArea>
-        <Typography variant="h6" color="primary" className="ml-2">
-          Các bình luận
-        </Typography>
-        <ScrollArea className="h-[250px] p-5 rounded-md m-4 shadow-lg border">
-        {reportSelected ? (
-          <Box>
-            {selectedComments.map((comment, commentIndex) => (
-              <React.Fragment key={commentIndex}>
-                {commentIndex > 0 && <Divider sx={{ my: 2 }} />}
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  alignItems="center"
-                  mt={commentIndex === 0 ? 0 : 2}
-                >
-                  <Box
-                    position="relative"
-                    pl={7}
-                    mt={commentIndex === 0 ? 0 : 2}
-                  >
-                    <Avatar
-                      src={comment.avatar}
-                      sx={{
-                        position: "absolute",
-                        left: 0,
-                        top: 0,
-                      }}
-                    />
-                    <Box>
-                      <Typography variant="body1" fontWeight="bold">
-                        {comment.name}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          wordBreak: "break-word",
-                          overflowWrap: "break-word",
-                          maxWidth: "600px",
-                        }}
-                      >
-                        {comment.text}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Stack>
-              </React.Fragment>
-            ))}
-          </Box>
-          ) : (
-            <Typography variant="body1">
-              Chưa có bình luận. Vui lòng chọn một báo cáo.
-            </Typography>
-          )}
-        </ScrollArea>
-        <Box mt={2} mx={2}>
+        <Box
+          mt={2}
+          display="flex"
+          alignItems="center"
+          gap={2}
+          style={{
+            marginTop: "auto",
+          }}
+        >
           <TextField
-            fullWidth
-            placeholder="Write a comment..."
-            multiline
-            required
-            rows={2}
+            label="Nhập bình luận"
             variant="outlined"
-            value={
-              selectedCardIndex !== null ? comments[selectedCardIndex] : ""
-            }
+            fullWidth
+            multiline
+            rows={2}
+            value={comment}
             onChange={handleCommentChange}
+            style={{ flexGrow: 1 }}
           />
           <Button
             variant="contained"
             color="primary"
             onClick={handleCommentSubmit}
-            sx={{ mt: 2, float: "right" }}
-            disabled={
-              selectedCardIndex === null ||
-              (selectedCardIndex !== null &&
-                comments[selectedCardIndex].trim() === "")
-            }
+            style={{
+              flexShrink: 0,
+              marginLeft: "10px",
+              alignSelf: "flex-end",
+            }}
+            disabled={comment.trim() === ""}
           >
-            Submit
+            Gửi
           </Button>
         </Box>
       </Box>

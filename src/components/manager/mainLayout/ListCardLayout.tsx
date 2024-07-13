@@ -132,7 +132,7 @@ const ListCardLayout = () => {
                       >
                         <Typography variant="h6">{project.name}</Typography>
                         <Typography color="textSecondary">
-                          {dayjs(project["start-date"]).format("DD/MM/YYYY")}
+                          {dayjs(project["est-start-time"]).format("DD/MM/YYYY")}
                         </Typography>
                       </CardContent>
                     </Card>

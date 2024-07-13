@@ -10,8 +10,8 @@ export const TaskSchema = z.object({
   status: z.string(),
   name: z.string(),
   description: z.string(),
-  "estimated-effort": z.string(),
-  "actual-effort": z.string(),
+  "estimated-effort": z.number(),
+  "actual-effort": z.number(),
 });
 
 export const TaskPageSchema = z.object({

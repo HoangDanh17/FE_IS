@@ -12,23 +12,70 @@ import {
 import MonthlyEarnings from "@/components/dashboard/MonthlyEarnings";
 import SalesOverview from "@/components/dashboard/SalesOverview";
 import YearlyBreakup from "@/components/dashboard/YearlyBreakup";
-import DetailReport from "@/components/dashboard/DetailReport";
+
+const handleExport = async (id: string|number) => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/v1/reports/${id}/project-intern`,
+      {
+        method: "GET",
+        headers: {
+          Accept:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    // Lấy filename từ header Content-Disposition nếu có
+    const contentDisposition = response.headers.get("Content-Disposition");
+    let filename = "export.xlsx";
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+      if (filenameMatch?.length === 2) {
+        filename = filenameMatch[1];
+      }
+    }
+
+    // Chuyển response thành blob
+    const blob = await response.blob();
+
+    // Tạo một URL object từ blob
+    const url = window.URL.createObjectURL(blob);
+
+    // Tạo một thẻ a tạm thời để tải xuống
+    const a = document.createElement("a");
+    a.style.display = "none";
+    a.href = url;
+    a.download = filename;
+
+    // Thêm thẻ a vào body, kích hoạt click, sau đó xóa nó
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error("There was a problem with the fetch operation:", error);
+  }
+};
 
 const Dashboard = () => {
-  const [open, setOpen] = useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
+  const handleExportId = () => {
+    const id = 1;
+    handleExport(id);
   };
 
   return (
     <div>
-      <Button variant="contained" className="mb-4" onClick={handleClickOpen}>
-        Xem báo cáo thực tập
+      <Button
+        variant="contained"
+        className="mb-4 mr-4 bg-green-600"
+        onClick={handleExportId}
+      >
+        Xuất excel
       </Button>
 
       <Box>
@@ -48,17 +95,6 @@ const Dashboard = () => {
           </Grid>
         </Grid>
       </Box>
-      <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth >
-        <DialogTitle>Báo cáo thực tập</DialogTitle>
-        <DialogContent>
-          <DetailReport />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Đóng
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };

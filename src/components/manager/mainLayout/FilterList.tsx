@@ -57,8 +57,9 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 }));
 
 const statusLabels: { [key: string]: string } = {
-  todo: "Todo",
-  done: "Done",
+  todo: "Chưa bắt đầu",
+  in_progress:"Đang thực hiện",
+  completed: "Hoàn thành",
   true: "Đã duyệt",
   false: "Không duyệt",
 };
@@ -130,7 +131,7 @@ const FilterList = () => {
                       />
                     </Grid>
                     <Grid item xs={3}>
-                      <InputLabel id="status-label">Trạng thái công việc</InputLabel>
+                      <InputLabel id="status-label">Trạng thái</InputLabel>
                       <Select
                         labelId="status-label"
                         id="status"
@@ -151,8 +152,8 @@ const FilterList = () => {
                           <em>Chọn trạng thái</em>
                         </MenuItem>
                         <MenuItem value="todo">Chưa bắt đầu</MenuItem>
-                        <MenuItem value="inprogress">Đang thực hiện</MenuItem>
-                        <MenuItem value="done">Hoàn thành</MenuItem>
+                        <MenuItem value="in_progress">Đang thực hiện</MenuItem>
+                        <MenuItem value="completed">Hoàn thành</MenuItem>
                       </Select>
                     </Grid>
                     <Grid item xs={3}>
@@ -161,7 +162,7 @@ const FilterList = () => {
                         value={formData["assignee-name"]}
                         onChange={handleChange}
                         id="assignee-name"
-                        label="Tên người làm"
+                        label="Người được phân công"
                         variant="standard"
                         size="small"
                         style={{ width: "90%", marginTop: 6 }}
@@ -173,7 +174,7 @@ const FilterList = () => {
                         value={formData["assignee-code"]}
                         onChange={handleChange}
                         id="assignee-code"
-                        label="Mã người làm"
+                        label="Mã thực tập"
                         variant="standard"
                         size="small"
                         style={{ width: "90%", marginTop: 6 }}
