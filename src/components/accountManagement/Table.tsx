@@ -86,15 +86,6 @@ function TableAccount({
     setPage(0);
   };
 
-  // const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>, row: RowData) => {
-  //   setSelectedValue(row);
-  //   console.log("co len: ", row)
-  // };
-
-  // const handleDeselectAll = () => {
-  //   setSelectedValue(undefined);
-  // };
-
   const handleOpenEditModal = (row: RowData) => {
     setSelectedValue(row);
     setOpenEditModal(true);

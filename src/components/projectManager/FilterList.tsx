@@ -27,7 +27,12 @@ const FilterList = () => {
 
   const handleSelectChange = (e: SelectChangeEvent<string>) => {
     setFormData({ ...formData, status: e.target.value });
-};
+  };
+
+  const handleSelectApprove = (e: SelectChangeEvent<string>) => {
+    setFormData({ ...formData, "is-approved": e.target.value });
+  };
+
 
   const [isFilter, setIsFilter] = useState<boolean>(false);
   const [dataFilter, setDataFilter] = useState<FormFilterData | null>(null);
@@ -110,10 +115,26 @@ const FilterList = () => {
                     <Select
                       name="status"
                       labelId="role-label"
-                      value={formData['is-approved']}
+                      value={formData.status}
                       onChange={handleSelectChange}
                     >
                       <MenuItem value={"todo"}>To Do</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={3}>
+                  <FormControl variant="standard" fullWidth>
+                    <InputLabel id="is-approved-label">Xác nhận</InputLabel>
+                    <Select
+                      name="is-approved"
+                      labelId="is-approved-label"
+                      label="Xác nhận"
+                      value={formData["is-approved"]}
+                      onChange={handleSelectApprove}
+                    >
+                      <MenuItem value="true">Approve</MenuItem>
+                      <MenuItem value="false">Waiting</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>

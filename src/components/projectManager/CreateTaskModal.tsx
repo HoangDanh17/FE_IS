@@ -4,6 +4,8 @@ import '@/styles/accountManagement/ModalBox.css';
 import { toast } from "@/components/ui/use-toast";
 import listTaskApiRequest from '@/apiRequests/listTask/listTask';
 import { CreateTaskType } from '@/schemaValidations/listTask/listTask.schema';
+import { useAppContext } from "@/app/app-provider";
+
 interface AddModalProps {
     onClose: () => void;
 }
@@ -19,9 +21,11 @@ const CreateTaskModal: React.FC<AddModalProps> = ({ onClose }) => {
     // List Member
     const [member, setMember] = useState<Member[]>([]);
 
+    const {project} = useAppContext()
+
     // Get list member in project
     useEffect(() => {
-        listTaskApiRequest.getMemberInProject()
+        listTaskApiRequest.getMemberInProject(project?.id)
             .then(({ payload }) => {
                 setMember(payload.data);
             })
@@ -53,7 +57,7 @@ const CreateTaskModal: React.FC<AddModalProps> = ({ onClose }) => {
 
 
         try {
-            const result = await listTaskApiRequest.createTask(formData);
+            const result = await listTaskApiRequest.createTask(project?.id, formData);
             toast({
                 title: `${result.payload.message}`,
                 duration: 2000,

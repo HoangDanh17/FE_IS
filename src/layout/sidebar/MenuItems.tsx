@@ -105,7 +105,7 @@ const MenuitemsManager = [
     id: 2,
     title: "Thành viên dự án",
     icon: AssignmentIcon,
-    href: "/homePage/projectMember",
+    href: "/homePage/projectMemberPM",
   },
   {
     id: 3,
@@ -130,7 +130,7 @@ const MenuitemsPm = [
     id: 2,
     title: "Thành viên dự án",
     icon: AssignmentIcon,
-    href: "/homePage/projectMember",
+    href: "/homePage/projectMemberPM",
   },
   {
     id: 3,

@@ -143,14 +143,26 @@ const FilterAccount = () => {
                                     </FormControl>
                                 </Grid>
 
-                                <Grid container item xs={12} sm={12} md={4} lg={4} spacing={1}>
+                                <Grid item xs={12} sm={3} container spacing={2}>
                                     <Grid item xs={6}>
-                                        <Button type="submit" variant="contained" startIcon={<Search />} fullWidth className='search-btn'>
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            startIcon={<Search />}
+                                            className="search-btn"
+                                            fullWidth
+                                        >
                                             Tìm kiếm
                                         </Button>
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <Button fullWidth className='clean-btn' onClick={handleReset}>
+                                        <Button
+                                            type="button"
+                                            variant="outlined"
+                                            onClick={handleReset}
+                                            className="clean-btn"
+                                            fullWidth
+                                        >
                                             Hủy Filter
                                         </Button>
                                     </Grid>

@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 
 interface ButtonGroupAccountProps {
     triggerRefresh: () => void;
-    selectedProjectId: string | null;
+    selectedProjectId: string | undefined;
     isFilter: boolean;
     dataFilter: FormFilter | null;
 }

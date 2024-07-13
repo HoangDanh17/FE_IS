@@ -6,6 +6,7 @@ import { ListTaskType, UpdateTaskType } from '@/schemaValidations/listTask/listT
 import listTaskApiRequest from '@/apiRequests/listTask/listTask';
 import { Task } from './ListTable';
 import { Member } from './CreateTaskModal';
+import { useAppContext } from "@/app/app-provider";
 
 interface EditTaskModalProps {
     onClose: () => void;
@@ -14,29 +15,30 @@ interface EditTaskModalProps {
 
 const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
     const [loading, setLoading] = useState(false);
-
     const [formData, setFormData] = useState<UpdateTaskType>({
         "assigned-to": task?.['assigned-to'] ?? "",
         description: task?.description ?? "",
         "estimated-effort": task?.['estimated-effort'] ?? "",
-        "is-approved": task?.['is-approved'] ?? "",
+        "is-approved": task ? task['is-approved'] === "true" : false,
         name: task?.name ?? "",
-        taskId: task?.taskId ?? "",
+        taskId: task?.id ?? "",
     });
+
+    const { project } = useAppContext()
 
     // List Member
     const [member, setMember] = useState<Member[]>([]);
 
     // Get list member in project
     useEffect(() => {
-        listTaskApiRequest.getMemberInProject()
+        listTaskApiRequest.getMemberInProject(project?.id)
             .then(({ payload }) => {
                 setMember(payload.data);
             })
             .catch(error => {
                 console.error("Failed to fetch projects", error);
             });
-    }, []);
+    }, [project?.id]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -45,14 +47,18 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
     const handleSelectChange = (e: SelectChangeEvent<string>) => {
         setFormData({ ...formData, "assigned-to": e.target.value });
     };
+    
+    const handleSelectApprove = (e: SelectChangeEvent<string>) => {
+        setFormData({ ...formData, "is-approved": e.target.value === "true" });
+    };
 
     async function handleSubmit(e: FormEvent) {
         if (loading) return;
         setLoading(true);
         e.preventDefault();
-
+        console.log(formData)
         try {
-            const result = await listTaskApiRequest.updateTask(formData);
+            const result = await listTaskApiRequest.updateTask(project?.id, formData);
             toast({
                 title: `${result.payload.message}`,
                 duration: 2000,
@@ -74,7 +80,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
     return (
         <Box className="modal-edit-box">
             <Typography id="modal-modal-title" variant="h6" component="h2">
-                Update Task
+                Cập nhật Task
             </Typography>
 
             {formData && (
@@ -137,15 +143,18 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
                         </Grid>
 
                         <Grid item xs={6}>
-                            <FormControl fullWidth>
-                                <TextField
+                            <FormControl variant="standard" fullWidth>
+                                <InputLabel id="is-approved-label">Xác nhận</InputLabel>
+                                <Select
+                                    name="is-approved"
+                                    labelId="is-approved-label"
                                     label="Xác nhận"
-                                    placeholder="Xác nhận"
-                                    name='is-approved'
-                                    value={formData['is-approved']}
-                                    onChange={handleChange}
-                                    required
-                                />
+                                    value={formData['is-approved'] ? "true" : "false"}
+                                    onChange={handleSelectApprove}
+                                >
+                                    <MenuItem value="true">Approve</MenuItem>
+                                    <MenuItem value="false">Not approve</MenuItem>
+                                </Select>
                             </FormControl>
                         </Grid>
 
@@ -173,15 +182,15 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
                             className="cancel-btn"
                             onClick={onClose}
                         >
-                            Cancel
+                            Hủy
                         </Button>
 
                         <Button
                             variant="contained"
-                            color="primary"
+                            color="warning"
                             type="submit"
                         >
-                            Update
+                            Cập nhật
                         </Button>
                     </Box>
                 </form>

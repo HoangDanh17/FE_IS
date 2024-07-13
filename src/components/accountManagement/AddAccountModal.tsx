@@ -48,8 +48,9 @@ const AddModalAccount: React.FC<AddModalProps> = ({ onClose }) => {
            // router.refresh();
 
         } catch (error: any) {
+            console.log("erorAddL ", error)
             toast({
-                title: `${error}`,
+                title: `${error.payload.message}`,
                 duration: 2000,
                 variant: "destructive",
             });
