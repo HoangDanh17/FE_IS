@@ -18,10 +18,10 @@ const Body = () => {
           variant="h3"
           style={{ color: "white", fontFamily: "sans-serif", fontWeight: 700 }}
         >
-          Only For Gay Nextbean
+        Nextbean Center
         </Typography>
         <Typography variant="h5" className="text-white/40">
-          We are team of talented designers making websites with Bootstrap
+          Best choice for managing member and information effeciently
         </Typography>
         <Link href={"/login"} className="btn-get-started mt-4 font-semibold">
           Get Started
