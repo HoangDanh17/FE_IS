@@ -1,5 +1,12 @@
 "use client";
-import React, { useState, ChangeEvent, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  ChangeEvent,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 import dayjs from "dayjs";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
@@ -7,142 +14,55 @@ import Button from "@mui/material/Button";
 import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import { Divider, Chip, Tooltip, LinearProgress } from "@mui/material";
+import {
+  Divider,
+  Chip,
+  Tooltip,
+  FormControl,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TaskType } from "@/schemaValidations/task.schema";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import CloseIcon from "@mui/icons-material/Close";
-import { useAppContext } from "@/app/app-provider";
-
-interface CardItem {
-  type: "card";
-  title: string;
-  description: string;
-  progress: number;
-  timestamp: number;
-}
-
-interface Comment {
-  type: "comment";
-  avatar: string;
-  text: string;
-  name: string;
-  timestamp: number;
-}
-
-type CombinedItem = CardItem | Comment;
-
-const getCardBackgroundColor = (progress: number) => {
-  if (progress <= 25) return "#FDCF76";
-  if (progress <= 50) return "#A0B4F2";
-  if (progress <= 99) return "#F29BC4";
-  return "#8EC9BB";
-};
+import commentApiRequest from "@/apiRequests/comment";
+import { CommentListResType } from "@/schemaValidations/comment.schema";
+import { toast } from "@/components/ui/use-toast";
 
 const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
-  const cards: CardItem[] = useMemo(
-    () => [
-      {
-        type: "card",
-        title: "26/06/2024",
-        description: "Báo cáo ngày 26/06/2024",
-        progress: 50,
-        timestamp: 1624675200000,
-      },
-      {
-        type: "card",
-        title: "25/06/2024",
-        description: "Báo cáo ngày 25/06/2024",
-        progress: 70,
-        timestamp: 1624588800000,
-      },
-      {
-        type: "card",
-        title: "24/06/2024",
-        description: "Báo cáo ngày 24/06/2024",
-        progress: 20,
-        timestamp: 1624502400000,
-      },
-      {
-        type: "card",
-        title: "23/06/2024",
-        description: "Báo cáo ngày 23/06/2024",
-        progress: 80,
-        timestamp: 1624416000000,
-      },
-      {
-        type: "card",
-        title: "22/06/2024",
-        description: "Báo cáo ngày 22/06/2024",
-        progress: 60,
-        timestamp: 1624329600000,
-      },
-      {
-        type: "card",
-        title: "21/06/2024",
-        description: "Báo cáo ngày 21/06/2024",
-        progress: 90,
-        timestamp: 1624243200000,
-      },
-      {
-        type: "card",
-        title: "20/06/2024",
-        description: "Báo cáo ngày 20/06/2024",
-        progress: 100,
-        timestamp: 1624156800000,
-      },
-    ],
-    []
-  );
-
-  const initialComments: Comment[][] = [
-    [
-      {
-        type: "comment",
-        avatar: "/images/avatar.jpg",
-        text: "Great job on this task!",
-        name: "John Doe",
-        timestamp: 1624416000000,
-      },
-      {
-        type: "comment",
-        avatar: "/images/avatar.jpg",
-        text: "I agree, well done!",
-        name: "Jane Smith",
-        timestamp: 1625014800000,
-      },
-    ],
-    [
-      {
-        type: "comment",
-        avatar: "/images/avatar.jpg",
-        text: "Can we discuss this further?",
-        name: "Alice Johnson",
-        timestamp: 1625022000000,
-      },
-    ],
-    [
-      {
-        type: "comment",
-        avatar: "/images/avatar.jpg",
-        text: "I have some concerns about this.",
-        name: "thanh",
-        timestamp: 1625025600000,
-      },
-      {
-        type: "comment",
-        avatar: "/images/avatar.jpg",
-        text: "Let's schedule a meeting to talk about it.",
-        name: "Charlie Brown",
-        timestamp: 1625029200000,
-      },
-    ],
-  ];
-
-  const { user } = useAppContext();
   const [comment, setComment] = useState("");
-  const [submittedComments, setSubmittedComments] =
-    useState<Comment[][]>(initialComments);
+
+  const [selectedType, setSelectedType] = useState<string>("all");
+  const [loading, setLoading] = useState(false);
+  const [limit, setLimit] = useState(10);
+  const [loadMore, setLoadMore] = useState(false);
+  const handleLoadMore = () => {
+    setLimit(limit + 10);
+    setLoadMore(true);
+  };
+  const [data, setData] = useState<CommentListResType>();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const { payload } = await commentApiRequest.getListComment(
+          selectedRow.id,
+          1,
+          limit,
+          selectedType
+        );
+        setData(payload);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [limit, selectedType, refreshKey]);
 
   const handleCommentChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -150,29 +70,25 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
     setComment(event.target.value);
   };
 
-  const handleCommentSubmit = useCallback(() => {
-    console.log("Submitting comment:", comment);
-    if (comment.trim()) {
-      const newComment: Comment = {
-        type: "comment",
-        avatar: "/images/avatar.jpg",
-        text: comment,
-        name: user?.["user-name"] || "Me",
-        timestamp: Date.now(),
-      };
-      setSubmittedComments((prev) => {
-        const updatedComments = [...prev];
-        const lastCardIndex = updatedComments.length - 1;
-        updatedComments[lastCardIndex] = [
-          ...updatedComments[lastCardIndex],
-          newComment,
-        ];
-        return updatedComments;
+  const handleCommentSubmit = () => {
+    const body = {
+      content: comment,
+      type: "comment",
+    };
+    commentApiRequest
+      .createComment(selectedRow.id, body)
+      .then(() => {
+        setRefreshKey((prevKey) => prevKey + 1);
+        setComment("");
+      })
+      .catch((error) => {
+        toast({
+          title: `${error}`,
+          duration: 2000,
+          variant: "destructive",
+        });
       });
-      setComment("");
-      console.log("New comments:", submittedComments);
-    }
-  }, [comment, user]);
+  };
 
   const getStatusChipColor = (status: string) => {
     switch (status) {
@@ -204,38 +120,43 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
     }
   };
 
-  const combinedData = useMemo(() => {
-    const commentsWithCardIndex = submittedComments.flatMap((comments, index) =>
-      comments.map((comment) => ({
-        ...comment,
-        cardIndex: index,
-        type: "comment" as const,
-      }))
-    );
-    const cardsWithType = cards.map((card, index) => ({
-      ...card,
-      type: "card" as const,
-      cardIndex: index,
-    }));
-    const combinedArray: CombinedItem[] = [
-      ...cardsWithType,
-      ...commentsWithCardIndex,
-    ];
-    return combinedArray.sort((a, b) => a.timestamp - b.timestamp);
-  }, [cards, submittedComments]);
-
-  const isCardItem = (item: CombinedItem): item is CardItem => {
-    return item.type === "card";
-  };
-  const formatDateTime = (timestamp: number) => {
+  const formatDateTime = (timestamp: string) => {
     return dayjs(timestamp).format("DD/MM/YYYY HH:mm");
   };
 
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (loadMore === true) {
+      setLoadMore(false);
+    } else {
+      if (data && scrollAreaRef.current) {
+        const scrollElement = scrollAreaRef.current.querySelector(
+          "[data-radix-scroll-area-viewport]"
+        );
+        if (scrollElement) {
+          scrollElement.scrollTop = scrollElement.scrollHeight;
+        }
+      }
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollElement = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]"
+      );
+      if (scrollElement) {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      }
+    }
+  }, [refreshKey]);
+
   return (
     <Box display="flex" flexDirection="row" flex={1}>
-      <Box flex={30} mr={2} maxHeight="500px">
+      <Box flex={25} mr={2} maxHeight="500px">
         <Typography variant="h6" color="primary">
-          Thông tin người được giao
+          Thông tin người được phân công
         </Typography>
         <Box mb={2}>
           <Stack spacing={2} className="mt-6">
@@ -245,50 +166,7 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
               justifyContent="space-between"
             >
               <Typography variant="body1" fontWeight="bold">
-                Tên người được giao:
-              </Typography>
-              <Typography variant="body1">
-                {selectedRow["assigned-name"]}
-              </Typography>
-            </Box>
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-            >
-              <Typography variant="body1" fontWeight="bold">
-                Thời gian (dự tính):
-              </Typography>
-              <Typography variant="body1">
-                {selectedRow["estimated-effort"]}
-              </Typography>
-            </Box>
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-            >
-              <Typography variant="body1" fontWeight="bold">
-                Thời gian (thực tế):
-              </Typography>
-              <Typography variant="body1">
-                {selectedRow["actual-effort"]}
-              </Typography>
-            </Box>
-          </Stack>
-        </Box>
-        <Typography variant="h6" color="primary">
-          Chi tiết task
-        </Typography>
-        <Box mb={2}>
-          <Stack spacing={2} className="mt-4">
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-            >
-              <Typography variant="body1" fontWeight="bold">
-                Tên task:
+                Tên công việc:
               </Typography>
               <Tooltip title={selectedRow.name} arrow>
                 <Typography
@@ -300,23 +178,16 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                 </Typography>
               </Tooltip>
             </Box>
-
             <Box
               display="flex"
               flexDirection="row"
               justifyContent="space-between"
             >
               <Typography variant="body1" fontWeight="bold">
-                Trạng thái:
+                Người được phân công:
               </Typography>
               <Typography variant="body1">
-                <Chip
-                  label={getStatusLabel(selectedRow.status)}
-                  style={{
-                    ...getStatusChipColor(selectedRow.status),
-                    fontWeight: "bold",
-                  }}
-                />
+                {selectedRow["assigned-name"]}
               </Typography>
             </Box>
             <Box
@@ -325,18 +196,28 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
               justifyContent="space-between"
             >
               <Typography variant="body1" fontWeight="bold">
-                Người giao task:
+                Thời gian (act):
               </Typography>
-              <Tooltip title={selectedRow["assigned-name"]} arrow>
-                <Typography
-                  variant="body1"
-                  noWrap
-                  style={{ maxWidth: "150px" }}
-                >
-                  {selectedRow["assigned-name"]}
-                </Typography>
-              </Tooltip>
+              <Typography variant="body1">
+                {selectedRow["actual-effort"]} giờ
+              </Typography>
             </Box>
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="space-between"
+            >
+              <Typography variant="body1" fontWeight="bold">
+                Thời gian (est):
+              </Typography>
+              <Typography variant="body1">
+                {selectedRow["estimated-effort"]} giờ
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
+        <Box mb={2}>
+          <Stack spacing={2} className="mt-4">
             <Box
               display="flex"
               flexDirection="row"
@@ -344,7 +225,7 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
               alignItems="center"
             >
               <Typography variant="body1" fontWeight="bold">
-                Đã xác nhận:
+                Trạng thái xác nhận:
               </Typography>
               <Typography display="flex" alignItems="center">
                 <Typography variant="body1">
@@ -357,11 +238,29 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                 )}
               </Typography>
             </Box>
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="space-between"
+            >
+              <Typography variant="body1" fontWeight="bold" className="mt-2">
+                Trạng thái công việc:
+              </Typography>
+              <Typography variant="body1">
+                <Chip
+                  label={getStatusLabel(selectedRow.status)}
+                  style={{
+                    ...getStatusChipColor(selectedRow.status),
+                    fontWeight: "bold",
+                  }}
+                />
+              </Typography>
+            </Box>
             <Box display="flex" flexDirection="column">
               <Typography variant="body1" fontWeight="bold">
                 Mô tả task:
               </Typography>
-              <ScrollArea className="h-[145px] pr-2">
+              <ScrollArea className="h-[210px] pr-2">
                 <Typography
                   variant="body1"
                   style={{
@@ -383,47 +282,93 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
 
       <Box flex={70} ml={2} maxHeight="500px">
         <Box display="flex" flexDirection="column" gap={2}>
-          <Typography variant="h6" color="primary">
-            Messenger Board
-          </Typography>
-          <ScrollArea style={{ height: "400px" }}>
-            <Stack spacing={2} paddingRight={2} paddingBottom={2}>
-              {combinedData.map((item, index) => (
+          <Box display="flex">
+            <Typography variant="h6" color="primary">
+              Chi tiết báo cáo -
+            </Typography>
+            <Box display="flex" style={{ height: 20 }}>
+              <Typography variant="body1" className="mx-4">
+                Chọn loại:
+              </Typography>
+              <FormControl sx={{ minWidth: 200, mb: 2, mr: 2 }}>
+                <Select
+                  labelId="term-select-label"
+                  value={selectedType}
+                  label="Select Term"
+                  variant="standard"
+                  placeholder="Chọn loại"
+                  size="small"
+                  defaultValue=""
+                  onChange={(e) => setSelectedType(e.target.value)}
+                >
+                  <MenuItem value="all">Tất cả</MenuItem>
+                  <MenuItem value="comment">comment</MenuItem>
+                  <MenuItem value="report">report</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
+          <ScrollArea
+            ref={scrollAreaRef}
+            style={{
+              height: "400px",
+              display: "flex",
+              flexDirection: "column",
+              overflowY: "auto",
+              scrollBehavior: "smooth",
+            }}
+          >
+            <Stack
+              spacing={2}
+              paddingRight={2}
+              paddingBottom={2}
+              style={{ display: "flex", flexDirection: "column-reverse" }}
+            >
+              {data?.data.slice(0, limit).map((item, index) => (
                 <React.Fragment key={index}>
-                  {isCardItem(item) ? (
-                    <Box
-                      bgcolor={getCardBackgroundColor(item.progress)}
-                      color="white"
-                      p={2}
-                      borderRadius={2}
-                      mb={1}
-                      minHeight="80px"
-                      display="flex"
-                      flexDirection="column"
-                      justifyContent="space-between"
-                    >
-                      <Typography
-                        variant="body1"
-                        fontWeight="bold"
-                        color="textPrimary"
+                  {item.type === "report" ? (
+                    <Box key={index} display="flex" width="100%">
+                      <Box
+                        bgcolor="#FDCF76"
+                        color="white"
+                        p={2}
+                        borderRadius={2}
+                        mb={1}
+                        minHeight="80px"
+                        maxWidth="70%"
+                        display="flex"
+                        flexDirection="column"
+                        justifyContent="space-between"
                       >
-                        Report
-                      </Typography>
-                      <Typography variant="body2">
-                        {item.description}
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        {formatDateTime(item.timestamp)}
-                      </Typography>
+                        <Typography
+                          variant="body1"
+                          fontWeight="bold"
+                          color="textPrimary"
+                        >
+                          {item["user-name"]}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          style={{
+                            maxWidth: "100%",
+                            wordBreak: "break-all",
+                            overflowWrap: "break-word",
+                            whiteSpace: "pre-wrap",
+                          }}
+                        >
+                          {item.content}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                          Report - {formatDateTime(item["created-at"])}
+                        </Typography>
+                      </Box>
                     </Box>
                   ) : (
                     <Box
                       key={index}
                       display="flex"
                       justifyContent={
-                        item.name === user?.["user-name"]
-                          ? "flex-end"
-                          : "flex-start"
+                        item["is-owner"] === true ? "flex-end" : "flex-start"
                       }
                       width="100%"
                     >
@@ -431,30 +376,26 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                         display="flex"
                         alignItems="center"
                         flexDirection={
-                          item.name === user?.["user-name"]
-                            ? "row-reverse"
-                            : "row"
+                          item["is-owner"] === true ? "row-reverse" : "row"
                         }
                         bgcolor={
-                          item.name === user?.["user-name"]
-                            ? "#e0f7fa"
-                            : "#f5f5f5"
+                          item["is-owner"] === true ? "#e0f7fa" : "#f5f5f5"
                         }
                         p={2}
                         borderRadius={2}
                         mb={1}
                         maxWidth="70%"
                       >
-                        <Avatar src={item.avatar} alt={item.name} />
+                        <Avatar src={item.avatar} alt={item["user-name"]} />
                         <Box
-                          ml={item.name === user?.["user-name"] ? 0 : 2}
-                          mr={item.name === user?.["user-name"] ? 2 : 0}
+                          ml={item["is-owner"] === true ? 0 : 2}
+                          mr={item["is-owner"] === true ? 2 : 0}
                         >
                           <Box
                             display="flex"
                             flexDirection="column"
                             alignItems={
-                              item.name === user?.["user-name"]
+                              item["is-owner"] === true
                                 ? "flex-end"
                                 : "flex-start"
                             }
@@ -464,21 +405,21 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                               fontWeight="bold"
                               color="textPrimary"
                             >
-                              {item.name}
+                              {item["user-name"]}
                             </Typography>
                             <Typography
                               variant="body1"
                               style={{
-                                maxWidth: '100%',
-                                wordBreak: 'break-all',
-                                overflowWrap: 'break-word',
-                                whiteSpace: 'pre-wrap',
+                                maxWidth: "100%",
+                                wordBreak: "break-all",
+                                overflowWrap: "break-word",
+                                whiteSpace: "pre-wrap",
                               }}
                             >
-                              {item.text}
+                              {item.content}
                             </Typography>
                             <Typography variant="caption" color="textSecondary">
-                              {formatDateTime(item.timestamp)}
+                              Comment - {formatDateTime(item["created-at"])}
                             </Typography>
                           </Box>
                         </Box>
@@ -487,6 +428,14 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
                   )}
                 </React.Fragment>
               ))}
+              <Button
+                onClick={handleLoadMore}
+                style={{
+                  display: data && data?.paging?.items <= limit ? "none" : "",
+                }}
+              >
+                Load More
+              </Button>
             </Stack>
           </ScrollArea>
         </Box>

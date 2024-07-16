@@ -78,6 +78,23 @@ export const MemberInProjectRes = z.object({
   data: z.array(MemberInProject),
 });
 
+export const DetailProject = z.object({
+  id: z.string(),
+  name: z.string(),
+  status:z.string(),
+  description:z.string(),
+  "est-start-time":z.string(),
+  "est-completion-time":z.string(),
+  "total-member":z.number(),
+  "total-task":z.number(),
+  "total-task-conpleted": z.number(),
+});
+
+export const DetailProjectRes = z.object({
+  status: z.number(),
+  data: DetailProject,
+});
+
 export type ProjectListResType = z.TypeOf<typeof ProjectListRes>;
 export type ProjectType = z.TypeOf<typeof ProjectSchema>;
 export type ProjectFilterType = z.TypeOf<typeof ProjectFilterSchema>;
@@ -90,3 +107,6 @@ export type UpdateProjectApiType = z.TypeOf<typeof UpdateProjectForApi>;
 
 export type MemberInProjectResType = z.TypeOf<typeof MemberInProjectRes>;
 export type MemberInProjectType = z.TypeOf<typeof MemberInProject>;
+
+export type DetailProjectResType = z.TypeOf<typeof DetailProjectRes>;
+export type DetailProjectType = z.TypeOf<typeof DetailProject>;

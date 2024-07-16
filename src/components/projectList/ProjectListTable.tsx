@@ -214,7 +214,6 @@ export default function ProjectListTable({
           <Table sx={{ minWidth: 700 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell align="center">#</StyledTableCell>
                 <StyledTableCell>Tên dự án</StyledTableCell>
                 <StyledTableCell align="center">
                   Ngày dự kiến bắt đầu
@@ -229,9 +228,6 @@ export default function ProjectListTable({
               {data?.data.map((row, index) => (
                 <Tooltip key={index} title="Ấn 2 lần để xem chi tiết" arrow>
                   <StyledTableRow onDoubleClick={() => handleDoubleClick(row)}>
-                    <StyledTableCell align="center" component="th" scope="row">
-                      {index + 1}
-                    </StyledTableCell>
                     <StyledTableCell align="left">{row.name}</StyledTableCell>
                     <StyledTableCell align="center">
                       {dayjs(row["est-start-time"]).format("DD/MM/YYYY")}

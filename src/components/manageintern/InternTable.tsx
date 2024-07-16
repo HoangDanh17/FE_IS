@@ -184,7 +184,6 @@ const InternTable = ({
           <Table sx={{ minWidth: 640 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell align="center">#</StyledTableCell>
                 <StyledTableCell>Hình ảnh</StyledTableCell>
                 <StyledTableCell>Họ và Tên</StyledTableCell>
                 <StyledTableCell>Email</StyledTableCell>
@@ -199,9 +198,6 @@ const InternTable = ({
                     key={index}
                     onDoubleClick={() => handleDoubleClick(account)}
                   >
-                    <StyledTableCell align="center" component="th" scope="row">
-                      {index + 1}
-                    </StyledTableCell>
                     <StyledTableCell>
                       <Avatar
                         //alt={`Avatar of ${row.internID}`}

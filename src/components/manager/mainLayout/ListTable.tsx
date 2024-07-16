@@ -158,12 +158,17 @@ export default function ListTable({
                 <StyledTableCell align="center" component="th" scope="row">
                   {index + 1}
                 </StyledTableCell>
-                <StyledTableCell align="left">{row.name}</StyledTableCell>
+                <StyledTableCell align="left" style={{
+                    maxWidth: "200px",
+                    wordBreak: "break-word",
+                    whiteSpace: "pre-wrap",
+                    overflowWrap: "break-word",
+                  }}>{row.name}</StyledTableCell>
                 <StyledTableCell align="center">
-                  {row["actual-effort"]}
+                  {row["actual-effort"]} giờ
                 </StyledTableCell>
                 <StyledTableCell align="center">
-                  {row["estimated-effort"]}
+                  {row["estimated-effort"]} giờ
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   <Chip

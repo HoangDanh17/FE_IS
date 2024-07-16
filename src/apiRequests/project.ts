@@ -2,6 +2,7 @@ import http from "@/lib/http";
 import {
   CreateProjectResType,
   CreateProjectType,
+  DetailProjectResType,
   MemberInProjectResType,
   ProjectFilterType,
   ProjectListResType,
@@ -11,10 +12,12 @@ import {
 const projectApiRequest = {
   getListPMInProject: (id: string) =>
     http.get<MemberInProjectResType>(`api/v1/projects/${id}/pm-in-project`),
+
   getListPMNotInProject: (id: string) =>
     http.get<MemberInProjectResType>(
       `/api/v1/projects/${id}/pm-outside-project`
     ),
+
   getListProject: (
     page: number,
     psize: number,
@@ -33,6 +36,10 @@ const projectApiRequest = {
           : ""
       }`
     ),
+
+  getDetailProject: (id: string|undefined) =>
+    http.get<DetailProjectResType>(`api/v1/projects/${id}/detail`),
+
   createProject: (body: CreateProjectType) =>
     http.post<CreateProjectResType>("/api/v1/projects", body),
 
@@ -41,6 +48,7 @@ const projectApiRequest = {
       `api/v1/projects/${id}/project-managers`,
       body
     ),
+
   updateProject: (body: UpdateProjectApiType) => {
     const { id, ...updateBody } = body;
     return http.put<CreateProjectResType>(

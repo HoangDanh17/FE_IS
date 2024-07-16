@@ -36,14 +36,14 @@ export interface RowData2 {
   university: string;
   "start-at": string;
   "end-at": string;
-  status:string;
+  status: string;
 }
 
 export interface RowData {
   id: string;
   semester: string;
   university: string;
-  status:string;
+  status: string;
 }
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -186,7 +186,6 @@ const TermTable = ({
     }
   };
 
-
   return (
     <div style={{ maxHeight: 762, width: "100%", marginTop: "10px" }}>
       <TableContainer component={Paper}>
@@ -205,7 +204,6 @@ const TermTable = ({
           <Table sx={{ minWidth: 640 }} aria-label="customized table">
             <TableHead>
               <TableRow>
-                <StyledTableCell>ID</StyledTableCell>
                 <StyledTableCell>Kỳ</StyledTableCell>
                 <StyledTableCell>Đại học</StyledTableCell>
                 <StyledTableCell>Ngày bắt đầu</StyledTableCell>
@@ -218,7 +216,6 @@ const TermTable = ({
             <TableBody>
               {data?.data.map((account, index) => (
                 <StyledTableRow key={index}>
-                  <StyledTableCell>{account.id}</StyledTableCell>
                   <StyledTableCell>{account.semester}</StyledTableCell>
                   <StyledTableCell>{account.university}</StyledTableCell>
                   <StyledTableCell>
@@ -227,13 +224,13 @@ const TermTable = ({
                   <StyledTableCell>
                     {dayjs(account["end-at"]).format("DD/MM/YYYY")}
                   </StyledTableCell>
-                  <StyledTableCell align="center" >
-                      <Chip
-                        size="small"
-                        label={getStatusLabel(account.status)}
-                        sx={getStatusChipColor(account.status)}
-                      ></Chip>
-                    </StyledTableCell>
+                  <StyledTableCell align="center">
+                    <Chip
+                      size="small"
+                      label={getStatusLabel(account.status)}
+                      sx={getStatusChipColor(account.status)}
+                    ></Chip>
+                  </StyledTableCell>
                   <StyledTableCell align="center">
                     <Button
                       style={{ marginRight: "10px" }}

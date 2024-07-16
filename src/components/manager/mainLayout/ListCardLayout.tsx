@@ -130,26 +130,6 @@ const ListCardLayout = () => {
                         height: "150px",
                       }}
                     >
-<<<<<<< HEAD
-                      <CardContent
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          textAlign: "center",
-                          height: "150px",
-                        }}
-                      >
-                        <Typography variant="h6">{project.name}</Typography>
-                        <Typography color="textSecondary">
-                          {dayjs(project["est-start-time"]).format("DD/MM/YYYY")}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-=======
                       <Typography variant="h6">{project.name}</Typography>
                       <Typography color="textSecondary">
                         {dayjs(project["est-start-time"]).format("DD/MM/YYYY")}
@@ -158,7 +138,6 @@ const ListCardLayout = () => {
                   </Card>
                 </Grid>
               ))}
->>>>>>> 1ec3dd2ce26246f53778f73d9d011ddbdfce81a2
           </Grid>
           {listProject?.data?.length && listProject.data.length > 12 && (
             <div className="flex justify-center">
