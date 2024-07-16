@@ -273,7 +273,6 @@ const TimeTable = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <StyledTableCell>#</StyledTableCell>
                     <StyledTableCell>Tên thực tập</StyledTableCell>
                     <StyledTableCell>Mã thực tập sinh</StyledTableCell>
                     <StyledTableCell>Trạng thái duyệt</StyledTableCell>
@@ -292,7 +291,6 @@ const TimeTable = () => {
                           key={intern.id}
                           onDoubleClick={() => handleDoubleClick(intern)}
                         >
-                          <StyledTableCell>{index + 1}</StyledTableCell>
                           <StyledTableCell>
                             {intern.intern_name}
                           </StyledTableCell>
