@@ -1,15 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import { styled } from '@mui/material/styles';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import { Table, TableBody, TableContainer, TableHead, TableRow, Paper, Avatar, TablePagination, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Chip } from '@mui/material';
-import MemberInfoModal from './MemberInfoModal';
-import { ProjectMemberListResType, ProjectMemberType } from '@/schemaValidations/projectMember/projectMember.schema';
+import React, { useState, useEffect } from "react";
+import Box from "@mui/material/Box";
+import { styled } from "@mui/material/styles";
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import {
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Avatar,
+  TablePagination,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+  Chip,
+} from "@mui/material";
+import MemberInfoModal from "./MemberInfoModal";
+import {
+  ProjectMemberListResType,
+  ProjectMemberType,
+} from "@/schemaValidations/projectMember/projectMember.schema";
 import "@/styles/accountManagement/DataTable.css";
 import projectMemberApiRequest from "@/apiRequests/projectMember/projectMember";
 import { toast } from "@/components/ui/use-toast";
 import { useAppContext } from "@/app/app-provider";
-import ButtonAdd from './Button';
+import ButtonAdd from "./Button";
 
 const StyledCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -51,7 +70,8 @@ function TableForPM({
   dataFilter: FormFilter | null;
   selectedProjectId: string | undefined;
 }) {
-  const [selectedMember, setSelectedMember] = useState<ProjectMemberType | null>(null);
+  const [selectedMember, setSelectedMember] =
+    useState<ProjectMemberType | null>(null);
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -62,27 +82,35 @@ function TableForPM({
   const [refreshKey, setRefreshKey] = React.useState(0);
   const triggerRefresh = () => {
     setRefreshKey((prevKey) => prevKey + 1);
-  }
+  };
 
-  const { project } = useAppContext()
+  const { project } = useAppContext();
   console.log(project);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   const fetchMembers = (projectId: string) => {
     setLoading(true);
-    projectMemberApiRequest.getMemberInProject(projectId, page + 1, rowsPerPage, isFilter ? dataFilter : {})
+    projectMemberApiRequest
+      .getMemberInProject(
+        projectId,
+        page + 1,
+        rowsPerPage,
+        isFilter ? dataFilter : {}
+      )
       .then(({ payload }) => {
         setMembers(payload);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Failed to fetch project members", error);
       })
       .finally(() => {
@@ -146,6 +174,28 @@ function TableForPM({
     setConfirmOpen(false);
   };
 
+  const getStatusChipColor = (status: string) => {
+    switch (status) {
+      case "in_progress":
+        return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
+      case "terminated":
+        return { backgroundColor: "#FFA07A", color: "white" }; // Màu cam pastel đậm hơn
+      default:
+        return { backgroundColor: "#D3D3D3", color: "white" }; // Màu xám
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "in_progress":
+        return "Đang hoạt động";
+      case "terminated":
+        return "Dừng hoạt động";
+      default:
+        return "Không xác định";
+    }
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       <TableContainer component={Paper}>
@@ -172,9 +222,15 @@ function TableForPM({
                     sx={{ width: 45, height: 45 }}
                   />
                 </CenteredAvatarCell>
-                <StyledCell>{member['user-name']}</StyledCell>
-                <StyledCell>{member['student-code']}</StyledCell>
-                <StyledCell><Chip label={member.status} color="success" /></StyledCell>
+                <StyledCell>{member["user-name"]}</StyledCell>
+                <StyledCell>{member["student-code"]}</StyledCell>
+                <StyledCell>
+                  <Chip
+                    size="small"
+                    label={getStatusLabel(member.status)}
+                    sx={getStatusChipColor(member.status)}
+                  ></Chip>
+                </StyledCell>
                 {/* <StyledCell>{member['ojt-semester-university']}</StyledCell>
                 <StyledCell>{member.technical_skills}</StyledCell> */}
 

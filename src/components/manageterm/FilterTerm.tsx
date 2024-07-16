@@ -21,7 +21,6 @@ import TermTable, { RowData } from "./TermTable";
 
 const Filter = () => {
   const [formData, setFormData] = useState<RowData>({
-    id: "",
     semester: "",
     university: "",
     status: "",
@@ -47,7 +46,6 @@ const Filter = () => {
 
   const handleReset = () => {
     setFormData({
-      id: "",
       semester: "",
       university: "",
       status: "",
@@ -73,16 +71,6 @@ const Filter = () => {
             <form onSubmit={handleSubmit}>
               <FormControl fullWidth>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={3}>
-                    <FormControl fullWidth>
-                      <Input
-                        name="id"
-                        placeholder="ID"
-                        value={formData.id}
-                        onChange={handleChange}
-                      />
-                    </FormControl>
-                  </Grid>
                   <Grid item xs={12} sm={3}>
                     <FormControl fullWidth>
                       <Input

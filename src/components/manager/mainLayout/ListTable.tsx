@@ -111,7 +111,7 @@ export default function ListTable({
         return { backgroundColor: "#FFB6C1", color: "white" }; // Màu hồng pastel đậm hơn
       case "inprogress":
         return { backgroundColor: "#87CEEB", color: "white" }; // Màu xanh dương pastel đậm hơn
-      case "done":
+      case "completed":
         return { backgroundColor: "#90EE90", color: "white" }; // Màu xanh lá pastel đậm hơn
       case "cancel":
         return { backgroundColor: "#FFA07A", color: "white" }; // Màu cam pastel đậm hơn
@@ -124,9 +124,9 @@ export default function ListTable({
     switch (status) {
       case "todo":
         return "Chưa bắt đầu";
-      case "inprogress":
+      case "in_progress":
         return "Đang thực hiện";
-      case "done":
+      case "completed":
         return "Hoàn thành";
       case "cancel":
         return "Hủy bỏ";
@@ -140,7 +140,6 @@ export default function ListTable({
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell align="center">#</StyledTableCell>
             <StyledTableCell>Tên công việc</StyledTableCell>
             <StyledTableCell align="center">Thời gian (act)</StyledTableCell>
             <StyledTableCell align="center">Thời gian (est)</StyledTableCell>
@@ -155,9 +154,6 @@ export default function ListTable({
           {data?.data.map((row, index) => (
             <Tooltip key={index} title="Ấn 2 lần để xem chi tiết" arrow>
               <StyledTableRow onDoubleClick={() => handleDoubleClick(row)}>
-                <StyledTableCell align="center" component="th" scope="row">
-                  {index + 1}
-                </StyledTableCell>
                 <StyledTableCell align="left" style={{
                     maxWidth: "200px",
                     wordBreak: "break-word",

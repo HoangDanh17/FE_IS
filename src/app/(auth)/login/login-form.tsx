@@ -69,6 +69,7 @@ const LoginForm = () => {
           }
         );
         const data = await result.json();
+        localStorage.setItem("sessionToken", data.data.token);
         if (data.data.account_info.role === "admin") {
           await authApiRequest.auth({
             sessionToken: data.data.token,
@@ -199,14 +200,21 @@ const LoginForm = () => {
           >
             <Card
               elevation={9}
-              sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "600px",backgroundColor:"inherit",color:"white" }}
+              sx={{
+                p: 4,
+                zIndex: 1,
+                width: "100%",
+                maxWidth: "600px",
+                backgroundColor: "inherit",
+                color: "white",
+              }}
             >
               <Typography
                 variant="h5"
                 textAlign="center"
                 color="textSecondary"
                 mb={1}
-                style={{color:"white"}}
+                style={{ color: "white" }}
               >
                 NEXTBEAN CENTER
               </Typography>

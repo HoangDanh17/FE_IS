@@ -6,12 +6,7 @@ import {
   Card,
   CardContent,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Chip,
-  CardHeader,
   Tooltip,
 } from "@mui/material";
 import {
@@ -20,12 +15,15 @@ import {
   DownloadOutlined,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
-import termApiRequest from "@/apiRequests/term";
-import { TermListResType } from "@/schemaValidations/term.schema";
+import dashboardApiRequest from "@/apiRequests/dashboard";
+import {
+  dashboardListResType,
+  dashboardListTotalResType,
+} from "@/schemaValidations/dashboard.schema";
 
 const Dashboard = () => {
-  const [listTerm, setListTerm] = useState<TermListResType>();
-
+  const [listTerm, setListTerm] = useState<dashboardListResType>();
+  const [total, setTotal] = useState<dashboardListTotalResType>();
   const handleExport = async (id: string | number, name: string) => {
     try {
       const response = await fetch(
@@ -76,13 +74,13 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    termApiRequest.getTerm().then((res) => {
+    dashboardApiRequest.getOjt().then((res) => {
       setListTerm(res.payload);
     });
+    dashboardApiRequest.getTotal().then((res) => {
+      setTotal(res.payload);
+    });
   }, []);
-
-  const totalProjects = 25;
-  const currentInterns = 10;
 
   const getStatusChipColor = (status: string) => {
     switch (status) {
@@ -113,11 +111,11 @@ const Dashboard = () => {
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
     const truncated = text.substr(0, maxLength);
-    const lastSpaceIndex = truncated.lastIndexOf(' ');
+    const lastSpaceIndex = truncated.lastIndexOf(" ");
     if (lastSpaceIndex > 0) {
-      return truncated.substr(0, lastSpaceIndex) + '...';
+      return truncated.substr(0, lastSpaceIndex) + "...";
     }
-    return truncated + '...';
+    return truncated + "...";
   };
 
   return (
@@ -145,7 +143,7 @@ const Dashboard = () => {
                     TỔNG SỐ DỰ ÁN
                   </Typography>
                   <Typography variant="h2" component="div">
-                    {totalProjects}
+                    {total?.data["total-project-in-progress"]}
                   </Typography>
                 </Box>
               </CardContent>
@@ -172,7 +170,7 @@ const Dashboard = () => {
                     TỔNG THỰC TẬP HIỆN TẠI
                   </Typography>
                   <Typography variant="h2" component="div">
-                    {currentInterns}
+                    {total?.data["total-intern-in-progress"]}
                   </Typography>
                 </Box>
               </CardContent>
@@ -203,7 +201,9 @@ const Dashboard = () => {
                       >
                         <strong>Đại học:</strong>{" "}
                         <Tooltip title={term.university} arrow>
-                          <span style={{cursor:"pointer"}}>{truncateText(term.university, 30)}</span>
+                          <span style={{ cursor: "pointer" }}>
+                            {truncateText(term.university, 30)}
+                          </span>
                         </Tooltip>
                       </Typography>
                       <Typography
@@ -219,7 +219,7 @@ const Dashboard = () => {
                         ></Chip>
                       </Typography>
                       <Typography variant="body1" color="text.secondary">
-                        <strong>Tổng thực tập:</strong> {term.id}
+                        <strong>Tổng thực tập:</strong> {term["total-intern"]}
                       </Typography>
                     </Grid>
                     <Grid

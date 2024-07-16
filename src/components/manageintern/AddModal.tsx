@@ -188,13 +188,6 @@ const AddModal: React.FC<AddModalProps> = ({ onClose, id }) => {
     });
   };
 
-  const handleOjtIdChange = (e: SelectChangeEvent<number>) => {
-    const value = e.target.value as number;
-    setFormData({
-      ...formData,
-      "ojt-id": value,
-    });
-  };
 
   async function handleAdd() {
     let valid = true;

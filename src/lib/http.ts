@@ -71,6 +71,7 @@ const request = async <Response>(
   if (isClient()) {
     const sessionToken = localStorage.getItem("sessionToken");
     if (sessionToken) {
+      console.log("123456");
       baseHeaders.Authorization = `Bearer ${sessionToken}`;
     }
   }
@@ -159,10 +160,8 @@ const request = async <Response>(
     ) {
       const { token } = (payload as LoginResType).data;
       localStorage.setItem("sessionToken", token);
-      // localStorage.setItem("sessionTokenExpiresAt", expiresAt);
     } else if ("auth/logout" === normalizePath(url)) {
       localStorage.removeItem("sessionToken");
-      localStorage.removeItem("sessionTokenExpiresAt");
     }
   }
 

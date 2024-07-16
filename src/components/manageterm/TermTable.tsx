@@ -29,6 +29,7 @@ import termApiRequest from "@/apiRequests/term";
 import { TermListResType } from "@/schemaValidations/term.schema";
 import dayjs from "dayjs";
 import { toast } from "../ui/use-toast";
+import { DownloadOutlined } from "@mui/icons-material";
 
 export interface RowData2 {
   id: string;
@@ -40,7 +41,6 @@ export interface RowData2 {
 }
 
 export interface RowData {
-  id: string;
   semester: string;
   university: string;
   status: string;
@@ -139,6 +139,55 @@ const TermTable = ({
     setOpenAddModal(false);
     setOpenEditModal(false);
     setOpenDeleteModal(false);
+  };
+
+  const handleExport = async (id: string | number, name: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/v1/reports/${id}/project-intern`,
+        {
+          method: "GET",
+          headers: {
+            Accept:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      // Get filename from header Content-Disposition if present
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = `${name}.xlsx`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+        if (filenameMatch?.length === 2) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Convert response to blob
+      const blob = await response.blob();
+
+      // Create a URL object from blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary anchor tag for download
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = filename;
+
+      // Append anchor tag to body, trigger click, then remove it
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("There was a problem with the fetch operation:", error);
+    }
   };
 
   useEffect(() => {
@@ -250,6 +299,15 @@ const TermTable = ({
                       onClick={() => handleOpenDeleteModal(account)}
                     >
                       Xóa
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      className="bg-emerald-600 text-white hover:bg-emerald-800 ml-2"
+                      startIcon={<DownloadOutlined />}
+                      onClick={() => handleExport(account.id, account.semester)}
+                    >
+                      Xuất excel
                     </Button>
                   </StyledTableCell>
                 </StyledTableRow>

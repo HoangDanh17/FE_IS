@@ -29,8 +29,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import commentApiRequest from "@/apiRequests/comment";
 import { CommentListResType } from "@/schemaValidations/comment.schema";
 import { toast } from "@/components/ui/use-toast";
+import { Task } from "@/components/projectManager/ListTable";
+import { ListTaskType } from "@/schemaValidations/listTask/listTask.schema";
 
-const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
+const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType |ListTaskType }) => {
   const [comment, setComment] = useState("");
 
   const [selectedType, setSelectedType] = useState<string>("all");
@@ -94,9 +96,9 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
     switch (status) {
       case "todo":
         return { backgroundColor: "#FFB6C1", color: "white" };
-      case "inprogress":
+      case "in_progress":
         return { backgroundColor: "#87CEEB", color: "white" };
-      case "done":
+      case "completed":
         return { backgroundColor: "#90EE90", color: "white" };
       case "cancel":
         return { backgroundColor: "#FFA07A", color: "white" };
@@ -109,9 +111,9 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
     switch (status) {
       case "todo":
         return "Chưa bắt đầu";
-      case "inprogress":
+      case "in_progress":
         return "Đang thực hiện";
-      case "done":
+      case "completed":
         return "Hoàn thành";
       case "cancel":
         return "Hủy bỏ";
@@ -156,7 +158,7 @@ const DetailTaskModal = ({ selectedRow }: { selectedRow: TaskType }) => {
     <Box display="flex" flexDirection="row" flex={1}>
       <Box flex={25} mr={2} maxHeight="500px">
         <Typography variant="h6" color="primary">
-          Thông tin người được phân công
+          Thông tin công việc
         </Typography>
         <Box mb={2}>
           <Stack spacing={2} className="mt-6">
