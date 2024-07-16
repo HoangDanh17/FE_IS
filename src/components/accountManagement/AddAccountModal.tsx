@@ -35,8 +35,6 @@ const AddModalAccount: React.FC<AddModalProps> = ({ onClose }) => {
         if (loading) return;
         setLoading(true);
         e.preventDefault();
-
-
         try {
             const result = await accountApiRequest.createAccount(formData);
             toast({

@@ -1,14 +1,17 @@
 'use client'
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import {
-    Modal, Box, Grid, Table, TableBody, TableCell, TableContainer, Input, Radio, Tooltip,
-    TableHead, TableRow, Paper, Typography, Button, CircularProgress, AvatarGroup, Avatar
+    Modal, Box, Grid, Table, TableBody, TableCell, TableContainer, Input, Radio, Tooltip, InputLabel,
+    TableHead, TableRow, Paper, Typography, Button, CircularProgress, AvatarGroup, Avatar, FormControl, MenuItem
 } from '@mui/material';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+
 import { Search } from '@mui/icons-material';
 import { ScrollArea } from "@/components/ui/scroll-area"
 import projectMemberApiRequest from '@/apiRequests/projectMember/projectMember';
 import { MemberNotInProListResType } from '@/schemaValidations/projectMember/projectMember.schema';
 import { toast } from "@/components/ui/use-toast";
+import termApiRequest from '@/apiRequests/term';
 
 type Member = {
     id: string,
@@ -25,6 +28,12 @@ export interface FormFilterData {
     semester: string,
     university: string,
 }
+
+type School = {
+    id: string | number;
+    university: string;
+    semester: string;
+};
 
 function AddMemberModal({
     open,
@@ -70,12 +79,29 @@ function AddMemberModal({
     console.log("Thành viên: ", member)
 
     // Filter
+    const [school, setSchool] = useState<School[]>([]);
+
     const [formData, setFormData] = useState<FormFilterData>({
         "user-name": "",
         "student-code": "",
         semester: "",
         university: ""
     });
+
+    // Get list School when select
+    useEffect(() => {
+        termApiRequest.getTerm()
+            .then(({ payload }) => {
+                setSchool(payload.data);
+            })
+            .catch(error => {
+                console.error("Failed to fetch projects", error);
+            });
+    }, []);
+
+    const handleSemesterChange = (e: SelectChangeEvent<string>) => {
+        setFormData({ ...formData, semester: e.target.value });
+    }
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -106,16 +132,6 @@ function AddMemberModal({
     const handleSelectMember = (selectedMember: Member) => {
         setSelectedMembers([selectedMember]);
     };
-
-    // const handleSelectMember = (member: Member) => {
-    //     setSelectedMembers((prevSelected) => {
-    //         if (prevSelected.find((m) => m.id === member.id)) {
-    //             return prevSelected.filter((m) => m.id !== member.id);
-    //         } else {
-    //             return [...prevSelected, member];
-    //         }
-    //     });
-    // };
 
     // Handle cancel add member
     const resetAndClose = () => {
@@ -190,22 +206,31 @@ function AddMemberModal({
 
                                 <Grid item xs={3}>
                                     <Input
-                                        name='semester'
-                                        placeholder="Kỳ OJT"
-                                        value={formData.semester}
-                                        onChange={handleChange}
-                                        fullWidth
-                                    />
-                                </Grid>
-
-                                <Grid item xs={3}>
-                                    <Input
                                         name='university'
                                         placeholder="Trường Đại học"
                                         value={formData.university}
                                         onChange={handleChange}
                                         fullWidth
                                     />
+                                </Grid>
+
+                                <Grid item xs={3}>
+                                    <FormControl variant="outlined" fullWidth>
+                                        <InputLabel id="ojt-label" sx={{ fontSize: 14 }}>Kỳ OJT</InputLabel>
+                                        <Select
+                                            labelId="ojt-label"
+                                            label="Kỳ OJT"
+                                            value={formData.semester}
+                                            onChange={handleSemesterChange}
+                                        >
+                                            {school.map((semester) => (
+                                                <MenuItem key={semester.id} value={semester.semester}>
+                                                    {semester.semester}
+                                                </MenuItem>
+
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                 </Grid>
 
                                 <Grid item xs={3}>
@@ -334,7 +359,6 @@ function AddMemberModal({
                         >
                             Thêm
                         </Button>
-
                     </Grid>
                 </Grid>
             </Box>

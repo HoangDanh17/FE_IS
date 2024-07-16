@@ -48,9 +48,10 @@ const EditModalAccount: React.FC<EditModalAccountProps> = ({ onClose, row }) => 
             onClose();
 
         } catch (error: any) {
+            const errorRes = { error };
             toast({
-                title: `${error.message}`,
-                duration: 2000,
+                title: `${errorRes.error.payload.message[0]['err-message']}`,
+                duration: 4000,
                 variant: "destructive",
             });
         } finally {

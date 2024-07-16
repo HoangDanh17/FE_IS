@@ -90,8 +90,10 @@ const DetailTimeTable = ({
       });
       handleCloseCard();
     } catch (error: any) {
+      const errorRes = { error };
+      console.log("time: ", errorRes)
       toast({
-        title: `${error}`,
+        title: `${errorRes.error.payload.message}`,
         duration: 2000,
         variant: "destructive",
       });
@@ -219,8 +221,8 @@ const DetailTimeTable = ({
             {loading
               ? "..."
               : row["status-attendance"] === "absent"
-              ? "Gỡ vắng"
-              : "Vắng mặt"}
+                ? "Gỡ vắng"
+                : "Vắng mặt"}
           </Button>
         </Box>
       )}

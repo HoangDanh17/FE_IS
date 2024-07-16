@@ -29,7 +29,6 @@ const FilterProjectMember: React.FC<FilterProjectMemberProps> = ({ selectedProje
         university: "",
     });
 
-
     // Get list School when select
     useEffect(() => {
         termApiRequest.getTerm()
