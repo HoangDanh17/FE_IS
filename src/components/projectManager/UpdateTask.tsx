@@ -105,7 +105,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
   }
 
   return (
-    <Box className="modal-edit-box">
+    <Box className="modal-add-box">
       <Typography id="modal-modal-title" variant="h6" component="h2">
         Cập nhật Task
       </Typography>

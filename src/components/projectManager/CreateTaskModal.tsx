@@ -16,6 +16,7 @@ import { toast } from "@/components/ui/use-toast";
 import listTaskApiRequest from "@/apiRequests/listTask/listTask";
 import { CreateTaskType } from "@/schemaValidations/listTask/listTask.schema";
 import { useAppContext } from "@/app/app-provider";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AddModalProps {
   onClose: () => void;
