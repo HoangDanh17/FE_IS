@@ -58,7 +58,7 @@ export const UpdateTask = z.object({
   name: z.string(),
   description: z.string(),
   "estimated-effort": z.number(),
-  "is-approved": z.boolean(),
+  "is-approved": z.union([z.string(), z.boolean(),z.undefined()]),
 });
 
 export type ListTaskAllResType = z.TypeOf<typeof ListTaskResAll>;

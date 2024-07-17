@@ -13,10 +13,7 @@ import {
 } from "@mui/material";
 import { toast } from "@/components/ui/use-toast";
 import "@/styles/accountManagement/ModalBox.css";
-import {
-  ListTaskType,
-  UpdateTaskType,
-} from "@/schemaValidations/listTask/listTask.schema";
+import { UpdateTaskType } from "@/schemaValidations/listTask/listTask.schema";
 import listTaskApiRequest from "@/apiRequests/listTask/listTask";
 import { Task } from "./ListTable";
 import { Member } from "./CreateTaskModal";
@@ -35,7 +32,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
     "assigned-to": task?.["assigned-to"] ?? "",
     description: task?.description ?? "",
     "estimated-effort": task?.["estimated-effort"] ?? 1,
-    "is-approved": task ? task["is-approved"] === "true" : false,
+    "is-approved": task?.["is-approved"] ?? "",
     name: task?.name ?? "",
     taskId: task?.id ?? "",
   });
@@ -66,22 +63,28 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
   };
 
   const handleSelectApprove = (e: SelectChangeEvent<string>) => {
-    setFormData({ ...formData, "is-approved": e.target.value === "true" });
+    setFormData({ ...formData, "is-approved": e.target.value });
   };
 
   async function handleSubmit(e: FormEvent) {
     if (loading) return;
     setLoading(true);
     e.preventDefault();
+
     if (formData["estimated-effort"] < 1) {
       setEstimatedEffortError(true);
+      setLoading(false); // Ensure loading state is reset
       return;
     }
+
     setEstimatedEffortError(false);
+
     const submittedData = {
       ...formData,
       "estimated-effort": Number(formData["estimated-effort"]),
+      "is-approved": formData["is-approved"] === "approved" ? true : false,
     };
+
     try {
       const result = await listTaskApiRequest.updateTask(
         project?.id,
@@ -174,11 +177,15 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
                   name="is-approved"
                   labelId="is-approved-label"
                   label="Xác nhận"
-                  value={formData["is-approved"] ? "true" : "false"}
+                  value={
+                    formData["is-approved"] === "approved"
+                      ? "approved"
+                      : "waiting"
+                  }
                   onChange={handleSelectApprove}
                 >
-                  <MenuItem value="true">Approve</MenuItem>
-                  <MenuItem value="false">Not approve</MenuItem>
+                  <MenuItem value="approved">Approve</MenuItem>
+                  <MenuItem value="waiting">Not approve</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -197,21 +204,21 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ onClose, task }) => {
               </FormControl>
             </Grid>
             {/* <Grid item xs={12}>
-                            <FormControl variant="standard" fullWidth>
-                                <InputLabel id="status-label">Status</InputLabel>
-                                <Select
-                                    name="status"
-                                    labelId="status-label"
-                                    value={formData.status}
-                                    onChange={handleSelectChange}
-                                    required
-                                >
-                                    <MenuItem value={"pending"}>Pending</MenuItem>
-                                    <MenuItem value={"in-progress"}>In Progress</MenuItem>
-                                    <MenuItem value={"completed"}>Completed</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid> */}
+              <FormControl variant="standard" fullWidth>
+                <InputLabel id="status-label">Status</InputLabel>
+                <Select
+                  name="status"
+                  labelId="status-label"
+                  value={formData.status}
+                  onChange={handleSelectChange}
+                  required
+                >
+                  <MenuItem value={"pending"}>Pending</MenuItem>
+                  <MenuItem value={"in-progress"}>In Progress</MenuItem>
+                  <MenuItem value={"completed"}>Completed</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid> */}
           </Grid>
 
           <Box display="flex" justifyContent="flex-end">
