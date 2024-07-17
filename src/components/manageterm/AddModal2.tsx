@@ -183,7 +183,8 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
             <Grid item xs={6}>
               <FormControl fullWidth error={!!errors["start-at"]}>
                 <DatePicker
-                  label="Start Date"
+                  label="Ngày bắt đầu"
+                  format="DD/MM/YYYY"
                   value={
                     formData["start-at"] ? dayjs(formData["start-at"]) : null
                   }
@@ -205,7 +206,8 @@ const AddModal: React.FC<AddModalProps> = ({ onClose }) => {
             <Grid item xs={6}>
               <FormControl fullWidth error={!!errors["end-at"]}>
                 <DatePicker
-                  label="End Date"
+                  label="Ngày kết thúc"
+                  format="DD/MM/YYYY"
                   value={formData["end-at"] ? dayjs(formData["end-at"]) : null}
                   onChange={(date) => handleDateChange("end-at", date)}
                   slotProps={{
