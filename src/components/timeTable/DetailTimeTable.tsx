@@ -24,13 +24,13 @@ const DetailTimeTable = ({
             - Đang chờ
           </Typography>
         );
-      case "absent":
+      case "authen-by-ip":
         return (
           <Typography
             variant="body2"
-            style={{ color: "#FA896B", fontWeight: "bold" }} // Pastel cam
+            style={{ color: "#EEC759", fontWeight: "bold" }} // Pastel cam
           >
-            - Vắng mặt
+            - Điểm danh tại văn phòng
           </Typography>
         );
       case "admin-check":
@@ -76,7 +76,7 @@ const DetailTimeTable = ({
   };
 
   const [loading, setLoading] = useState(false);
-
+  const [err, setErr] = useState();
   async function handleSubmit(id: string, newStatus: string) {
     setLoading(true);
 
@@ -91,12 +91,16 @@ const DetailTimeTable = ({
       handleCloseCard();
     } catch (error: any) {
       const errorRes = { error };
-      console.log("time: ", errorRes)
-      toast({
-        title: `${errorRes.error.payload.message}`,
-        duration: 2000,
-        variant: "destructive",
-      });
+      setErr(errorRes.error.payload.message);
+      const errorMessage = errorRes.error.payload.message;
+      const splitMessage = errorMessage.split(":");
+
+      if (splitMessage.length > 1) {
+        const trimmedMessage = splitMessage[1].trim();
+        setErr(trimmedMessage);
+      } else {
+        setErr(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -115,11 +119,17 @@ const DetailTimeTable = ({
       });
       handleCloseCard();
     } catch (error: any) {
-      toast({
-        title: `${error}`,
-        duration: 2000,
-        variant: "destructive",
-      });
+      const errorRes = { error };
+      setErr(errorRes.error.payload.message);
+      const errorMessage = errorRes.error.payload.message;
+      const splitMessage = errorMessage.split(":");
+
+      if (splitMessage.length > 1) {
+        const trimmedMessage = splitMessage[1].trim();
+        setErr(trimmedMessage);
+      } else {
+        setErr(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -205,6 +215,9 @@ const DetailTimeTable = ({
           </Grid>
         </Grid>
       </Grid>
+      <Box display="flex" justifyContent="flex-end" mt={2}>
+        {err && <Typography color="red">{err}</Typography>}
+      </Box>
       {row["status-attendance"] !== "present" && (
         <Box display="flex" justifyContent="flex-end" mt={2}>
           <Button
@@ -221,8 +234,8 @@ const DetailTimeTable = ({
             {loading
               ? "..."
               : row["status-attendance"] === "absent"
-                ? "Gỡ vắng"
-                : "Vắng mặt"}
+              ? "Gỡ vắng"
+              : "Vắng mặt"}
           </Button>
         </Box>
       )}
