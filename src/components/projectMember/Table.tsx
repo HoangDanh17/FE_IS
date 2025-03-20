@@ -68,7 +68,7 @@ function TableProjectMember({
 }: {
   isFilter: boolean;
   dataFilter: FormFilter | null;
-  selectedProjectId: string | undefined;
+  selectedProjectId?: string | undefined;
 }) {
   const [selectedMember, setSelectedMember] =
     useState<ProjectMemberType | null>(null);
