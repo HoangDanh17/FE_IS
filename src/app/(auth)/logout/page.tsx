@@ -7,7 +7,7 @@ import { Suspense, useEffect } from "react";
 function LogoutLogic() {
   const router = useRouter();
   const pathname = usePathname();
-  const { setUser,setProject } = useAppContext();
+  const { setUser, setProject } = useAppContext();
 
   const searchParams = useSearchParams();
   const sessionToken = searchParams.get("sessionToken");
@@ -25,7 +25,6 @@ function LogoutLogic() {
     }
     return () => {
       controller.abort();
-      
     };
   }, [sessionToken, router, pathname, setUser]);
   return <div>page</div>;

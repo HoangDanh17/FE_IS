@@ -19,7 +19,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { handleErrorApi } from "@/lib/utils";
 import authApiRequest from "@/apiRequests/auth";
-import CustomSnackbar from "@/components/ui/snackbar";
 
 const RegisterForm = () => {
   const router = useRouter();
@@ -42,10 +41,7 @@ const RegisterForm = () => {
       await authApiRequest.auth({
         sessionToken: result.payload.data.token,
       });
-      CustomSnackbar({
-        description: result.payload.message,
-        type: "success",
-      });
+     
       //   setUser(result.payload.data.account);
 
       router.push("/me");

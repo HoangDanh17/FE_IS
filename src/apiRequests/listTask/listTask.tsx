@@ -22,7 +22,7 @@ const listTaskApiRequest = {
             `
         ),
 
-    getMemberInProject: (id: string | undefined) =>
+    getMemberInProject: (id: string | undefined) => 
         http.get<ProjectMemberListResType>(
             `/api/v1/projects/${id}/member-in-project`
         ),
